@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Start
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="/static/trip_form.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<form action="/trip" method="POST">
+    <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Trip code</label>
+
+    <div id="trip_code" class="inputs d-flex flex-row justify-content-center mt-3">
+        <input class="me-2 text-center form-control rounded" type="text" id="first" name="first" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" id="second" name="second" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" id="third" name="third" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" id="fourth" name="fourth" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" id="fifth" name="fifth" maxlength="1" />
+        <input class="ms-2 text-center form-control rounded" type="text" id="sixth" name="sixth" maxlength="1" />
+    </div>
+
+    <button type="submit" class="d-grid gap-2 col-6 mt-3 mx-auto btn btn-primary">Continue</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            function OTPInput() {
+                const inputs = document.querySelectorAll('#trip_code > *[id]');
+                for (let i = 0; i < inputs.length; i++) {
+                    inputs[i].addEventListener('keydown', function (event) {
+                        if (event.key === "Backspace") {
+                            inputs[i].value = '';
+                            if (i !== 0) inputs[i - 1].focus();
+                        }
+                        else {
+                            if (i === inputs.length - 1 && inputs[i].value !== '') {
+                                return true;
+                            }
+                            else if (event.keyCode > 47 && event.keyCode < 58) {
+                                inputs[i].value = event.key;
+                                if (i !== inputs.length - 1) inputs[i + 1].focus();
+                                event.preventDefault();
+                            }
+                            else if (event.keyCode > 64 && event.keyCode < 91) {
+                                inputs[i].value = String.fromCharCode(event.keyCode);
+                                if (i !== inputs.length - 1) inputs[i + 1].focus();
+                                event.preventDefault();
+                            }
+                        }
+                    });
+                }
+            } OTPInput();
+        });
+    </script>
+</form>
+{% endblock %}

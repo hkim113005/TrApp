@@ -1,0 +1,21 @@
+.inputs input {
+    width: 40px;
+    height: 40px
+}
+
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0
+}
+
+.btn-primary {
+    width: 320px !important;
+    border-color: #014C43 !important; 
+    background-color: #014C43 !important;
+}
+
+.form-label {
+    width: 320px !important;
+}
