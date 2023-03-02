@@ -19,3 +19,15 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .form-label {
     width: 320px !important;
 }
+
+.form-select {
+    width: 320px !important;
+}
+
+#email {
+    width: 320px !important;
+}
+
+#password {
+    width: 320px !important;
+}

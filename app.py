@@ -58,9 +58,9 @@ def start():
     return render_template("start.html")
 
 @app.route("/trip", methods=["GET", "POST"])
-def trip():
+def trip_code_form():
     if request.method == "GET":
-        return render_template("trip_form.html")
+        return render_template("trip_code_form.html")
     else:
         first = request.form["first"]
         second = request.form["second"]
@@ -69,8 +69,17 @@ def trip():
         fifth = request.form["fifth"]
         sixth = request.form["sixth"]
 
-        return first + second + third + fourth + fifth + sixth
+        return redirect("/" + first + second + third + fourth + fifth + sixth)
+    
+@app.route("/<trip_id>", methods=["GET", "POST"])
+def student_preference_form(trip_id):
+    if request.method == "GET":
+        return render_template("student_preference_form.html")
 
+@app.route("/teacher-login", methods=["GET", "POST"])
+def teacher_login_form():
+    if request.method == "GET":
+        return render_template("teacher_login_form.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3000")
