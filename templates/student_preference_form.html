@@ -5,12 +5,11 @@ Start
 {% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" type="text/css" href="/static/form.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {% endblock %}
 
 {% block main %}
-<form action="/trip" method="POST">
+<form action="/{{trip_id}}}}" method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
     <select class="mt-3 mx-auto form-select" aria-label=".form-select-sm example">

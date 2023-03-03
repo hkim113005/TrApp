@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Success
+{% endblock %}
+
+{% block stylesheets %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="myFunction()"
+    placeholder="Search for names...">
+<table class="table table-sm table-hover mt-5 mx-auto">
+    <thead>
+        <tr>
+            <th scope="col">Trip</th>
+            <th scope="col">Organizer</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        <tr onclick="window.location='trips/1'">
+            <td>Viper Venture 2023: Thailand</td>
+            <td>MS</td>
+            <td>0/82</td>
+        </tr>
+        <tr onclick="window.location='trips/1'">
+            <td>Viper Venture 2023: Nepal</td>
+            <td>HS</td>
+            <td>42/64</td>
+        </tr>
+        <tr class="completed" onclick="window.location='trips/1'">
+            <td>Varsity Soccer</td>
+            <td>HS</td>
+            <td>16/16</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    function myFunction() {
+        // Declare variables
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("students_table");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

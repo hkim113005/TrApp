@@ -1,16 +1,15 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Start
+Teacher Login
 {% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" type="text/css" href="/static/form.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {% endblock %}
 
 {% block main %}
-<form action="/trip" method="POST">
+<form action="/teacher-login" method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Login</label>
 
     <input type="text" class="mt-3 mx-auto form-control" id="email" placeholder="Email">

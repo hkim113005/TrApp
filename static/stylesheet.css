@@ -1,0 +1,62 @@
+.inputs input {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0
+}
+
+.btn-primary {
+    width: 320px !important;
+    border-color: #014C43 !important;
+    background-color: #014C43 !important;
+}
+
+.form-label {
+    width: 320px !important;
+}
+
+.form-select {
+    width: 320px !important;
+}
+
+.form-control {
+    width: 320px !important;
+}
+
+.table {
+    width: 320px !important;
+}
+
+label {
+    color: #014C43;
+    font-weight: bold;
+    font-size: large;
+}
+
+thead {
+    color: #014C43;
+}
+
+.modal-dialog {
+    width: 360px !important;
+}
+
+.modal-header {
+    border-bottom: 0 none !important;
+}
+
+.selected {
+    background-color: #014c4350 !important;
+    border-color: #014c4350;
+}
+
+.completed {
+    color: #014C43 !important;
+    font-weight: bolder;
+}

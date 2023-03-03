@@ -74,12 +74,27 @@ def trip_code_form():
 @app.route("/<trip_id>", methods=["GET", "POST"])
 def student_preference_form(trip_id):
     if request.method == "GET":
-        return render_template("student_preference_form.html")
+        return render_template("student_preference_form.html", trip_id=trip_id)
+    else:
+        return render_template("success.html", trip_id=trip_id)
 
 @app.route("/teacher-login", methods=["GET", "POST"])
 def teacher_login_form():
     if request.method == "GET":
         return render_template("teacher_login_form.html")
+    else:
+        return redirect("/trips")
+    
+@app.route("/trips", methods=["GET", "POST"])
+def trips():
+    if request.method == "GET":
+        return render_template("trips.html")
+
+@app.route("/trips/<trip_id>", methods=["GET", "POST"])
+def trip(trip_id):
+    if request.method == "GET":
+        return render_template("trip.html")
+    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3000")
