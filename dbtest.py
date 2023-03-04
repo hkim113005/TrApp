@@ -3,7 +3,7 @@ from classes import Student, Trip
 import csv
 
 
-conn = sqlite3.connect("trApp.db")
+conn = sqlite3.connect("data/TrApp.db")
 c = conn.cursor()
 
 tables = c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
@@ -11,7 +11,7 @@ tables = [x[0] for x in tables]
 
 if "students" not in tables:
     c.execute("CREATE TABLE students (id INTEGER, name TEXT, email TEXT, grade INTEGER, gender TEXT, PRIMARY KEY(id))")
-    file = open("TrApp Student Database - All.csv", "r")
+    file = open("data/students.csv", "r")
     data = list(csv.DictReader(file, delimiter=","))
     file.close()
     students = [Student(s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
@@ -116,6 +116,7 @@ trips = [
     }
 ]
 
+# This part doesn't work
 for t in trips:
     c.execute("INSERT INTO trips (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)", (t['id'], t['name'], t['type'], t['num_rooms'], t['students_per_room'], t['preferences']))
     for id in t['students']:

@@ -1,3 +1,5 @@
-import verify_email as vf
+import pandas as pd
 
-print(vf.verify_email("hyungjae1130@gmail.com"))
+valid_emails = pd.read_csv("data/acs_emails.csv", usecols=["email"], dtype=str)
+emails = pd.read_csv("data/T")
+print(emails)
