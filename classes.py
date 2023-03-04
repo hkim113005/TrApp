@@ -2,17 +2,21 @@ import uuid
 
 class Student:
     student_count = 0
-    def __init__(self, name, gender, grade, preferences):
+    def __init__(self, name, email, grade, gender, preferences):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
-        self.name = name
+        self.name = str(name)
         self.id = (Student.student_count + 1)
-        self.gender = gender
-        self.grade = grade
-        self.preferences = preferences
+        self.email = str(email)
+        self.gender = str(gender)
+        self.grade = int(grade)
+        self.preferences = str(preferences)
         Student.student_count += 1
 
     def set_name(self, name):
         self.name = name
+
+    def set_email(self, email):
+        self.email = email
     
     def set_gender(self, gender):
         self.gender = gender
@@ -25,6 +29,9 @@ class Student:
 
     def get_name(self):
         return self.name
+    
+    def get_email(self):
+        return self.email
     
     def get_id(self):
         return self.id
@@ -39,8 +46,9 @@ class Student:
         return self.preferences
 
     def __str__(self):
-        s = "[STUDENT INFO - " + self.id + "]"
+        s = "[STUDENT INFO - " + str(self.id) + "]"
         s += "\nName: " + self.name
+        s += "\nEmail: " + self.email
         s += "\nGender: " + self.gender
         s += "\nGrade: " + str(self.grade)
         s += "\nPreferences: " + self.preferences

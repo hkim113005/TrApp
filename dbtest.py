@@ -1,5 +1,6 @@
 import sqlite3
 from classes import Student, Trip
+import csv
 
 
 conn = sqlite3.connect("trApp.db")
@@ -10,6 +11,12 @@ tables = [x[0] for x in tables]
 
 if "students" not in tables:
     c.execute("CREATE TABLE students (id INTEGER, name TEXT, email TEXT, grade INTEGER, gender TEXT, PRIMARY KEY(id))")
+    file = open("TrApp Student Database - All.csv", "r")
+    data = list(csv.DictReader(file, delimiter=","))
+    file.close()
+    students = [Student(s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
+    for s in students:
+        c.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
 
 if "trips" not in tables:
     c.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_rooms INTEGER, students_per_room INTEGER, preferences TEXT, PRIMARY KEY(id))")
@@ -17,6 +24,8 @@ if "trips" not in tables:
 if "trip_students" not in tables:
     c.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
 
+"""
+TEST STUDENTS ARRAY
 students_raw = [
     {
         "name": "Jeremiah Mathew",
@@ -93,6 +102,7 @@ students_raw = [
 ]
     
 students = [Student(s['name'], s['gender'], s['grade'],"") for s in students_raw]
+"""
 
 trips = [
     {
@@ -106,11 +116,7 @@ trips = [
     }
 ]
 
-for s in students:
-    c.execute("INSERT INTO students (id, name, gender, grade) VALUES(?, ?, ?, ?)", (s.get_id(), s.get_name(), s.get_gender(), s.get_grade()))
-
 for t in trips:
-    #c.execute("INSERT INTO trips (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)", t['id'], t['name'], t['type'], t['num_rooms'], t['students_per_room'], t['preferences'])
     c.execute("INSERT INTO trips (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)", (t['id'], t['name'], t['type'], t['num_rooms'], t['students_per_room'], t['preferences']))
     for id in t['students']:
         c.execute("INSERT INTO trip_students (trip_id, student_id) VALUES(?, ?)", (t['id'], id))
