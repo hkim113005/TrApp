@@ -10,30 +10,30 @@ Success
 
 {% block main %}
 <input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="myFunction()"
-    placeholder="Search for names...">
-<table class="table table-sm table-hover mt-5 mx-auto">
+    placeholder="Search">
+<table class="table table-sm table-hover mt-3 mx-auto">
     <thead>
         <tr>
-            <th scope="col">Trip</th>
-            <th scope="col">Organizer</th>
-            <th scope="col">Status</th>
+            <th style="width: 60%;" scope="col">Name</th>
+            <th class="text-center" scope="col">By</th>
+            <th class="text-center" scope="col">Status</th>
         </tr>
     </thead>
     <tbody class="table-group-divider">
         <tr onclick="window.location='trips/1'">
             <td>Viper Venture 2023: Thailand</td>
-            <td>MS</td>
-            <td>0/82</td>
+            <td class="text-center">MS</td>
+            <td class="text-center">0/82</td>
         </tr>
         <tr onclick="window.location='trips/1'">
             <td>Viper Venture 2023: Nepal</td>
-            <td>HS</td>
-            <td>42/64</td>
+            <td class="text-center">HS</td>
+            <td class="text-center">42/64</td>
         </tr>
         <tr class="completed" onclick="window.location='trips/1'">
             <td>Varsity Soccer</td>
-            <td>HS</td>
-            <td>16/16</td>
+            <td class="text-center">HS</td>
+            <td class="text-center">16/16</td>
         </tr>
     </tbody>
 </table>
