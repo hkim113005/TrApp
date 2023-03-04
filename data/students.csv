@@ -64,7 +64,7 @@ id,name,email,grade,sex
 ,Mia Musfy,MiaMusfy@acs.sch.ae,12,F
 ,Ahmad Nasser,AhmadNasser@acs.sch.ae,12,M
 ,Lavinia Neal,LaviniaNeal@acs.sch.ae,12,F
-,Sara Pardlo,SaraPardlo@acs.sch.ae,12,F
+,Sara Pardlo,gabriellapardlo@acs.sch.ae,12,F
 ,Varun Parekh,VarunParekh@acs.sch.ae,12,M
 ,Nicolo Pasqualetti,NicoloPasqualetti@acs.sch.ae,12,M
 ,Zoe Lea Petroianu,ZoeLeaPetroianu@acs.sch.ae,12,F
@@ -89,17 +89,17 @@ id,name,email,grade,sex
 ,Marina Torres,MarinaTorres@acs.sch.ae,12,F
 ,Joshua Torrez,JoshuaTorrez@acs.sch.ae,12,M
 ,Dunya Toth,DunyaToth@acs.sch.ae,12,F
-,Theodor Ulander,TheodorUlander@acs.sch.ae,12,M
+,Theo Ulander,theoulander@acs.sch.ae,12,M
 ,Rani Youness,RaniYouness@acs.sch.ae,12,M
 ,Dahnia Zarroug,DahniaZarroug@acs.sch.ae,12,F
-,Andy Zhu,AndyZhu@acs.sch.ae,12,M
+,Andy Zhu,shengdizhu@acs.sch.ae,12,M
 ,Khulood Abdulla,KhuloodAbdulla@acs.sch.ae,11,F
 ,Rafael Aguilar Zelaya,RafaelAguilarZelaya@acs.sch.ae,11,M
-,Zak Ahmad,ZakAhmad@acs.sch.ae,11,M
+,Zak Ahmad,zakariaahmad@acs.sch.ae,11,M
 ,Saif Akasha,SaifAkasha@acs.sch.ae,11,M
 ,Adam Akhtar,AdamAkhtar@acs.sch.ae,11,M
-,Basma Al Nuwais,BasmaAlNuwais@acs.sch.ae,11,F
-,Maysa Al-Busaidy,MaysaAl-Busaidy@acs.sch.ae,11,F
+,Basmah Al Nuwais,basmahalnuwais@acs.sch.ae,11,F
+,Maysa Al-Busaidy,maysaalbusaidy@acs.sch.ae,11,F
 ,Saif Alnuaimi,SaifAlnuaimi@acs.sch.ae,11,M
 ,Laura Aloudat,LauraAloudat@acs.sch.ae,11,F
 ,Danny Alsharaa,DannyAlsharaa@acs.sch.ae,11,M
@@ -113,7 +113,7 @@ id,name,email,grade,sex
 ,Ameen Bakhache,AmeenBakhache@acs.sch.ae,11,M
 ,Rahma Bayumi,RahmaBayumi@acs.sch.ae,11,F
 ,Sydney Berry,SydneyBerry@acs.sch.ae,11,F
-,Bella Boson,BellaBoson@acs.sch.ae,11,F
+,Bella Boson,bellalouvisaboson@acs.sch.ae,11,F
 ,Jayla Brown,JaylaBrown@acs.sch.ae,11,F
 ,Karl Camato,KarlCamato@acs.sch.ae,11,M
 ,Eric Carmi,EricCarmi@acs.sch.ae,11,M
@@ -127,20 +127,20 @@ id,name,email,grade,sex
 ,Dawud Dajani,DawudDajani@acs.sch.ae,11,M
 ,Damian Dujanic,DamianDujanic@acs.sch.ae,11,M
 ,Ian Duthler,IanDuthler@acs.sch.ae,11,M
-,Nour El Bacha,NourElBacha@acs.sch.ae,11,F
+,Nour El-Bacha,nourel-bacha@acs.sch.ae,11,F
 ,Omar El Masri,OmarElMasri@acs.sch.ae,11,M
 ,Kareem Elkhatib,KareemElkhatib@acs.sch.ae,11,M
 ,Serene Elmusharaf,SereneElmusharaf@acs.sch.ae,11,F
 ,Francesca Fadel,FrancescaFadel@acs.sch.ae,11,F
 ,Elsie Ficek,ElsieFicek@acs.sch.ae,11,F
-,Joey Gardner,JoeyGardner@acs.sch.ae,11,M
+,Joey Gardner,josephgardner@acs.sch.ae,11,M
 ,Noor Ghanem,NoorGhanem@acs.sch.ae,11,F
 ,Janaki Gokul,JanakiGokul@acs.sch.ae,11,F
 ,Giulia Gregotti,GiuliaGregotti@acs.sch.ae,11,F
 ,Jazz Griffiths,JazzGriffiths@acs.sch.ae,11,F
 ,Rayan Hamdan,RayanHamdan@acs.sch.ae,11,M
 ,Ruby Haryanto,RubyHaryanto@acs.sch.ae,11,F
-,GT Heming,GTHeming@acs.sch.ae,11,M
+,GT Heming,gordonheming@acs.sch.ae,11,M
 ,Nell Herbert,NellHerbert@acs.sch.ae,11,F
 ,Fatima Hufdhi Hasan,FatimaHufdhiHasan@acs.sch.ae,11,F
 ,Anton Issak,AntonIssak@acs.sch.ae,11,M
@@ -153,9 +153,9 @@ id,name,email,grade,sex
 ,Rohan Litton,RohanLitton@acs.sch.ae,11,M
 ,John Lobo,JohnLobo@acs.sch.ae,11,M
 ,Esme Mackin,EsmeMackin@acs.sch.ae,11,F
-,Abby Madden,AbbyMadden@acs.sch.ae,11,F
-,Ben Madoyan,BenMadoyan@acs.sch.ae,11,M
-,Anthony Mousa Mamdouh Zareh,AnthonyMousaMamdouhZareh@acs.sch.ae,11,M
+,Abby Madden,abigailmadden@acs.sch.ae,11,F
+,Ben Madoyan,benjaminmadoyan@acs.sch.ae,11,M
+,Anthony Mousa Mamdouh Zareh,anthonymamdouhzareh@acs.sch.ae,11,M
 ,Archie Mather,ArchieMather@acs.sch.ae,11,M
 ,Lara Memisoglu,LaraMemisoglu@acs.sch.ae,11,F
 ,Emma Miller,EmmaMiller@acs.sch.ae,11,F
@@ -184,14 +184,14 @@ id,name,email,grade,sex
 ,Emily Shin,EmilyShin@acs.sch.ae,11,F
 ,Ibrahim Siddiqi,IbrahimSiddiqi@acs.sch.ae,11,M
 ,Meryam Siddiqi,MeryamSiddiqi@acs.sch.ae,11,F
-,Sam Sievers,SamSievers@acs.sch.ae,11,M
+,Sam Sievers,samuelsievers@acs.sch.ae,11,M
 ,Batu Sinanoglu,BatuSinanoglu@acs.sch.ae,11,M
 ,Ronak Siwatch,RonakSiwatch@acs.sch.ae,11,M
 ,Nina Snyman,NinaSnyman@acs.sch.ae,11,F
 ,Ariane Spruit,ArianeSpruit@acs.sch.ae,11,F
 ,Harshini Sundararaman,HarshiniSundararaman@acs.sch.ae,11,F
 ,Benjamin Terblanche,BenjaminTerblanche@acs.sch.ae,11,M
-,AJ Timoshenko,AJTimoshenko@acs.sch.ae,11,M
+,AJ Timoshenko,andreytimoshenko@acs.sch.ae,11,M
 ,Aneschka Van Zyl,AneschkaVanZyl@acs.sch.ae,11,F
 ,Tia Abbas,tiaabbas@acs.sch.ae,10,F
 ,Noor Abu Yousef,noorabuyousef@acs.sch.ae,10,F
@@ -221,19 +221,19 @@ id,name,email,grade,sex
 ,Oliver Bray,oliverbray@acs.sch.ae,10,M
 ,Brooke Cho,yezicho@acs.sch.ae,10,F
 ,Sophie Cristaldi,sophiecristaldi@acs.sch.ae,10,F
-,Julius Clyde Dagdagan,juliusclydedagdagan@acs.sch.ae,10,M
+,Julius Clyde Dagdagan,juliusdagdagan@acs.sch.ae,10,M
 ,Haider Darr,haiderdarr@acs.sch.ae,10,M
 ,Lionel De Visscher,lioneldevisscher@acs.sch.ae,10,M
 ,Marium Devji,mariumdevji@acs.sch.ae,10,F
 ,Emma Dicastri,emmadicastri@acs.sch.ae,10,F
 ,Kerem Edepli,keremedepli@acs.sch.ae,10,M
 ,Samir EL-Chaar,samirel-chaar@acs.sch.ae,10,M
-,Omar ElShennawi,omarelshennawi@acs.sch.aei,10,M
+,Omar ElShennawi,omarelshennawi@acs.sch.ae,10,M
 ,Michael Evans,michaelevans@acs.sch.ae,10,M
 ,Sophia Fahmy,sophiafahmy@acs.sch.ae,10,F
 ,Gwyneth Garbutt,gwynethgarbutt@acs.sch.ae,10,F
 ,Mason Garmus,masongarmus@acs.sch.ae,10,M
-,Ben Gatehouse,bengatehouse@acs.sch.ae,10,M
+,Ben Gatehouse,benjamingatehouse@acs.sch.ae,10,M
 ,Lucile Gettman,lucilegettman@acs.sch.ae,10,F
 ,Kennedy Gibson,kennedygibson@acs.sch.ae,10,F
 ,Aarav Gupta,aaravgupta@acs.sch.ae,10,M
@@ -260,7 +260,7 @@ id,name,email,grade,sex
 ,Tiana Martin,TianaMartin@acs.sch.ae,10,F
 ,Jeremiah Mathew,JeremiahMathew@acs.sch.ae,10,M
 ,Emma McCann,EmmaMcCann@acs.sch.ae,10,F
-,Nick Meisner,NickMeisner@acs.sch.ae,10,M
+,Nick Meisner,nicholasmeisner@acs.sch.ae,10,M
 ,Jakob Mogensen,JakobMogensen@acs.sch.ae,10,M
 ,Evan Moore,EvanMoore@acs.sch.ae,10,M
 ,Yasmina Musfy,YasminaMusfy@acs.sch.ae,10,F
@@ -289,13 +289,13 @@ id,name,email,grade,sex
 ,Rohit Sundararaman,RohitSundararaman@acs.sch.ae,10,M
 ,Yazan Tarazi,YazanTarazi@acs.sch.ae,10,M
 ,Leyla Trinkl,LeylaTrinkl@acs.sch.ae,10,F
-,Shira Turbiner Hayek,ShiraTurbinerHayek@acs.sch.ae,10,F
+,Shira Turbiner Hayek,shirahayek@acs.sch.ae,10,F
 ,Robin Turner,RobinTurner@acs.sch.ae,10,M
 ,Alia Waels,AliaWaels@acs.sch.ae,10,F
 ,Hazel Whitaker,HazelWhitaker@acs.sch.ae,10,F
 ,Dani Youness,DaniYouness@acs.sch.ae,10,M
 ,Sami Zimmerman,SamiZimmerman@acs.sch.ae,10,M
-,Sarah Zimmerman,SarahZimmerman ,10,F
+,Sarah Zimmerman,sarahzimmerman@acs.sch.ae,10,F
 ,Malak Abdulhalim,malakabdulhalim@acs.sch.ae,9,F
 ,Razan Abo Ryah Mokhalalati,razanmokhalalati@acs.sch.ae,9,F
 ,Jenna Abu-Ghali,jennaabu-ghali@acs.sch.ae,9,F
@@ -308,7 +308,7 @@ id,name,email,grade,sex
 ,Sami Alsharaa,samialsharaa@acs.sch.ae,9,M
 ,Naia Asfour,naiaasfour@acs.sch.ae,9,F
 ,Theodora Attallah,theodoraattallah@acs.sch.ae,9,F
-,Tanya Babynine,tanyababynine@acs.sch.ae,9,F
+,Tanya Babynine,tatianababynine@acs.sch.ae,9,F
 ,Sophia Baldwin,sophiabaldwin@acs.sch.ae,9,F
 ,Hussein Ballout,husseinballout@acs.sch.ae,9,M
 ,Asia Bandini,asiabandini@acs.sch.ae,9,F
@@ -330,13 +330,13 @@ id,name,email,grade,sex
 ,Adam Fahmy,adamfahmy@acs.sch.ae,9,M
 ,Ahmed Gabralla,ahmedgabralla@acs.sch.ae,9,M
 ,Tarush Garg,tarushgarg@acs.sch.ae,9,M
-,Dora Gheorghiu,doragheorghiu@acs.sch.ae,9,F
+,Dora Gheorghiu,paulagheorghiu@acs.sch.ae,9,F
 ,Anna Gregotti,annagregotti@acs.sch.ae,9,F
 ,Lucas Halvorson,lucashalvorson@acs.sch.ae,9,M
 ,Sophia Hamel,sophiahamel@acs.sch.ae,9,F
 ,Bahaa Hassanieh,bahaahassanieh@acs.sch.ae,9,M
 ,Solomon Ibrayev,solomonibrayev@acs.sch.ae,9,M
-,Sam Jun,samjun@acs.sch.ae,9,M
+,Sam Jun,yejoonjun@acs.sch.ae,9,M
 ,Hyungsun Kim,hyungsunkim@acs.sch.ae,9,F
 ,Emily Kosbar,emilykosbar@acs.sch.ae,9,F
 ,Nicholas Kroll,nicholaskroll@acs.sch.ae,9,M
@@ -384,7 +384,7 @@ id,name,email,grade,sex
 ,Joya Youness,joyayouness@acs.sch.ae,9,F
 ,Dylan Younger,dylanyounger@acs.sch.ae,9,M
 ,Ben Zentner,benzentner@acs.sch.ae,9,M
-,Joey Zhang,joeyzhang@acs.sch.ae,9,M
+,Joey Zhang,junyizhang@acs.sch.ae,9,M
 ,Yousif Zo Mot,yousifzomot@acs.sch.ae,9,M
 ,Julianna Zuchowski,juliannazuchowski@acs.sch.ae,9,F
 ,Malek Zuhdi,malekzuhdi@acs.sch.ae,9,M
