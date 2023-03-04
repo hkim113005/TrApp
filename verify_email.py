@@ -31,4 +31,4 @@ def verify_email(email):
     except:
         return False
 
-print(verify_email("hyungjaekim@acs.sch.ae"))
+print(verify_email("hyungjae1130@gmail.com"))

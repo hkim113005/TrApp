@@ -9,7 +9,7 @@ tables = c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall
 tables = [x[0] for x in tables]
 
 if "students" not in tables:
-    c.execute("CREATE TABLE students (id INTEGER, name TEXT, gender TEXT, grade INTEGER, PRIMARY KEY(id))")
+    c.execute("CREATE TABLE students (id INTEGER, name TEXT, email TEXT, grade INTEGER, gender TEXT, PRIMARY KEY(id))")
 
 if "trips" not in tables:
     c.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_rooms INTEGER, students_per_room INTEGER, preferences TEXT, PRIMARY KEY(id))")
@@ -20,68 +20,75 @@ if "trip_students" not in tables:
 students_raw = [
     {
         "name": "Jeremiah Mathew",
-        "gender": "male",
-        "grade": 10
+        "email": "jeremiahmathew@acs.sch.ae",
+        "grade": 10,
+        "gender": "M"
     },
     {
         "name": "Hyungjae Kim",
-        "gender": "male",
-        "grade": 11
+        "email": "hyungjaekim@acs.sch.ae",
+        "grade": 11,
+        "gender": "M"
     },
     {
         "name": "Ryan Ayoub",
-        "gender": "male",
-        "grade": 10
+        "email": "ryan-ramiayoub@acs.sch.ae",
+        "grade": 10,
+        "gender": "M"
     },
     {
         "name": "Lionel DeVisscher",
-        "gender": "male",
-        "grade": 10
+        "email": "lioneldevisscher@acs.sch.ae",
+        "grade": 10,
+        "gender": "M"
     },
     {
         "name" : "Rohit Sundararaman",
-        "gender": "male",
-        "grade": 10
+        "email": "rohitsundararaman@acs.sch.ae",
+        "grade": 10,
+        "gender": "M"
     },
     {
         "name": "Jiyun Kim",
-        "gender": "female",
-        "grade": 11
+        "email": "jiyunkim@acs.sch.ae",
+        "grade": 11,
+        "gender": "F"
     },
     {
         "name": "Malek Zuhdi",
-        "gender": "male",
-        "grade": 9
+        "email": "malekzuhdi@acs.sch.ae",
+        "grade": 9,
+        "gender": "M"
     },
     {
         "name": "Jasir Zakaria",
-        "gender": "male",
-        "grade": 11
+        "email": "jasirzakaria@acs.sch.ae",
+        "grade": 11,
+        "gender": "M"
     },
     {
-        "name": "GT",
-        "gender": "male",
-        "grade": 11
+        "name": "GT Heming",
+        "email": "gordonheming@acs.sch.ae",
+        "grade": 11,
+        "gender": "M"
     },
     {
         "name": "Batu Sinanoglu",
-        "gender": "male",
-        "grade": 11
+        "email": "batusinanoglu@acs.sch.ae",
+        "grade": 11,
+        "gender": "M"
     },
     {
         "name": "Kyna Rochlani",
-        "gender": "female",
-        "grade": 11
-    },
-    {
-        "name": "Matthew Sado",
-        "gender": "male",
-        "grade": 10
+        "email": "kynarochlani@acs.sch.ae",
+        "grade": 11,
+        "gender": "F"
     },
     {
         "name": "Jehyeok Lee",
-        "gender": "male",
-        "grade": 10
+        "email": "jehyeoklee@acs.sch.ae",
+        "grade": 10,
+        "gender": "M"
     },
 ]
     
