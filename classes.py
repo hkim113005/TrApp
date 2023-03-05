@@ -1,11 +1,88 @@
 import uuid
+import sqlite3
+import csv
+
+def setup(f):
+    def wrap(*args, **kwargs):
+        args[0].conn = sqlite3.connect(Database.DEFAULT_DB)
+        r = f(*args, **kwargs)
+        args[0].conn.close()
+        return r
+    return wrap
+
+class Database:
+    STUDENT_CSV = "data/students.csv"
+    DEFAULT_DB = "data/TrApp.db"
+
+    def __init__(self, fn=None):
+        self.csv = fn if fn is not None else Database.STUDENT_CSV
+        self.conn = sqlite3.connect(Database.DEFAULT_DB)
+        self.cursor = self.conn.cursor()
+        tables = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+        tables = [x[0] for x in tables]
+        if "students" not in tables:
+            self.cursor.execute("CREATE TABLE students (id INTEGER, name TEXT, email TEXT, grade INTEGER, gender TEXT, PRIMARY KEY(id))")
+            file = open(self.csv, "r")
+            data = list(csv.DictReader(file, delimiter=","))
+            file.close()
+            students = [Student(0, s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
+            for s in students:
+                self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
+        if "trips" not in tables:
+            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_rooms INTEGER, students_per_room INTEGER, preferences TEXT, PRIMARY KEY(id))")
+        if "trip_students" not in tables:
+            self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
+        self.conn.commit()
+    
+    @setup
+    def getStudentById(self, student_id):
+        student = self.cursor.execute(f'select * from students WHERE id = {student_id}').fetchall()
+        if student != []:
+            s = student[0]
+            return s
+    
+    @setup
+    def getTripById(self, trip_id):
+        trip = self.cursor.execute(f'select * from trips WHERE id = {trip_id}').fetchall()
+        if trip != []:
+            t = trip[0]
+            return t
+        
+    @setup
+    def getAllStudents(self):
+        return self.cursor.execute('select * from students').fetchall()
+
+    @setup
+    def getAllTrips(self):
+        return self.cursor.execute('select * from trips').fetchall()
+    
+    @setup 
+    def getAllStudentsInTrip(self, trip_id):
+        students = self.cursor.execute(f'select * from trip_students WHERE trip_id = {trip_id}').fetchall()
+        if students != []:
+            return students
+    
+    @setup 
+    def getAllStudentsInTrip(self, grade, gender):
+        students = self.cursor.execute(f'select * from students WHERE grade = {grade} AND gender = {gender}').fetchall()
+        if students != []:
+            return students
+        
+    @setup
+    def addStudentToTrip(self, student_id, trip_id):
+        self.cursor.execute('INSERT into trip_students(trip_id. student_id) VALUES(?, ?)', (trip_id, student_id))
+
+    #TODO
+    @setup
+    def addNewTrip(self, trip):
+        self.cursor.execute('INSERT into trips(trip_id. student_id) VALUES(?, ?)', (trip))
 
 class Student:
     student_count = 0
-    def __init__(self, name, email, grade, gender, preferences):
+    def __init__(self, id, name, email, grade, gender, preferences=""):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = str(name)
-        self.id = (Student.student_count + 1)
+        self.id = id if id != 0 else (Student.student_count + 1)
         self.email = str(email)
         self.gender = str(gender)
         self.grade = int(grade)
