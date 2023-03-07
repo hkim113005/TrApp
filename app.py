@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, session, redirect, url_for, s
 from flask_session import Session
 from flask_login import LoginManager, UserMixin
 
-import mysql.connector
-from mysql.connector import Error
 import pandas as pd
 import numpy as np
 from werkzeug.security import check_password_hash, generate_password_hash
