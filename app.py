@@ -15,16 +15,6 @@ import time
 import os
 
 
-db = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="hyungjae1130",
-  database="eden"
-)
-
-cursor = db.cursor()
-
-
 app = Flask(__name__)
 
 app.config["SESSION_TYPE"] = "filesystem"
