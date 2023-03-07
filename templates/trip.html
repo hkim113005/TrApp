@@ -127,11 +127,13 @@ Success
                             <td class="text-center">10</td>
                             <td class="text-center">M</td>
                         </tr>
+                        {%for i in range(all_students|length)%}
                         <tr>
-                            <td>Gordon Heming</td>
-                            <td class="text-center">11</td>
-                            <td class="text-center">M</td>
+                            <td>{{all_students[i][1]}}</td>
+                            <td class="text-center">{{all_students[i][3]}}</td>
+                            <td class="text-center">{{all_students[i][4]}}</td>
                         </tr>
+                        {%endfor%}
                     </tbody>
                 </table>
             </div>

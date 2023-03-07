@@ -12,6 +12,9 @@ import time
 
 import os
 
+from classes import Database
+db = Database()
+
 
 app = Flask(__name__)
 
@@ -81,7 +84,7 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html")
+        return render_template("trip.html", all_students=db.getAllStudents())
     
 
 if __name__ == "__main__":

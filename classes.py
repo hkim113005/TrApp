@@ -16,7 +16,7 @@ class Database:
 
     def __init__(self, fn=None):
         self.csv = fn if fn is not None else Database.STUDENT_CSV
-        self.conn = sqlite3.connect(Database.DEFAULT_DB)
+        self.conn = sqlite3.connect(Database.DEFAULT_DB, check_same_thread=False)
         self.cursor = self.conn.cursor()
         tables = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
         tables = [x[0] for x in tables]
