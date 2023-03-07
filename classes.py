@@ -63,8 +63,8 @@ class Database:
             return students
     
     @setup 
-    def getAllStudentsInTrip(self, grade, gender):
-        students = self.cursor.execute(f'select * from students WHERE grade = {grade} AND gender = {gender}').fetchall()
+    def getStudentsByAttribute(self, grade, gender):
+        students = self.cursor.execute(f"select * from students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
             return students
         
@@ -74,8 +74,9 @@ class Database:
 
     #TODO
     @setup
-    def addNewTrip(self, trip):
-        self.cursor.execute('INSERT into trips(trip_id. student_id) VALUES(?, ?)', (trip))
+    def addTrip(self, trip):
+        self.cursor.execute('INSERT into trips(id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
+        return trip
 
 class Student:
     student_count = 0
