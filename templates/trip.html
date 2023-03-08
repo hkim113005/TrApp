@@ -30,26 +30,13 @@ Success
             <td class="text-center">11</td>
             <td class="text-center">M</td>
         </tr>
+        {%for i in range(sel_trip|length)%}
         <tr>
-            <td>Jeremiah Mathew</td>
-            <td class="text-center">10</td>
-            <td class="text-center">M</td>
+            <td>{{all_students[i][1]}}</td>
+            <td class="text-center">{{all_students[i][3]}}</td>
+            <td class="text-center">{{all_students[i][4]}}</td>
         </tr>
-        <tr>
-            <td>Batu Sinanoglu</td>
-            <td class="text-center">11</td>
-            <td class="text-center">M</td>
-        </tr>
-        <tr>
-            <td>Ryan-Rami Ayoub</td>
-            <td class="text-center">10</td>
-            <td class="text-center">M</td>
-        </tr>
-        <tr>
-            <td>Rohit Sundararaman</td>
-            <td class="text-center">10</td>
-            <td class="text-center">M</td>
-        </tr>
+        {%endfor%}
     </tbody>
 </table>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
@@ -75,56 +62,6 @@ Success
                         <tr class="selected">
                             <td>Hyungjae Kim</td>
                             <td class="text-center">11</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr class="selected">
-                            <td>Jeremiah Mathew</td>
-                            <td class="text-center">10</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr class="selected">
-                            <td>Batu Sinanoglu</td>
-                            <td class="text-center">11</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr class="selected">
-                            <td>Ryan-Rami Ayoub</td>
-                            <td class="text-center">10</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr class="selected">
-                            <td>Rohit Sundararaman</td>
-                            <td class="text-center">10</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr>
-                            <td>Jiyun Kim</td>
-                            <td class="text-center">11</td>
-                            <td class="text-center">F</td>
-                        </tr>
-                        <tr>
-                            <td>Kyna Rochlani</td>
-                            <td class="text-center">11</td>
-                            <td class="text-center">F</td>
-                        </tr>
-                        <tr>
-                            <td>Malek Zuhdi</td>
-                            <td class="text-center">10</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr>
-                            <td>Jasir Zakaria</td>
-                            <td class="text-center">11</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr>
-                            <td>Jehyeok Lee</td>
-                            <td class="text-center">10</td>
-                            <td class="text-center">M</td>
-                        </tr>
-                        <tr>
-                            <td>Lionel De Visscher</td>
-                            <td class="text-center">10</td>
                             <td class="text-center">M</td>
                         </tr>
                         {%for i in range(all_students|length)%}

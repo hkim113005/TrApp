@@ -1,4 +1,3 @@
-import uuid
 import sqlite3
 import csv
 
@@ -43,7 +42,7 @@ class Database:
     
     @setup
     def getTripById(self, trip_id):
-        trip = self.cursor.execute(f'select * from trips WHERE id = {trip_id}').fetchall()
+        trip = self.cursor.execute(f"select * from trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:
             t = trip[0]
             return t
@@ -57,10 +56,12 @@ class Database:
         return self.cursor.execute('select * from trips').fetchall()
     
     @setup 
-    def getAllStudentsInTrip(self, trip_id):
-        students = self.cursor.execute(f'select * from trip_students WHERE trip_id = {trip_id}').fetchall()
-        if students != []:
-            return students
+    def getStudentsInTrip(self, trip_id):
+        ids = self.cursor.execute(f"select * from trip_students WHERE trip_id = '{trip_id}'").fetchall()
+        if ids != []:
+            students = [self.getStudentById(id) for id in ids]
+            if students != []:
+                return students
     
     @setup 
     def getStudentsByAttribute(self, grade, gender):
@@ -134,11 +135,12 @@ class Student:
 
 
 class Trip:
+    trip_count = 0
     trips = []
-    def __init__(self, name, trip_type, num_rooms, students_per_room, preferences, students):
+    def __init__(self, id, name, trip_type, num_rooms, students_per_room, preferences, students):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = name
-        self.id = uuid.uuid4()
+        self.id = f"t{id}" if id != 0 else f"t{Trip.trip_count + 1}"
         self.trip_type = trip_type
         self.students = students
         self.num_rooms = num_rooms

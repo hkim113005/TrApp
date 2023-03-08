@@ -12,8 +12,11 @@ import time
 
 import os
 
-from classes import Database
+from classes import Database, Trip
 db = Database()
+
+# REMOVE LATER: Adds trip to database
+db.addTrip(Trip(0, "Test Trip", "TEST", 4, 2, "blah blah blah", [1, 2, 3, 4]))
 
 
 app = Flask(__name__)
@@ -79,12 +82,12 @@ def teacher_login_form():
 @app.route("/trips", methods=["GET", "POST"])
 def trips():
     if request.method == "GET":
-        return render_template("trips.html")
+        return render_template("trips.html", all_trips = db.getAllTrips())
 
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", all_students=db.getAllStudents())
+        return render_template("trip.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), all_students=db.getAllStudents())
     
 
 if __name__ == "__main__":
