@@ -24,7 +24,7 @@ class Database:
             file = open(self.csv, "r")
             data = list(csv.DictReader(file, delimiter=","))
             file.close()
-            students = [Student(None, s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
+            students = [Student(None, s['name'], s['email'], int(s['grade']), s['gender'], "") for s in data]
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
@@ -72,7 +72,6 @@ class Database:
     
     @setup 
     def removeStudentsInTrip(self, trip_id):
-        print(trip_id)
         self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
     
     @setup 
@@ -101,7 +100,7 @@ class Database:
         if self.getTripById(trip.get_id()) != None:
             self.cursor.execute(f"UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
             self.removeStudentsInTrip(trip.get_id())
-            for s in list(trip.get_students()):
+            for s in trip.get_students():
                 self.addStudentToTrip(s, trip.get_id())
         else:
             self.addTrip(trip)
