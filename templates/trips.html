@@ -9,7 +9,7 @@ Active Trips
 {% endblock %}
 
 {% block main %}
-<input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="myFunction()"
+<input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="search()"
     placeholder="Search">
 <table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
@@ -33,7 +33,7 @@ Active Trips
 data-bs-target="#student_edit_modal">Create</button>
 
 <script>
-    function myFunction(table) {
+    function search() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("search");

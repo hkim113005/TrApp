@@ -24,7 +24,7 @@ class Database:
             file = open(self.csv, "r")
             data = list(csv.DictReader(file, delimiter=","))
             file.close()
-            students = [Student(0, s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
+            students = [Student(None, s['name'], s['email'], int(s['grade']), s['sex'], "") for s in data]
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
@@ -48,12 +48,14 @@ class Database:
             return t
         
     @setup
-    def getAllStudents(self):
-        return self.cursor.execute('select * from students').fetchall()
+    def getAllStudents(self, excluded = []):
+        all = self.cursor.execute('select * from students').fetchall()
+        all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
+        return all
 
     @setup
     def getAllTrips(self):
-        return self.cursor.execute('SELECT * FROM trips').fetchall()
+        return sorted(self.cursor.execute('SELECT * FROM trips').fetchall(), key=lambda x: x[1])
     
     @setup
     def getAllTripStudents(self):
@@ -64,7 +66,7 @@ class Database:
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
         if ids != []:
-            students = [self.getStudentById(id) for id in ids]
+            students = sorted([self.getStudentById(id) for id in ids], key=lambda x: (x[3], x[1]))
             if students != []:
                 return students
     
@@ -108,7 +110,7 @@ class Student:
     def __init__(self, id, name, email, grade, gender, preferences=""):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = str(name)
-        self.id = id if id != 0 else (Student.student_count + 1)
+        self.id = id if id != None else (Student.student_count + 1)
         self.email = str(email)
         self.gender = str(gender)
         self.grade = int(grade)
@@ -164,7 +166,7 @@ class Trip:
     def __init__(self, id, name, trip_type, num_rooms, students_per_room, preferences, students):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = name
-        self.id = f"t{id}" if id != 0 else f"t{Trip.trip_count + 1}"
+        self.id = f"t{id}" if id != None else f"t{Trip.trip_count + 1}"
         self.trip_type = trip_type
         self.students = students
         self.num_rooms = num_rooms

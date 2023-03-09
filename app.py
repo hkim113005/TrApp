@@ -16,9 +16,9 @@ from classes import Database, Trip
 db = Database()
 
 # REMOVE LATER: Adds trip to database
-db.addTrip(Trip(0, "WWW 2023", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
-db.addTrip(Trip(0, "Viper Venture 2023", "HS", 5, 3, "idk lol", [260, 261, 262]))
-db.addTrip(Trip(0, "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7]))
+db.addTrip(Trip(None, "WWW 2023", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
+db.addTrip(Trip(None, "Viper Venture 2023: Thailand", "HS", 5, 3, "idk lol", [260, 261, 262]))
+db.addTrip(Trip(None, "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7]))
 print(db.getTripById("t2"))
 
 app = Flask(__name__)
@@ -89,7 +89,7 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), all_students=db.getAllStudents())
+        return render_template("trip.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), all_students=db.getAllStudents(db.getStudentsInTrip(trip_id)))
     
 
 if __name__ == "__main__":
