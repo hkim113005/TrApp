@@ -19,7 +19,8 @@ db = Database()
 db.addTrip(Trip(None, "WWW 2023", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
 db.addTrip(Trip(None, "Viper Venture 2023: Thailand", "HS", 5, 3, "idk lol", [260, 261, 262]))
 db.addTrip(Trip(None, "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7]))
-print(db.getTripById("t2"))
+#db.updateTrip(Trip("t3", "Varsity Boys Soccer", "MESAC", 9, 3, "aaaaa", [21, 150, 230, 190, 72, 110]))
+#print(db.getTripById("t3"))
 
 app = Flask(__name__)
 

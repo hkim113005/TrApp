@@ -72,7 +72,8 @@ class Database:
     
     @setup 
     def removeStudentsInTrip(self, trip_id):
-        self.cursor.execute(f"REMOVE student_id FROM trip_students WHERE trip_id = '{trip_id}'")
+        print(trip_id)
+        self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
     
     @setup 
     def getStudentsByAttribute(self, grade, gender):
@@ -92,15 +93,15 @@ class Database:
 
     @setup
     def removeTrip(self, trip_id):
-        self.cursor.execute(f"REMOVE * FROM trips WHERE trip_id = '{trip_id}'")
+        self.cursor.execute(f"DELETE FROM trips WHERE trip_id = '{trip_id}'")
         self.removeStudentsInTrip(trip_id)
 
-    #TODO
     @setup
-    def editTrip(self, trip):
+    def updateTrip(self, trip):
         if self.getTripById(trip.get_id()) != None:
-            self.cursor.execute('UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
-            for s in list(set(trip.get_students()) - set(self.getStudentsInTrip(trip.get_id))):
+            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
+            self.removeStudentsInTrip(trip.get_id())
+            for s in list(trip.get_students()):
                 self.addStudentToTrip(s, trip.get_id())
         else:
             self.addTrip(trip)
@@ -166,7 +167,7 @@ class Trip:
     def __init__(self, id, name, trip_type, num_rooms, students_per_room, preferences, students):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = name
-        self.id = f"t{id}" if id != None else f"t{Trip.trip_count + 1}"
+        self.id = id if id != None else f"t{Trip.trip_count + 1}"
         self.trip_type = trip_type
         self.students = students
         self.num_rooms = num_rooms
