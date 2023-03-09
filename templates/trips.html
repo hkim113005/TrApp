@@ -11,7 +11,7 @@ Success
 {% block main %}
 <input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="myFunction()"
     placeholder="Search">
-<table class="table table-sm table-hover mt-3 mx-auto">
+<table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
             <th style="width: 60%;" scope="col">Name</th>
@@ -20,11 +20,11 @@ Success
         </tr>
     </thead>
     <tbody class="table-group-divider">
-        {%for t in all_trips%}
-        <tr onclick="window.location='trips/{{t[0]}}'">
-            <td>{{t[1]}}</td>
-            <td class="text-center">HS</td>
-            <td class="text-center">16/16</td>
+        {%for i in range(all_trips|length)%}
+        <tr onclick="window.location='trips/{{all_trips[i][0]}}'">
+            <td>{{all_trips[i][1]}}</td>
+            <td class="text-center">{{all_trips[i][2]}}</td>
+            <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i][3] * all_trips[i][4]}}</td>
         </tr>
         {%endfor%}
     </tbody>
@@ -33,12 +33,12 @@ Success
 data-bs-target="#student_edit_modal">Create</button>
 
 <script>
-    function myFunction() {
+    function myFunction(table) {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("search");
         filter = input.value.toUpperCase();
-        table = document.getElementById("students_table");
+        table = document.getElementById("trips_table");
         tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those who don't match the search query

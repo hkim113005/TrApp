@@ -16,11 +16,10 @@ from classes import Database, Trip
 db = Database()
 
 # REMOVE LATER: Adds trip to database
-db.addTrip(Trip(0, "Test Trip 1", "TEST", 4, 2, "blah blah blah", [1, 2, 3, 4]))
-db.addTrip(Trip(0, "Test Trip 2", "TEST", 4, 2, "idk lol", [260, 261, 262]))
-for s in db.getStudentsInTrip("t2"):
-    print(s)
-
+db.addTrip(Trip(0, "WWW 2023", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
+db.addTrip(Trip(0, "Viper Venture 2023", "HS", 5, 3, "idk lol", [260, 261, 262]))
+db.addTrip(Trip(0, "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7]))
+print(db.getTripById("t2"))
 
 app = Flask(__name__)
 
@@ -85,7 +84,7 @@ def teacher_login_form():
 @app.route("/trips", methods=["GET", "POST"])
 def trips():
     if request.method == "GET":
-        return render_template("trips.html", all_trips = db.getAllTrips())
+        return render_template("trips.html", all_trips = db.getAllTrips(), trip_studs = [db.getStudentsInTrip(t[0]) for t in db.getAllTrips()])
 
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
