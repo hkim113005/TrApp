@@ -55,9 +55,14 @@ class Database:
     def getAllTrips(self):
         return self.cursor.execute('select * from trips').fetchall()
     
+    @setup
+    def getAllTripStudents(self):
+        return self.cursor.execute('select * from trip_students').fetchall()
+    
     @setup 
     def getStudentsInTrip(self, trip_id):
-        ids = self.cursor.execute(f"select * from trip_students WHERE trip_id = '{trip_id}'").fetchall()
+        ids = self.cursor.execute(f"select student_id from trip_students WHERE trip_id = '{trip_id}'").fetchall()
+        ids = [x[0] for x in ids]
         if ids != []:
             students = [self.getStudentById(id) for id in ids]
             if students != []:
@@ -71,13 +76,14 @@ class Database:
         
     @setup
     def addStudentToTrip(self, student_id, trip_id):
-        self.cursor.execute('INSERT into trip_students(trip_id. student_id) VALUES(?, ?)', (trip_id, student_id))
+        self.cursor.execute('INSERT into trip_students(trip_id, student_id) VALUES(?, ?)', (trip_id, student_id))
 
     #TODO
     @setup
     def addTrip(self, trip):
         self.cursor.execute('INSERT into trips(id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
-        return trip
+        for s in trip.get_students():
+            self.addStudentToTrip(s, trip.get_id())
 
 class Student:
     student_count = 0
@@ -147,6 +153,7 @@ class Trip:
         self.students_per_room = students_per_room
         self.preferences = preferences
         Trip.trips.append(self)
+        Trip.trip_count += 1
 
     def set_name(self, name):
         self.name = name

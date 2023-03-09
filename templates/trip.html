@@ -30,11 +30,11 @@ Success
             <td class="text-center">11</td>
             <td class="text-center">M</td>
         </tr>
-        {%for i in range(sel_trip|length)%}
+        {%for student in sel_students%}
         <tr>
-            <td>{{all_students[i][1]}}</td>
-            <td class="text-center">{{all_students[i][3]}}</td>
-            <td class="text-center">{{all_students[i][4]}}</td>
+            <td>{{student[1]}}</td>
+            <td class="text-center">{{student[3]}}</td>
+            <td class="text-center">{{student[4]}}</td>
         </tr>
         {%endfor%}
     </tbody>
@@ -64,11 +64,11 @@ Success
                             <td class="text-center">11</td>
                             <td class="text-center">M</td>
                         </tr>
-                        {%for i in range(all_students|length)%}
+                        {%for s in all_students%}
                         <tr>
-                            <td>{{all_students[i][1]}}</td>
-                            <td class="text-center">{{all_students[i][3]}}</td>
-                            <td class="text-center">{{all_students[i][4]}}</td>
+                            <td>{{s[1]}}</td>
+                            <td class="text-center">{{s[3]}}</td>
+                            <td class="text-center">{{s[4]}}</td>
                         </tr>
                         {%endfor%}
                     </tbody>

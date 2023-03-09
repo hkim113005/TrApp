@@ -20,24 +20,9 @@ Success
         </tr>
     </thead>
     <tbody class="table-group-divider">
-        <tr onclick="window.location='trips/1'">
-            <td>Viper Venture 2023: Thailand</td>
-            <td class="text-center">MS</td>
-            <td class="text-center">0/82</td>
-        </tr>
-        <tr onclick="window.location='trips/1'">
-            <td>Viper Venture 2023: Nepal</td>
-            <td class="text-center">HS</td>
-            <td class="text-center">42/64</td>
-        </tr>
-        <tr class="completed" onclick="window.location='trips/1'">
-            <td>Varsity Soccer</td>
-            <td class="text-center">HS</td>
-            <td class="text-center">16/16</td>
-        </tr>
-        {%for i in range(all_trips|length)%}
-        <tr onclick="window.location='trips/{{all_trips[i][0]}}'">
-            <td>{{all_trips[i][1]}}</td>
+        {%for t in all_trips%}
+        <tr onclick="window.location='trips/{{t[0]}}'">
+            <td>{{t[1]}}</td>
             <td class="text-center">HS</td>
             <td class="text-center">16/16</td>
         </tr>

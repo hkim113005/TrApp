@@ -16,7 +16,10 @@ from classes import Database, Trip
 db = Database()
 
 # REMOVE LATER: Adds trip to database
-db.addTrip(Trip(0, "Test Trip", "TEST", 4, 2, "blah blah blah", [1, 2, 3, 4]))
+db.addTrip(Trip(0, "Test Trip 1", "TEST", 4, 2, "blah blah blah", [1, 2, 3, 4]))
+db.addTrip(Trip(0, "Test Trip 2", "TEST", 4, 2, "idk lol", [260, 261, 262]))
+for s in db.getStudentsInTrip("t2"):
+    print(s)
 
 
 app = Flask(__name__)
