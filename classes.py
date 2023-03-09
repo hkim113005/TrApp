@@ -96,9 +96,12 @@ class Database:
     #TODO
     @setup
     def editTrip(self, trip):
-        self.cursor.execute('UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
-        for s in trip.get_students():
-            self.addStudentToTrip(s, trip.get_id())
+        if self.getTripById(trip.get_id()) != None:
+            self.cursor.execute('UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
+            for s in list(set(trip.get_students()) - set(self.getStudentsInTrip(trip.get_id))):
+                self.addStudentToTrip(s, trip.get_id())
+        else:
+            self.addTrip(trip)
 
 class Student:
     student_count = 0
