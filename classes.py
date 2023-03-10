@@ -1,5 +1,7 @@
 import sqlite3
 import csv
+import random
+import string
 
 def setup(f):
     def wrap(*args, **kwargs):
@@ -161,19 +163,19 @@ class Student:
 
 
 class Trip:
-    trip_count = 0
+    trip_ids = []
     trips = []
     def __init__(self, id, name, trip_type, num_rooms, students_per_room, preferences, students):
         # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
         self.name = name
-        self.id = id if id != None else f"t{Trip.trip_count + 1}"
+        self.id = id if id != None else Trip.generate_id()
         self.trip_type = trip_type
         self.students = students
         self.num_rooms = num_rooms
         self.students_per_room = students_per_room
         self.preferences = preferences
         Trip.trips.append(self)
-        Trip.trip_count += 1
+        Trip.trip_ids.append(self.id)
 
     def set_name(self, name):
         self.name = name
@@ -217,6 +219,15 @@ class Trip:
     @staticmethod
     def get_trips():
         return Trip.trips
+
+    @staticmethod
+    def generate_id():
+        id = ""
+        while True:
+            id = ''.join(random.sample((string.ascii_uppercase+string.digits),6))
+            if(id not in Trip.trip_ids):
+                break
+        return id
 
     def __str__(self):
         s = "[TRIP INFO - " + self.name + "]"

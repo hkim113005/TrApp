@@ -13,12 +13,12 @@ Start
     <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Trip code</label>
 
     <div id="trip_code" class="inputs d-flex flex-row justify-content-center mt-3">
-        <input class="me-2 text-center form-control rounded" type="text" id="first" name="first" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" id="second" name="second" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" id="third" name="third" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" id="fourth" name="fourth" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" id="fifth" name="fifth" maxlength="1" />
-        <input class="ms-2 text-center form-control rounded" type="text" id="sixth" name="sixth" maxlength="1" />
+        <input class="me-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="first" name="first" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="second" name="second" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="third" name="third" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="fourth" name="fourth" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="fifth" name="fifth" maxlength="1" />
+        <input class="ms-2 text-center form-control rounded" type="text" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="sixth" name="sixth" maxlength="1" />
     </div>
 
     <button type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
@@ -30,15 +30,16 @@ Start
                 for (let i = 0; i < inputs.length; i++) {
                     inputs[i].addEventListener('keydown', function (event) {
                         if (event.key === "Backspace") {
+                            if ((i > 0 && i < inputs.length - 1) || (i == inputs.length - 1 && inputs[i].value == '')) 
+                                inputs[i - 1].focus();
                             inputs[i].value = '';
-                            if (i !== 0) inputs[i - 1].focus();
                         }
                         else {
                             if (i === inputs.length - 1 && inputs[i].value !== '') {
                                 return true;
                             }
-                            else if (event.keyCode > 47 && event.keyCode < 58) {
-                                inputs[i].value = event.key;
+                            else if (event.keyCode >= 48 && event.keyCode <= 90) {
+                                inputs[i].value = event.key.toUpperCase();
                                 if (i !== inputs.length - 1) inputs[i + 1].focus();
                                 event.preventDefault();
                             }

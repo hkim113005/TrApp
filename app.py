@@ -16,15 +16,15 @@ from classes import Database, Trip
 db = Database()
 
 # REMOVE LATER: Adds trip to database
-db.addTrip(Trip(None, "WWW 2023", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
+db.addTrip(Trip(None, "WWW 2023: Grade 6 (Greece)", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
 db.addTrip(Trip(None, "Viper Venture 2023: Thailand", "HS", 5, 3, "idk lol", [260, 261, 262]))
 db.addTrip(Trip(None, "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7]))
 db.addTrip(Trip(None, "Varsity Boys Soccer", "MESAC", 9, 3, "aaaaa", [21, 150, 230, 190, 72, 110]))
-db.addTrip(Trip(None, "HS Cross Country", "MESAC", 3, 3, "yyyyyy", [273, 220]))
+db.addTrip(Trip(None, "HS Track & Field", "MESAC", 3, 3, "yyyyyy", [273, 220]))
 db.addTrip(Trip(None, "HS Tennis", "MESAC", 5, 2, "xxxxxxx", [288, 270, 242, 276]))
 db.addTrip(Trip(None, "HS Wrestling", "MESAC", 6, 2, "wwwwww", [204]))
-db.updateTrip(Trip("t4", "Varsity Boys Soccer", "MESAC", 9, 3, "updated soccer", [21, 150, 230, 190, 72, 110, 289, 280]))
-#print(db.getTripById("t3"))
+db.updateTrip(Trip(Trip.get_trips()[3].get_id(), "Varsity Boys Soccer", "MESAC", 9, 3, "updated soccer", [21, 150, 230, 190, 72, 110, 289, 280]))
+print(Trip.get_trips()[0])
 
 app = Flask(__name__)
 
@@ -75,7 +75,7 @@ def trip_code_form():
 @app.route("/<trip_id>", methods=["GET", "POST"])
 def student_preference_form(trip_id):
     if request.method == "GET":
-        return render_template("student_preference_form.html", trip_id=trip_id)
+        return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id))
     else:
         return render_template("success.html", trip_id=trip_id)
 
