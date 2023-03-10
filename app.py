@@ -76,7 +76,10 @@ def trip_code_form():
 @app.route("/<trip_id>", methods=["GET", "POST"])
 def student_preference_form(trip_id):
     if request.method == "GET":
-        return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id))
+        if db.getTripById(trip_id) != None:
+            return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id))
+        else:
+            return render_template("error.html")
     else:
         return render_template("success.html", trip_id=trip_id)
 
