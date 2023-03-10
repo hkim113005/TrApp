@@ -13,6 +13,7 @@ import time
 import os
 
 from classes import Database, Trip
+
 db = Database()
 
 # REMOVE LATER: Adds trip to database
