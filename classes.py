@@ -36,76 +36,76 @@ class Database:
         self.conn.commit()
     
     @setup
-    def getStudentById(self, student_id):
+    def get_student_by_id(self, student_id):
         student = self.cursor.execute(f'SELECT * FROM students WHERE id = {student_id}').fetchall()
         if student != []:
             s = student[0]
             return s
     
     @setup
-    def getTripById(self, trip_id):
+    def get_trip_by_id(self, trip_id):
         trip = self.cursor.execute(f"SELECT * FROM trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:
             t = trip[0]
             return t
         
     @setup
-    def getAllStudents(self, excluded = []):
+    def get_all_students(self, excluded = []):
         all = self.cursor.execute('select * from students').fetchall()
         all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
         return all
 
     @setup
-    def getAllTrips(self):
+    def get_all_trips(self):
         return sorted(self.cursor.execute('SELECT * FROM trips').fetchall(), key=lambda x: x[1])
     
     @setup
-    def getAllTripStudents(self):
+    def get_all_tripstudents(self):
         return self.cursor.execute('SELECT * FROM trip_students').fetchall()
     
     @setup 
-    def getStudentsInTrip(self, trip_id):
+    def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
         if ids != []:
-            students = sorted([self.getStudentById(id) for id in ids], key=lambda x: (x[3], x[1]))
+            students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
             if students != []:
                 return students
     
     @setup 
-    def removeStudentsInTrip(self, trip_id):
+    def remove_students_in_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
     
     @setup 
-    def getStudentsByAttribute(self, grade, gender):
+    def get_students_by_attribute(self, grade, gender):
         students = self.cursor.execute(f"SELECT * FROM students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
             return students
         
     @setup
-    def addStudentToTrip(self, student_id, trip_id):
+    def add_student_to_trip(self, student_id, trip_id):
         self.cursor.execute('INSERT INTO trip_students(trip_id, student_id) VALUES(?, ?)', (trip_id, student_id))
 
     @setup
-    def addTrip(self, trip):
+    def add_trip(self, trip):
         self.cursor.execute('INSERT INTO trips(id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
         for s in trip.get_students():
-            self.addStudentToTrip(s, trip.get_id())
+            self.add_student_to_trip(s, trip.get_id())
 
     @setup
-    def removeTrip(self, trip_id):
+    def remove_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trips WHERE trip_id = '{trip_id}'")
-        self.removeStudentsInTrip(trip_id)
+        self.remove_students_in_trip(trip_id)
 
     @setup
-    def updateTrip(self, trip):
-        if self.getTripById(trip.get_id()) != None:
+    def update_trip(self, trip):
+        if self.get_trip_by_id(trip.get_id()) != None:
             self.cursor.execute(f"UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
-            self.removeStudentsInTrip(trip.get_id())
+            self.remove_students_in_trip(trip.get_id())
             for s in trip.get_students():
-                self.addStudentToTrip(s, trip.get_id())
+                self.add_student_to_trip(s, trip.get_id())
         else:
-            self.addTrip(trip)
+            self.add_trip(trip)
 
 class Student:
     student_count = 0
