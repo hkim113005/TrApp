@@ -41,6 +41,9 @@ Active Trips
                 <label class="d-grid form-label mt-3 mx-auto">Name</label>
                 <input type="text" class="mt-3 mx-auto form-control" id="create_name" placeholder="Name">
 
+                <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
+                <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer">
+
                 <label class="d-grid form-label mt-3 mx-auto">Groups</label>
                 <input type="number" min="0" oninput="this.value = 
     !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
@@ -129,7 +132,7 @@ Active Trips
             var data = [
                 {
                     "name": document.getElementById("create_name").value,
-                    "organizer": document.getElementById("create_"),
+                    "organizer": document.getElementById("create_organizer").value,
                     "students": [1, 2, 3],
                     "num_groups": document.getElementById("create_num_groups").value,
                     "students_per_group": document.getElementById("create_students_per_group").value
