@@ -93,7 +93,7 @@ def teacher_login_form():
 @app.route("/trips", methods=["GET", "POST"])
 def trips():
     if request.method == "GET":
-        return render_template("trips.html", all_trips = db.getAllTrips(), trip_studs = [db.getStudentsInTrip(t[0]) for t in db.getAllTrips()])
+        return render_template("trips.html", all_trips = db.getAllTrips(), trip_studs = [db.getStudentsInTrip(t[0]) for t in db.getAllTrips()], all_students=db.getAllStudents())
 
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):

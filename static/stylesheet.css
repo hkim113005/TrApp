@@ -62,3 +62,9 @@ thead {
     color: #014C43 !important;
     font-weight: bolder;
 }
+
+.table {
+    display: block !important;
+    max-height: 500px !important;
+    overflow: auto !important;
+}
