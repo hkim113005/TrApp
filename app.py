@@ -25,7 +25,7 @@ db.addTrip(Trip(None, "HS Track & Field", "MESAC", 3, 3, "yyyyyy", [273, 220]))
 db.addTrip(Trip(None, "HS Tennis", "MESAC", 5, 2, "xxxxxxx", [288, 270, 242, 276]))
 db.addTrip(Trip(None, "HS Wrestling", "MESAC", 6, 2, "wwwwww", [204]))
 db.updateTrip(Trip(Trip.get_trips()[3].get_id(), "Varsity Boys Soccer", "MESAC", 9, 3, "updated soccer", [21, 150, 230, 190, 72, 110, 289, 280]))
-print(Trip.get_trips()[0])
+print(db.getAllTrips())
 
 app = Flask(__name__)
 
@@ -77,7 +77,7 @@ def trip_code_form():
 def student_preference_form(trip_id):
     if request.method == "GET":
         if db.getTripById(trip_id) != None:
-            return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id))
+            return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), num_prefs = 5 if len(db.getStudentsInTrip(trip_id)) - 1 > 5 else len(db.getStudentsInTrip(trip_id)) - 1)
         else:
             return render_template("error.html")
     else:
@@ -99,7 +99,7 @@ def trips():
 def trip(trip_id):
     if request.method == "GET":
         return render_template("trip.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), all_students=db.getAllStudents(db.getStudentsInTrip(trip_id)))
-    
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3000")
