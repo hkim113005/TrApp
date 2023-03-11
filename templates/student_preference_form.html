@@ -12,8 +12,8 @@
 <form action="/{{trip_id}}" method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
-    <select id="pref_0" class="mt-3 mx-auto form-select" aria-label=".form-select-sm example">
-        <option >Name</option>
+    <select id="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+        <option selected="selected" disabled selected>Name</option>
         {%for i in range(sel_students|length)%}
             <option value={{sel_students[i][0]}}>{{sel_students[i][1]}}</option>
         {%endfor%}
@@ -24,14 +24,42 @@
     <label class="d-grid form-label mt-5 mx-auto">Preferences</label>
 
     {%for i in range(num_prefs)%}
-    <select id={{'pref_'+ (i+1)|string}} class="mt-3 mx-auto form-select" aria-label=".form-select-sm example">
-        <option >Name</option>
+    <select id={{'pref_'+ (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+        <option selected="selected">Name</option>
         {%for j in range(sel_students|length)%}
-            <option value={{sel_students[i][0]}}>{{sel_students[j][1]}}</option>
+            <option value={{sel_students[j][0]}}>{{sel_students[j][1]}}</option>
         {%endfor%}
     </select>
     {%endfor%}
 
     <button type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
 </form>
+
+<script>
+    function update(id) {
+        let ids = [];
+        let selected = [];
+        let tripStudents = JSON.parse('{{ sel_students | tojson | safe }}');
+        for (let i = 0; i <= JSON.parse('{{num_prefs}}'); i++) {
+            ids.push(`pref_${i}`);
+        }
+        ids.forEach(id => {
+            let options = document.querySelectorAll(`#${id} option`);
+            options.forEach(o => {
+                if(o.value != "Name" && o.selected) selected.push(parseInt(o.value));
+            });
+        });
+        ids.splice(ids.indexOf(id), 1);
+        //ids.splice(ids.indexOf("pref_0"), 1); //Name box will show all names
+        ids.forEach(id => {
+            let options = document.querySelectorAll(`#${id} option`);
+            options.forEach(o => {
+                if(o.value != "Name" && !o.selected) o.remove()
+            });
+            tripStudents.filter(x => !selected.includes(x[0])).forEach(s =>
+                document.getElementById(id).add(new Option(s[1],s[0]), undefined)
+            );
+        });
+    }
+</script>
 {% endblock %}
