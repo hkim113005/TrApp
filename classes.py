@@ -165,11 +165,11 @@ class Student:
 class Trip:
     trip_ids = []
     trips = []
-    def __init__(self, id, name, trip_type, num_groups, students_per_group, preferences, students):
+    def __init__(self, id, name, organizer, num_groups, students_per_group, preferences, students):
         # Have either num_groups or max_per_group and calculate the other variable based on the one that wasn't entered
         self.name = name
         self.id = id if id != None else Trip.generate_id()
-        self.trip_type = trip_type
+        self.organizer = organizer
         self.students = students
         self.num_groups = num_groups
         self.students_per_group = students_per_group
@@ -181,7 +181,7 @@ class Trip:
         self.name = name
 
     def set_type(self, type):
-        self.trip_type = type
+        self.organizer = type
     
     def add_student(self, student):
         self.students.append(student)
@@ -202,7 +202,7 @@ class Trip:
         return self.id
     
     def get_type(self):
-        return self.trip_type
+        return self.organizer
     
     def get_students(self):
         return self.students
@@ -232,7 +232,7 @@ class Trip:
     def __str__(self):
         s = "[TRIP INFO - " + self.name + "]"
         s += "\nTrip ID = " + str(self.id)
-        s += "\nTrip Type: " + self.trip_type
+        s += "\nTrip Type: " + self.organizer
         s += "\nTotal Students: " + str(len(self.students))
         s += "\nStudent Ids: " + str(self.students)
         s += "\nNumber of groups: " + str(self.num_groups)
