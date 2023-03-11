@@ -96,7 +96,7 @@ class Database:
 
     @setup
     def remove_trip(self, trip_id):
-        self.cursor.execute(f"DELETE FROM trips WHERE trip_id = '{trip_id}'")
+        self.cursor.execute(f"DELETE FROM trips WHERE id = '{trip_id}'")
         self.remove_students_in_trip(trip_id)
 
     @setup

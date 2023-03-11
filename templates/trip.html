@@ -36,6 +36,8 @@
 </table>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
     data-bs-target="#student_edit_modal">Edit</button>
+    <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
+    id="delete_button" data-bs-target="#trip_delete_modal">Delete</button>
 <button type="button" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Make Groups</button>
 
 <div class="modal fade" id="student_edit_modal" tabindex="-1" aria-labelledby="student_edit_modal_label" aria-hidden="true">
@@ -65,6 +67,19 @@
                 </table>
             </div>
             <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal">Save</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="trip_delete_modal" tabindex="-1" aria-labelledby="trip_delete_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <label class="d-grid form-label mx-auto">Delete Trip - Are You Sure?</label>
+            </div>
+            <a href="/trips" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Yes</a>
+            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal">No</button>
         </div>
     </div>
 </div>
@@ -110,5 +125,22 @@
         }
         return val
     }
+
+    window.addEventListener("load", () => {
+        document.getElementById("delete_button").addEventListener("click", () => {
+            var data = [
+                {
+                    "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                }
+            ];
+            $.ajax({
+                type: "POST",
+                url: "/delete_trip",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "json"
+            });
+        })
+    })
 </script>
 {% endblock %}

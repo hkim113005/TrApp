@@ -112,7 +112,7 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), all_students=db.get_all_students(db.get_students_in_trip(trip_id)))
+        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), all_students=db.get_all_students(db.get_students_in_trip(trip_id)))
 
 @app.route("/create_trip", methods=["POST"])
 def create_trip():
@@ -125,6 +125,13 @@ def create_trip():
     print(data)
     db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
 
+    return redirect("/trips")
+
+@app.route("/delete_trip", methods=["POST"])
+def delete_trip():
+    data = request.get_json()[0]
+    id = data["id"]
+    db.remove_trip(id)
     return redirect("/trips")
 
 if __name__ == "__main__":
