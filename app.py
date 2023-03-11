@@ -77,7 +77,7 @@ def trip_code_form():
 def student_preference_form(trip_id):
     if request.method == "GET":
         if db.getTripById(trip_id) != None:
-            return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id))
+            return render_template("student_preference_form.html", sel_trip = db.getTripById(trip_id), sel_students = db.getStudentsInTrip(trip_id), num_prefs = 5 if len(db.getStudentsInTrip(trip_id)) - 1 > 5 else len(db.getStudentsInTrip(trip_id)) - 1)
         else:
             return render_template("error.html")
     else:
