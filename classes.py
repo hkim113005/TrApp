@@ -33,6 +33,8 @@ class Database:
             self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
         if "trip_students" not in tables:
             self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
+        if "trip_preferences" not in tables:
+            self.cursor.execute("CREATE TABLE trip_preferences (trip_id TEXT, student_id INTEGER, a TEXT, b TEXT, c TEXT, d TEXT, e TEXT, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         self.conn.commit()
     
     @setup
@@ -106,6 +108,12 @@ class Database:
                 self.add_student_to_trip(s, trip.get_id())
         else:
             self.add_trip(trip)
+
+    @setup
+    def add_preference(self, trip_id, student_id, preferences):
+        for i in range(5 - len(preferences)):
+            preferences.append(None)
+        self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
 
 class Student:
     student_count = 0
