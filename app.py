@@ -76,11 +76,11 @@ def trip_code_form():
 def student_preference_form(trip_id):
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
-            return render_template("student_preference_form.html", sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), num_prefs = 5 if len(db.get_students_in_trip(trip_id)) - 1 > 5 else len(db.get_students_in_trip(trip_id)) - 1)
+            return render_template("student_preference_form.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), num_prefs = 5 if len(db.get_students_in_trip(trip_id)) - 1 > 5 else len(db.get_students_in_trip(trip_id)) - 1)
         else:
             return render_template("error.html")
     else:
-        self_id = pref_1 = pref_2 = pref_3 = pref_4 = pref_5 = 0
+        self_id = pref_1 = pref_2 = pref_3 = pref_4 = pref_5 = None
         if 'pref_0' in request.form:
             self_id = request.form['pref_0']
         if 'pref_1' in request.form:
