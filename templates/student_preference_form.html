@@ -9,10 +9,10 @@
 {% endblock %}
 
 {% block main %}
-<form action="/{{trip_id}}" method="POST">
+<form action=/{{trip_id}} method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
-    <select id="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+    <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
         <option selected="selected" disabled selected>Name</option>
         {%for i in range(sel_students|length)%}
             <option value={{sel_students[i][0]}}>{{sel_students[i][1]}}</option>
@@ -24,7 +24,7 @@
     <label class="d-grid form-label mt-5 mx-auto">Preferences</label>
 
     {%for i in range(num_prefs)%}
-    <select id={{'pref_'+ (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+    <select id={{'pref_' + (i+1)|string}} name={{'pref_' + (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
         <option selected="selected">Name</option>
         {%for j in range(sel_students|length)%}
             <option value={{sel_students[j][0]}}>{{sel_students[j][1]}}</option>
