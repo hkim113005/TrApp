@@ -9,8 +9,7 @@ Active Trips
 {% endblock %}
 
 {% block main %}
-<input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="search()"
-    placeholder="Search">
+<input type="text" class="mt-5 mx-auto form-control" id="search1" onkeyup="search1()" placeholder="Search">
 <table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
@@ -30,13 +29,61 @@ Active Trips
     </tbody>
 </table>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
-data-bs-target="#student_edit_modal">Create</button>
+    data-bs-target="#trip_create_modal">Create</button>
+
+<div class="modal fade" id="trip_create_modal" tabindex="-1" aria-labelledby="trip_create_modal_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <label class="d-grid form-label mx-auto">Create a Trip</label>
+
+                <label class="d-grid form-label mt-3 mx-auto">Name</label>
+                <input type="text" class="mt-3 mx-auto form-control" id="create_name" placeholder="Name">
+
+                <label class="d-grid form-label mt-3 mx-auto">Groups</label>
+                <input type="number" min="0" oninput="this.value = 
+    !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+                    id="create_num_groups" placeholder="# of Groups">
+
+                <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
+                <input type="number" min="0" oninput="this.value = 
+    !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+                    id="create_students_per_group" placeholder="Max Group Size">
+
+                <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
+                <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="search2()"
+                    placeholder="Search">
+                <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60%;">Name</th>
+                            <th class="text-center">Grade</th>
+                            <th class="text-center">Gender</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        {%for s in all_students%}
+                        <tr>
+                            <td>{{s[1]}}</td>
+                            <td class="text-center">{{s[3]}}</td>
+                            <td class="text-center">{{s[4]}}</td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal"
+                id="create_button">Create</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    function search() {
+    function search1() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search");
+        input = document.getElementById("search1");
         filter = input.value.toUpperCase();
         table = document.getElementById("trips_table");
         tr = table.getElementsByTagName("tr");
@@ -54,5 +101,48 @@ data-bs-target="#student_edit_modal">Create</button>
             }
         }
     }
+
+    function search2() {
+        // Declare variables
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search2");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("students_table");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    window.addEventListener("load", () => {
+        document.getElementById("create_button").addEventListener("click", () => {
+            var data = [
+                {
+                    "name": document.getElementById("create_name").value,
+                    "organizer": document.getElementById("create_"),
+                    "students": [1, 2, 3],
+                    "num_groups": document.getElementById("create_num_groups").value,
+                    "students_per_group": document.getElementById("create_students_per_group").value
+                }
+            ];
+            $.ajax({
+                type: "POST",
+                url: "/create_trip",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "json"
+            });
+        })
+    })
 </script>
 {% endblock %}

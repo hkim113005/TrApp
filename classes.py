@@ -30,87 +30,95 @@ class Database:
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
-            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_rooms INTEGER, students_per_room INTEGER, preferences TEXT, PRIMARY KEY(id))")
+            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
         if "trip_students" not in tables:
             self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
+        if "trip_preferences" not in tables:
+            self.cursor.execute("CREATE TABLE trip_preferences (trip_id TEXT, student_id INTEGER, a TEXT, b TEXT, c TEXT, d TEXT, e TEXT, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         self.conn.commit()
     
     @setup
-    def getStudentById(self, student_id):
+    def get_student_by_id(self, student_id):
         student = self.cursor.execute(f'SELECT * FROM students WHERE id = {student_id}').fetchall()
         if student != []:
             s = student[0]
             return s
     
     @setup
-    def getTripById(self, trip_id):
+    def get_trip_by_id(self, trip_id):
         trip = self.cursor.execute(f"SELECT * FROM trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:
             t = trip[0]
             return t
         
     @setup
-    def getAllStudents(self, excluded = []):
+    def get_all_students(self, excluded = []):
         all = self.cursor.execute('select * from students').fetchall()
         all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
         return all
 
     @setup
-    def getAllTrips(self):
+    def get_all_trips(self):
         return sorted(self.cursor.execute('SELECT * FROM trips').fetchall(), key=lambda x: x[1])
     
     @setup
-    def getAllTripStudents(self):
+    def get_all_tripstudents(self):
         return self.cursor.execute('SELECT * FROM trip_students').fetchall()
     
     @setup 
-    def getStudentsInTrip(self, trip_id):
+    def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
         if ids != []:
-            students = sorted([self.getStudentById(id) for id in ids], key=lambda x: (x[3], x[1]))
+            students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
             if students != []:
                 return students
     
     @setup 
-    def removeStudentsInTrip(self, trip_id):
+    def remove_students_in_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
     
     @setup 
-    def getStudentsByAttribute(self, grade, gender):
+    def get_students_by_attribute(self, grade, gender):
         students = self.cursor.execute(f"SELECT * FROM students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
             return students
         
     @setup
-    def addStudentToTrip(self, student_id, trip_id):
+    def add_student_to_trip(self, student_id, trip_id):
         self.cursor.execute('INSERT INTO trip_students(trip_id, student_id) VALUES(?, ?)', (trip_id, student_id))
 
     @setup
-    def addTrip(self, trip):
-        self.cursor.execute('INSERT INTO trips(id, name, type, num_rooms, students_per_room, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
+    def add_trip(self, trip):
+        self.cursor.execute('INSERT INTO trips(id, name, type, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
         for s in trip.get_students():
-            self.addStudentToTrip(s, trip.get_id())
+            self.add_student_to_trip(s, trip.get_id())
 
     @setup
-    def removeTrip(self, trip_id):
+    def remove_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trips WHERE trip_id = '{trip_id}'")
-        self.removeStudentsInTrip(trip_id)
+        self.remove_students_in_trip(trip_id)
 
     @setup
-    def updateTrip(self, trip):
-        if self.getTripById(trip.get_id()) != None:
-            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_rooms, students_per_room, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_rooms(), trip.get_students_per_room(), trip.get_preferences()))
-            self.removeStudentsInTrip(trip.get_id())
+    def update_trip(self, trip):
+        if self.get_trip_by_id(trip.get_id()) != None:
+            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+            self.remove_students_in_trip(trip.get_id())
             for s in trip.get_students():
-                self.addStudentToTrip(s, trip.get_id())
+                self.add_student_to_trip(s, trip.get_id())
         else:
-            self.addTrip(trip)
+            self.add_trip(trip)
+
+    @setup
+    def add_preference(self, trip_id, student_id, preferences):
+        for i in range(5 - len(preferences)):
+            preferences.append(None)
+        self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
 
 class Student:
     student_count = 0
     def __init__(self, id, name, email, grade, gender, preferences=""):
-        # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
+        # Have either num_groups or max_per_group and calculate the other variable based on the one that wasn't entered
         self.name = str(name)
         self.id = id if id != None else (Student.student_count + 1)
         self.email = str(email)
@@ -165,14 +173,14 @@ class Student:
 class Trip:
     trip_ids = []
     trips = []
-    def __init__(self, id, name, trip_type, num_rooms, students_per_room, preferences, students):
-        # Have either num_rooms or max_per_room and calculate the other variable based on the one that wasn't entered
+    def __init__(self, id, name, organizer, num_groups, students_per_group, preferences, students):
+        # Have either num_groups or max_per_group and calculate the other variable based on the one that wasn't entered
         self.name = name
         self.id = id if id != None else Trip.generate_id()
-        self.trip_type = trip_type
+        self.organizer = organizer
         self.students = students
-        self.num_rooms = num_rooms
-        self.students_per_room = students_per_room
+        self.num_groups = num_groups
+        self.students_per_group = students_per_group
         self.preferences = preferences
         Trip.trips.append(self)
         Trip.trip_ids.append(self.id)
@@ -181,16 +189,16 @@ class Trip:
         self.name = name
 
     def set_type(self, type):
-        self.trip_type = type
+        self.organizer = type
     
     def add_student(self, student):
         self.students.append(student)
 
-    def set_num_rooms(self, rooms):
-        self.num_rooms = rooms
+    def set_num_groups(self, groups):
+        self.num_groups = groups
 
-    def set_students_per_room(self, max):
-        self.students_per_room = max
+    def set_students_per_group(self, max):
+        self.students_per_group = max
 
     def set_preferences(self, preferences):
         self.preferences = preferences
@@ -202,16 +210,16 @@ class Trip:
         return self.id
     
     def get_type(self):
-        return self.trip_type
+        return self.organizer
     
     def get_students(self):
         return self.students
     
-    def get_num_rooms(self):
-        return self.num_rooms
+    def get_num_groups(self):
+        return self.num_groups
     
-    def get_students_per_room(self):
-        return self.students_per_room
+    def get_students_per_group(self):
+        return self.students_per_group
     
     def get_preferences(self):
         return self.preferences
@@ -232,10 +240,10 @@ class Trip:
     def __str__(self):
         s = "[TRIP INFO - " + self.name + "]"
         s += "\nTrip ID = " + str(self.id)
-        s += "\nTrip Type: " + self.trip_type
+        s += "\nTrip Type: " + self.organizer
         s += "\nTotal Students: " + str(len(self.students))
         s += "\nStudent Ids: " + str(self.students)
-        s += "\nNumber of Rooms: " + str(self.num_rooms)
-        s += "\nStudents Per Room: " + str(self.students_per_room)
+        s += "\nNumber of groups: " + str(self.num_groups)
+        s += "\nStudents Per group: " + str(self.students_per_group)
         s += "\nPreferences: " + self.preferences
         return s
