@@ -9,7 +9,7 @@ Active Trips
 {% endblock %}
 
 {% block main %}
-<input type="text" class="mt-5 mx-auto form-control" id="search" onkeyup="search()" placeholder="Search">
+<input type="text" class="mt-5 mx-auto form-control" id="search1" onkeyup="search1()" placeholder="Search">
 <table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
@@ -52,7 +52,7 @@ Active Trips
                     placeholder="Max Group Size">
 
                 <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="search" onkeyup="search()"
+                <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="search2()"
                     placeholder="Search">
                 <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
                     <thead>
@@ -79,12 +79,34 @@ Active Trips
 </div>
 
 <script>
-    function search() {
+    function search1() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search");
+        input = document.getElementById("search1");
         filter = input.value.toUpperCase();
         table = document.getElementById("trips_table");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    
+    function search2() {
+        // Declare variables
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search2");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("students_table");
         tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those who don't match the search query
