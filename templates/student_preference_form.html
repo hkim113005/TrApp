@@ -9,22 +9,22 @@
 {% endblock %}
 
 {% block main %}
-<form action=/{{trip_id}} method="POST">
+<form id = "preferences_form" action=/{{trip_id}} method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
-    <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+    <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id); checkform();" aria-label=".form-select-sm example">
         <option selected="selected" disabled selected>Name</option>
         {%for i in range(sel_students|length)%}
             <option value={{sel_students[i][0]}}>{{sel_students[i][1]}}</option>
         {%endfor%}
     </select>
 
-    <input type="password" class="mt-3 mx-auto form-control" id="password" placeholder="Password">
+    <input type="password" onkeyup="checkform()" class="mt-3 mx-auto form-control" id="password" placeholder="Password">
 
     <label class="d-grid form-label mt-5 mx-auto">Preferences</label>
 
     {%for i in range(num_prefs)%}
-    <select id={{'pref_' + (i+1)|string}} name={{'pref_' + (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id)" aria-label=".form-select-sm example">
+    <select id={{'pref_' + (i+1)|string}} name={{'pref_' + (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id); checkform();" aria-label=".form-select-sm example">
         <option selected="selected">Name</option>
         {%for j in range(sel_students|length)%}
             <option value={{sel_students[j][0]}}>{{sel_students[j][1]}}</option>
@@ -32,7 +32,7 @@
     </select>
     {%endfor%}
 
-    <button type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
+    <button id = "pref_submit" disabled="disabled" type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
 </form>
 
 <script>
@@ -60,6 +60,17 @@
                 document.getElementById(id).add(new Option(s[1],s[0]), undefined)
             );
         });
+    }
+
+    function checkform() {
+        var f = document.forms["preferences_form"].elements;
+        var cansubmit = true;
+
+        for (var i = 0; i < f.length; i++) {
+            if (f[i].id != "pref_submit" && (f[i].value == "Name" || f[i].value.length == 0)) cansubmit = false;
+        }
+
+        document.getElementById('pref_submit').disabled = !cansubmit;
     }
 </script>
 {% endblock %}

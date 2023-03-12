@@ -93,8 +93,8 @@ def student_preference_form(trip_id):
             pref_4 = request.form['pref_4']
         if 'pref_5' in request.form:
             pref_5 = request.form['pref_5']
-        print(self_id, pref_1, pref_2, pref_3, pref_4, pref_5)
-        
+        db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
+        #print(self_id, pref_1, pref_2, pref_3, pref_4, pref_5)
         return render_template("success.html", sel_trip = db.get_trip_by_id(trip_id))
 
 @app.route("/teacher-login", methods=["GET", "POST"])

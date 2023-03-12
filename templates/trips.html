@@ -36,48 +36,50 @@ Active Trips
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-body">
-                <label class="d-grid form-label mx-auto">Create a Trip</label>
+                <form name="create_trip_form">
+                    <label class="d-grid form-label mx-auto">Create a Trip</label>
 
-                <label class="d-grid form-label mt-3 mx-auto">Name</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="create_name" placeholder="Name">
+                    <label class="d-grid form-label mt-3 mx-auto">Name</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="create_name" placeholder="Name" onKeyup="checkform()">
 
-                <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer">
+                    <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkform()">
 
-                <label class="d-grid form-label mt-3 mx-auto">Groups</label>
-                <input type="number" min="0" oninput="this.value = 
-    !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
-                    id="create_num_groups" placeholder="# of Groups">
+                    <label class="d-grid form-label mt-3 mx-auto">Groups</label>
+                    <input type="number" min="0" oninput="this.value = 
+        !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+                        onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
 
-                <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
-                <input type="number" min="0" oninput="this.value = 
-    !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
-                    id="create_students_per_group" placeholder="Max Group Size">
+                    <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
+                    <input type="number" min="0" oninput="this.value = 
+        !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+                        onKeyup="checkform()" id="create_students_per_group" placeholder="Max Group Size">
 
-                <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="search2()"
-                    placeholder="Search">
-                <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
-                    <thead>
-                        <tr>
-                            <th style="width: 60%;">Name</th>
-                            <th class="text-center">Grade</th>
-                            <th class="text-center">Gender</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider">
-                        {%for s in all_students%}
-                        <tr>
-                            <td>{{s[1]}}</td>
-                            <td class="text-center">{{s[3]}}</td>
-                            <td class="text-center">{{s[4]}}</td>
-                        </tr>
-                        {%endfor%}
-                    </tbody>
-                </table>
+                    <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="search2()"
+                        placeholder="Search">
+                    <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%;">Name</th>
+                                <th class="text-center">Grade</th>
+                                <th class="text-center">Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            {%for s in all_students%}
+                            <tr>
+                                <td>{{s[1]}}</td>
+                                <td class="text-center">{{s[3]}}</td>
+                                <td class="text-center">{{s[4]}}</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </form>
             </div>
             <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal"
-                id="create_button">Create</button>
+                disabled="disabled" id="create_button">Create</button>
         </div>
     </div>
 </div>
@@ -148,5 +150,16 @@ Active Trips
             setTimeout(location.reload(), 250); //Refreshes trip list
         })
     })
+
+    function checkform() {
+        var f = document.forms["create_trip_form"].elements;
+        var cansubmit = true;
+
+        for (var i = 0; i < f.length; i++) {
+            if (f[i].id != "search2" && f[i].value.length == 0) cansubmit = false;
+        }
+
+        document.getElementById('create_button').disabled = !cansubmit;
+    }
 </script>
 {% endblock %}
