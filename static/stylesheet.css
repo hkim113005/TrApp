@@ -68,3 +68,7 @@ thead {
     max-height: 500px !important;
     overflow: auto !important;
 }
+
+td {
+    border: 1px solid;
+  }

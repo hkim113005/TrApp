@@ -94,7 +94,6 @@ def student_preference_form(trip_id):
         if 'pref_5' in request.form:
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
-        #print(self_id, pref_1, pref_2, pref_3, pref_4, pref_5)
         return render_template("success.html", sel_trip = db.get_trip_by_id(trip_id))
 
 @app.route("/teacher-login", methods=["GET", "POST"])
@@ -112,7 +111,7 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), all_students=db.get_all_students(db.get_students_in_trip(trip_id)))
+        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), all_students=db.get_all_students())
 
 @app.route("/create_trip", methods=["POST"])
 def create_trip():
@@ -132,6 +131,14 @@ def delete_trip():
     data = request.get_json()[0]
     id = data["id"]
     db.remove_trip(id)
+    return redirect("/trips")
+
+@app.route("/save_trip", methods=["POST"])
+def save_trip():
+    data = request.get_json()[0]
+    id = data["id"]
+    students = data["students"]
+    db.update_students_in_trip(id, students)
     return redirect("/trips")
 
 if __name__ == "__main__":

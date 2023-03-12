@@ -115,6 +115,13 @@ class Database:
             preferences.append(None)
         self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
 
+    @setup
+    def update_students_in_trip(self, trip_id, students):
+        self.remove_students_in_trip(trip_id)
+        for new in students:
+            self.add_student_to_trip(trip_id, new)
+
+
 class Student:
     student_count = 0
     def __init__(self, id, name, email, grade, gender, preferences=""):

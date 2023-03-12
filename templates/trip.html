@@ -50,14 +50,16 @@
                 <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
                     <thead>
                         <tr>
+                            <th style="width: 15%;">X</th>
                             <th style="width: 60%;">Name</th>
                             <th class="text-center">Grade</th>
                             <th class="text-center">Gender</th>
                         </tr>
                     </thead>
-                    <tbody class="table-group-divider">
+                    <tbody id="all_students" class="table-group-divider">
                         {%for s in all_students%}
-                        <tr>
+                        <tr id={{s[0]}}>
+                            <td> <input onclick="updateCheckbox()" type="checkbox"> </td>
                             <td>{{s[1]}}</td>
                             <td class="text-center">{{s[3]}}</td>
                             <td class="text-center">{{s[4]}}</td>
@@ -66,7 +68,7 @@
                     </tbody>
                 </table>
             </div>
-            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal">Save</button>
+            <button id="save_trip" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal">Save</button>
         </div>
     </div>
 </div>
@@ -95,7 +97,7 @@
 
         // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
+            td = tr[i].getElementsByTagName("td")[1];
             if (td) {
                 txtValue = td.textContent || td.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -126,6 +128,31 @@
         return val
     }
 
+    function getSelectedStudents() {
+        var table = document.getElementById("students_table");
+        var tr = table.getElementsByTagName("tr");
+        let selected = [];
+        for (i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (inp.checked) {
+                selected.push(tr[i].id);
+            }
+        }
+        return selected;
+    }
+
+    function updateCheckbox() {
+        var selected = getSelectedStudents();
+        var table = document.getElementById("students_table");
+        var tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (selected.includes(tr[i].id)) {
+                inp.checked = true;
+            }
+        }
+    }
+
     window.addEventListener("load", () => {
         document.getElementById("delete_button").addEventListener("click", () => {
             var data = [
@@ -141,6 +168,23 @@
                 dataType: "json"
             });
         })
+
+        document.getElementById("save_trip").addEventListener("click", () => {
+            var data = [
+                {
+                    "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                    "students": getSelectedStudents().map(x => parseInt(x))
+                }
+            ];
+            $.ajax({
+                type: "POST",
+                url: "/save_trip",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "json"
+            });
+        })
+        updateCheckbox();
     })
 </script>
 {% endblock %}
