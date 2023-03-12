@@ -68,7 +68,7 @@
                     </tbody>
                 </table>
             </div>
-            <button id="save_trip" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal">Save</button>
+            <a id="save_trip" href={{'/trips/' + trip_id | string}} class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Save</a>
         </div>
     </div>
 </div>
@@ -141,14 +141,36 @@
         return selected;
     }
 
-    function updateCheckbox() {
-        var selected = getSelectedStudents();
+    function initCheckboxes() {
+        var selected = JSON.parse('{{ sel_students | tojson | safe }}').map(x => x[0])
         var table = document.getElementById("students_table");
         var tr = table.getElementsByTagName("tr");
         for (i = 1; i < tr.length; i++) {
             var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (selected.includes(parseInt(tr[i].id))) {
+                inp.checked = true;
+            }
+        }
+        updateCheckbox();
+    }
+
+    function updateCheckbox() {
+        var selected = getSelectedStudents();
+        var table = document.getElementById("students_table");
+        var rows = table.rows;
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
             if (selected.includes(tr[i].id)) {
                 inp.checked = true;
+            }
+        }
+
+        for (var j = 1; j < tr.length; j++) {
+            var inp = tr[j].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (inp.checked) {
+                parent = rows[j].parentNode;
+                parent.insertBefore(rows[j],parent.firstChild);
             }
         }
     }
@@ -183,8 +205,8 @@
                 contentType: "application/json",
                 dataType: "json"
             });
-        })
-        updateCheckbox();
+        });
+        initCheckboxes();
     })
 </script>
 {% endblock %}

@@ -119,7 +119,7 @@ class Database:
     def update_students_in_trip(self, trip_id, students):
         self.remove_students_in_trip(trip_id)
         for new in students:
-            self.add_student_to_trip(trip_id, new)
+            self.add_student_to_trip(new, trip_id)
 
 
 class Student:
