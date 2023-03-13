@@ -35,7 +35,7 @@
     </tbody>
 </table>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
-    onclick="initRows()" data-bs-target="#student_edit_modal">Edit</button>
+    onclick="initCheckboxes()" data-bs-target="#student_edit_modal">Edit</button>
     <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
     id="delete_button" data-bs-target="#trip_delete_modal">Delete</button>
 <button type="button" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Make Groups</button>
@@ -50,6 +50,7 @@
                 <table class="table table-sm table-hover mt-2 mx-auto" id="students_table">
                     <thead>
                         <tr>
+                            <th style="width: 15%;"> </th>
                             <th style="width: 60%;">Name</th>
                             <th class="text-center">Grade</th>
                             <th class="text-center">Gender</th>
@@ -57,7 +58,8 @@
                     </thead>
                     <tbody id="all_students" class="table-group-divider">
                         {%for s in all_students%}
-                        <tr id={{s[0]}}  onclick="updateRow(this.id)">
+                        <tr id={{s[0]}}>
+                            <td> <input onclick="updateCheckbox()" type="checkbox"> </td>
                             <td>{{s[1]}}</td>
                             <td class="text-center">{{s[3]}}</td>
                             <td class="text-center">{{s[4]}}</td>
@@ -95,7 +97,7 @@
 
         // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
+            td = tr[i].getElementsByTagName("td")[1];
             if (td) {
                 txtValue = td.textContent || td.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -126,54 +128,52 @@
         return val
     }
 
-    function initRows() {
-        var selected = JSON.parse('{{ sel_students | tojson | safe }}').map(x => x[0])
-        var table = document.getElementById("students_table");
-        var tr = table.getElementsByTagName("tr");
-        for (i = 1; i < tr.length; i++) {
-            if (selected.includes(parseInt(tr[i].id))) {
-                tr[i].className = "selected";
-            }
-        }
-        updateRow();
-    }
-
     function getSelectedStudents() {
         var table = document.getElementById("students_table");
         var tr = table.getElementsByTagName("tr");
         let selected = [];
         for (i = 1; i < tr.length; i++) {
-            if (tr[i].className == "selected") {
-                selected.push(parseInt(tr[i].id));
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (inp.checked) {
+                selected.push(tr[i].id);
             }
         }
         return selected;
     }
 
-    function updateRow(id) {
-        var selected = getSelectedStudents();
-        console.log(selected);
-        if (id !== undefined) {
-            let rowElem = document.getElementById(id);
-            if(rowElem.className == "selected") {
-                rowElem.className = ""
-            } else {
-                rowElem.className = "selected";
+    function initCheckboxes() {
+        var selected = JSON.parse('{{ sel_students | tojson | safe }}').map(x => x[0])
+        var table = document.getElementById("students_table");
+        var tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (selected.includes(parseInt(tr[i].id))) {
+                inp.checked = true;
             }
         }
+        updateCheckbox();
+    }
+
+    function updateCheckbox() {
+        var selected = getSelectedStudents();
         var table = document.getElementById("students_table");
         var rows = table.rows;
         var tr = table.getElementsByTagName("tr");
         for (var i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
             if (selected.includes(tr[i].id)) {
-                tr[i].className = "selected"
+                inp.checked = true;
             }
         }
 
         for (var j = 1; j < tr.length; j++) {
-            if (tr[j].className == "selected") {
+            var inp = tr[j].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (inp.checked) {
+                tr[j].className = "selected";
                 parent = rows[j].parentNode;
                 parent.insertBefore(rows[j],parent.firstChild);
+            } else {
+                tr[j].className = "";
             }
         }
     }
