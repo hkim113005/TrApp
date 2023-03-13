@@ -5,7 +5,7 @@ import string
 
 def setup(f):
     def wrap(*args, **kwargs):
-        args[0].conn = sqlite3.connect(Database.DEFAULT_DB)
+        args[0].conn = sqlite3.connect(Database.DEFAULT_DB, check_same_thread=False)
         r = f(*args, **kwargs)
         args[0].conn.close()
         return r
