@@ -69,10 +69,8 @@ class Database:
     def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
-        if ids != []:
-            students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
-            if students != []:
-                return students
+        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
+        return students
     
     @setup 
     def remove_students_in_trip(self, trip_id):

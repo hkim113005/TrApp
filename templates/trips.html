@@ -47,12 +47,12 @@ Active Trips
 
                     <label class="d-grid form-label mt-3 mx-auto">Groups</label>
                     <input type="number" min="0" oninput="this.value = 
-        !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+        !!this.value && Math.abs(this.value) > 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
 
                     <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
                     <input type="number" min="0" oninput="this.value = 
-        !!this.value && Math.abs(this.value) >= 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+        !!this.value && Math.abs(this.value) > 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_students_per_group" placeholder="Max Group Size">
 
                     <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
