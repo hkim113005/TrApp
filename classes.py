@@ -2,6 +2,7 @@ import sqlite3
 import csv
 import random
 import string
+import time
 
 def setup(f):
     def wrap(*args, **kwargs):
@@ -75,6 +76,7 @@ class Database:
     @setup 
     def remove_students_in_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
+        self.conn.commit()
     
     @setup 
     def get_students_by_attribute(self, grade, gender):
@@ -85,16 +87,19 @@ class Database:
     @setup
     def add_student_to_trip(self, student_id, trip_id):
         self.cursor.execute('INSERT INTO trip_students(trip_id, student_id) VALUES(?, ?)', (trip_id, student_id))
+        self.conn.commit()
 
     @setup
     def add_trip(self, trip):
         self.cursor.execute('INSERT INTO trips(id, name, type, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+        self.conn.commit()
         for s in trip.get_students():
             self.add_student_to_trip(s, trip.get_id())
 
     @setup
     def remove_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trips WHERE id = '{trip_id}'")
+        self.conn.commit()
         self.remove_students_in_trip(trip_id)
 
     @setup
@@ -112,6 +117,11 @@ class Database:
         for i in range(5 - len(preferences)):
             preferences.append(None)
         self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
+        self.conn.commit()
+        
+    @setup
+    def get_all_trip_preferences(self):
+        return self.cursor.execute('SELECT * FROM trip_preferences').fetchall()
 
     @setup
     def update_students_in_trip(self, trip_id, students):

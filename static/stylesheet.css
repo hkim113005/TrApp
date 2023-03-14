@@ -69,7 +69,7 @@ thead {
     overflow: auto !important;
 }
 
-.table_students {
+.table-students {
     display: block !important;
     max-height: 200px !important;
     overflow: auto !important;
