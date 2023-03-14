@@ -71,6 +71,6 @@ thead {
 
 .table-students {
     display: block !important;
-    max-height: 200px !important;
+    max-height: 350px !important;
     overflow: auto !important;
 }
