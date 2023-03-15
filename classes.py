@@ -91,7 +91,7 @@ class Database:
 
     @setup
     def add_trip(self, trip):
-        self.cursor.execute('INSERT INTO trips(id, name, type, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+        self.cursor.execute('INSERT INTO trips(id, name, type, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
         self.conn.commit()
         for s in trip.get_students():
             self.add_student_to_trip(s, trip.get_id())
@@ -105,7 +105,7 @@ class Database:
     @setup
     def update_trip(self, trip):
         if self.get_trip_by_id(trip.get_id()) != None:
-            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_type(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
             self.remove_students_in_trip(trip.get_id())
             for s in trip.get_students():
                 self.add_student_to_trip(s, trip.get_id())
@@ -203,7 +203,7 @@ class Trip:
     def set_name(self, name):
         self.name = name
 
-    def set_type(self, type):
+    def set_organizer(self, type):
         self.organizer = type
     
     def add_student(self, student):
@@ -224,7 +224,7 @@ class Trip:
     def get_id(self):
         return self.id
     
-    def get_type(self):
+    def get_organizer(self):
         return self.organizer
     
     def get_students(self):
@@ -242,6 +242,12 @@ class Trip:
     @staticmethod
     def get_trips():
         return Trip.trips
+    
+    @staticmethod
+    def get_trip_with_id(id):
+        for trip in Trip.get_trips():
+            if trip.get_id() == id:
+                return trip
 
     @staticmethod
     def generate_id():
@@ -255,7 +261,7 @@ class Trip:
     def __str__(self):
         s = "[TRIP INFO - " + self.name + "]"
         s += "\nTrip ID = " + str(self.id)
-        s += "\nTrip Type: " + self.organizer
+        s += "\nOrganizer: " + self.organizer
         s += "\nTotal Students: " + str(len(self.students))
         s += "\nStudent Ids: " + str(self.students)
         s += "\nNumber of groups: " + str(self.num_groups)

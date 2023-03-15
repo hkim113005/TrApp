@@ -133,12 +133,20 @@ def delete_trip():
     db.remove_trip(id)
     return redirect("/trips")
 
-@app.route("/save_trip", methods=["POST"])
-def save_trip():
+@app.route("/update_trip", methods=["POST"])
+def update_trip():
     data = request.get_json()[0]
     id = data["id"]
-    students = data["students"]
-    db.update_students_in_trip(id, students)
+    if "students" in data:
+        students = data["students"]
+        db.update_students_in_trip(id, students)
+    else:
+        trip = Trip.get_trip_with_id(id)
+        num_groups = data["numGroups"]
+        group_size = data["groupSize"]
+        trip.set_num_groups(num_groups)
+        trip.set_students_per_group(group_size)
+        db.update_trip(trip)
     return redirect("/trips")
 
 if __name__ == "__main__":
