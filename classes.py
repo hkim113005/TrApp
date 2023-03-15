@@ -251,9 +251,11 @@ class Trip:
 
     @staticmethod
     def generate_id():
+        letters = "ABCDEFGHJKLMNPQRSTUVWXYZ" # No "I" or "O" (too confusing with 1 and 0 numbers)
+        nums = "0123456789"
         id = ""
         while True:
-            id = ''.join(random.sample((string.ascii_uppercase+string.digits),6))
+            id = ''.join(random.sample((letters + nums),6))
             if(id not in Trip.trip_ids):
                 break
         return id
