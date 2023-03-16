@@ -123,7 +123,6 @@ def create_trip():
     students_per_group = data["students_per_group"]
     print(data)
     db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
-
     return redirect("/trips")
 
 @app.route("/delete_trip", methods=["POST"])

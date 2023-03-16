@@ -66,7 +66,7 @@
                     </tbody>
                 </table>
             </div>
-            <a id="save_trip" href={{'/trips/' + trip_id | string}} class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Save</a>
+            <a id="save_trip" data-bs-dismiss="modal" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Save</a>
         </div>
     </div>
 </div>
@@ -228,6 +228,7 @@
                 contentType: "application/json",
                 dataType: "json"
             });
+            //setTimeout(location.reload(), 500); //Refreshes trip list (BUGGED)
         });
 
         

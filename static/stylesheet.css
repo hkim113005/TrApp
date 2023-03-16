@@ -29,10 +29,6 @@ input[type=number]::-webkit-outer-spin-button {
     width: 320px !important;
 }
 
-.table {
-    width: 320px !important;
-}
-
 label {
     color: #014C43;
     font-weight: bold;
@@ -64,6 +60,7 @@ thead {
 }
 
 .table {
+    width: 320px !important;
     display: block !important;
     max-height: 500px !important;
     overflow: auto !important;
@@ -73,4 +70,10 @@ thead {
     display: block !important;
     max-height: 350px !important;
     overflow: auto !important;
+}
+
+thead {
+    top: 0;
+    position: sticky;
+    background-color: white;
 }
