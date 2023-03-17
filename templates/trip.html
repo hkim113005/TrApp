@@ -120,12 +120,14 @@
         val = !!val && Math.abs(val) > 0 ? Math.abs(val) : null
         var groupElem = document.getElementById("num_groups");
         var sizeElem = document.getElementById("group_size");
-        if (x) {
-            sizeElem.value = Math.ceil(numStudents / val);
-        } else {
-            groupElem.value = Math.ceil(numStudents / val);
-        }
-        if (groupElem.value != 0 && sizeElem.value != 0) {
+        let autoVal = Math.ceil(numStudents / val);
+        
+        if (sizeElem.value != 0 && groupElem.value != 0 && autoVal != 0) {
+            if (x) {
+                sizeElem.value = autoVal;
+            } else {
+                groupElem.value = autoVal;
+            }
             var data = [
                 {
                     "id": JSON.parse('{{ trip_id | tojson | safe }}'),
@@ -140,10 +142,10 @@
                 contentType: "application/json",
                 dataType: "json"
             });
+            return val;
         } else {
             return null;
         }
-        return val;
     }
 
     function initRows() {
@@ -221,14 +223,17 @@
                     "students": getSelectedStudents().map(x => parseInt(x))
                 }
             ];
-            $.ajax({
+            let updatePost = $.ajax({
                 type: "POST",
                 url: "/update_trip",
                 data: JSON.stringify(data),
                 contentType: "application/json",
-                dataType: "json"
+                dataType: "json",
+                complete: function(response) {
+                    window.location = window.location;
+                }
             });
-            //setTimeout(location.reload(), 500); //Refreshes trip list (BUGGED)
+            console.log(JSON.parse('{{ sel_students | tojson | safe }}'))
         });
 
         

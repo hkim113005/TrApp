@@ -140,14 +140,16 @@ Active Trips
                     "students_per_group": document.getElementById("create_students_per_group").value
                 }
             ];
-            $.ajax({
+            let updatePost = $.ajax({
                 type: "POST",
                 url: "/create_trip",
                 data: JSON.stringify(data),
                 contentType: "application/json",
-                dataType: "json"
+                dataType: "json",
+                complete: function(response) {
+                    window.location = window.location;
+                }
             });
-            //setTimeout(location.reload(), 500); //Refreshes trip list (BUGGED)
         })
 
         // TABLE SORTING WITH HEADERS

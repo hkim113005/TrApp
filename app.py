@@ -115,38 +115,41 @@ def trip(trip_id):
 
 @app.route("/create_trip", methods=["POST"])
 def create_trip():
-    data = request.get_json()[0]
-    name = data["name"]
-    organizer = data["organizer"]
-    students = data["students"]
-    num_groups = data["num_groups"]
-    students_per_group = data["students_per_group"]
-    print(data)
-    db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
-    return redirect("/trips")
+    if request.method == "POST":
+        data = request.get_json()[0]
+        name = data["name"]
+        organizer = data["organizer"]
+        students = data["students"]
+        num_groups = data["num_groups"]
+        students_per_group = data["students_per_group"]
+        print(data)
+        db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
+        return redirect("/trips")
 
 @app.route("/delete_trip", methods=["POST"])
 def delete_trip():
-    data = request.get_json()[0]
-    id = data["id"]
-    db.remove_trip(id)
-    return redirect("/trips")
+    if request.method == "POST":
+        data = request.get_json()[0]
+        id = data["id"]
+        db.remove_trip(id)
+        return redirect("/trips")
 
 @app.route("/update_trip", methods=["POST"])
 def update_trip():
-    data = request.get_json()[0]
-    id = data["id"]
-    if "students" in data:
-        students = data["students"]
-        db.update_students_in_trip(id, students)
-    else:
-        trip = Trip.get_trip_with_id(id)
-        num_groups = data["numGroups"]
-        group_size = data["groupSize"]
-        trip.set_num_groups(num_groups)
-        trip.set_students_per_group(group_size)
-        db.update_trip(trip)
-    return redirect("/trips")
+    if request.method == "POST":
+        data = request.get_json()[0]
+        id = data["id"]
+        if "students" in data:
+            students = data["students"]
+            db.update_students_in_trip(id, students)
+        else:
+            trip = Trip.get_trip_with_id(id)
+            num_groups = data["numGroups"]
+            group_size = data["groupSize"]
+            trip.set_num_groups(num_groups)
+            trip.set_students_per_group(group_size)
+            db.update_trip(trip)
+        return redirect(f"/trips/{id}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3001")
