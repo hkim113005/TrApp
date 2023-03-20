@@ -113,15 +113,22 @@ class Database:
             self.add_trip(trip)
 
     @setup
-    def add_preferences(self, trip_id, student_id, preferences):
-        for i in range(5 - len(preferences)):
-            preferences.append(None)
-        self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
-        self.conn.commit()
-        
-    @setup
     def get_all_trip_preferences(self):
         return self.cursor.execute('SELECT * FROM trip_preferences').fetchall()
+
+    @setup
+    def check_student_preferences(self, trip_id, student_id):
+        pref = self.cursor.execute(f"SELECT * FROM trip_preferences WHERE trip_id ='{trip_id}' AND student_id = {student_id}").fetchall()
+        return pref != []
+
+    @setup
+    def add_preferences(self, trip_id, student_id, preferences):
+        for _ in range(5 - len(preferences)):
+            preferences.append(None)
+        if self.check_student_preferences(trip_id, student_id):
+            self.cursor.execute(f"UPDATE trip_preferences SET (a, b, c, d, e) = (?, ?, ?, ?, ?) WHERE trip_id ='{trip_id}' AND student_id = {student_id}", preferences)
+        else:
+            self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
 
     @setup
     def update_students_in_trip(self, trip_id, students):

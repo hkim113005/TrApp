@@ -94,6 +94,7 @@ def student_preference_form(trip_id):
         if 'pref_5' in request.form:
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
+        print(db.get_all_trip_preferences())
         return render_template("success.html", sel_trip = db.get_trip_by_id(trip_id))
 
 @app.route("/teacher-login", methods=["GET", "POST"])
@@ -111,7 +112,7 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), all_students=db.get_all_students())
+        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = [db.check_student_preferences(trip_id, s[0]) for s in db.get_students_in_trip(trip_id)], all_students=db.get_all_students())
 
 @app.route("/create_trip", methods=["POST"])
 def create_trip():
@@ -152,4 +153,4 @@ def update_trip():
         return redirect(f"/trips/{id}")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="3001")
+    app.run(host="0.0.0.0", port="5000")

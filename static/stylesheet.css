@@ -54,6 +54,16 @@ thead {
     border-color: #014c4350;
 }
 
+.complete {
+    background-color: rgba(0, 255, 0, 0.350) !important;
+    border-color: rgba(0, 255, 0, 0.350);
+}
+
+.incomplete {
+    background-color: rgba(255, 0, 0, 0.350) !important;
+    border-color: rgba(255, 0, 0, 0.350);
+}
+
 .completed {
     color: #014C43 !important;
     font-weight: bolder;

@@ -26,7 +26,7 @@
     </thead>
     <tbody class="table-group-divider">
         {%for student in sel_students%}
-        <tr>
+        <tr class={{'complete' if student_prefs[loop.index - 1] else 'incomplete'}}>
             <td>{{student[1]}}</td>
             <td class="text-center">{{student[3]}}</td>
             <td class="text-center">{{student[4]}}</td>
