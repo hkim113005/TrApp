@@ -45,15 +45,13 @@ Active Trips
                     <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkform()">
 
-                    <label class="d-grid form-label mt-3 mx-auto">Groups</label>
-                    <input type="number" min="0" oninput="this.value = 
-        !!this.value && Math.abs(this.value) > 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
+                    <label class="d-grid form-label mt-3 mx-auto">Groups (Auto-Calculated)</label>
+                    <input type="number" min="0" disabled class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
 
                     <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
-                    <input type="number" min="0" oninput="this.value = 
-        !!this.value && Math.abs(this.value) > 0 ? Math.abs(this.value) : null" class="mt-3 mx-auto form-control"
-                        onKeyup="checkform()" id="create_students_per_group" placeholder="Max Group Size">
+                    <input type="number" min="0" oninput="this.value = updateGroupVal(this.value, false)" class="mt-3 mx-auto form-control"
+                        onKeyup="checkform()" id="create_group_size" placeholder="Max Group Size">
 
                     <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="searchStudents()"
@@ -137,7 +135,7 @@ Active Trips
                     "organizer": document.getElementById("create_organizer").value,
                     "students": getSelectedStudents().map(x => parseInt(x)),
                     "num_groups": document.getElementById("create_num_groups").value,
-                    "students_per_group": document.getElementById("create_students_per_group").value
+                    "students_per_group": document.getElementById("create_group_size").value
                 }
             ];
             let updatePost = $.ajax({
@@ -237,7 +235,6 @@ Active Trips
 
     function updateRow(id) {
         var selected = getSelectedStudents();
-        console.log(selected);
         if (id != undefined) {
             let rowElem = document.getElementById(id);
             if(rowElem.className == "selected") {
@@ -260,6 +257,43 @@ Active Trips
                 parent = rows[j].parentNode;
                 parent.insertBefore(rows[j],parent.firstChild);
             }
+        }
+        updateGroupVal(document.getElementById("create_group_size").value, false)
+    }
+
+    function updateGroupVal(val, x) {
+        var table = document.getElementById("students_table");
+        var tr = table.getElementsByTagName("tr");
+        let tripStudents = [];
+        for (i = 1; i < tr.length; i++) {
+            if (tr[i].className == "selected") {
+                let attr = tr[i].getElementsByTagName("td");
+                let s = [parseInt(tr[i].id), attr[0].innerHTML, "", attr[1].innerHTML, attr[2].innerHTML]
+                tripStudents.push(s);
+            }
+        }
+        var males = tripStudents.filter(s => s[4] == "M");
+        var females = tripStudents.filter(s => s[4] == "F");
+
+        val = !!val && Math.abs(val) > 0 ? Math.abs(val) : null
+        var groupElem = document.getElementById("create_num_groups");
+        var sizeElem = document.getElementById("create_group_size");
+        let autoVal = 0;
+        if (x) {
+            autoVal = null; //DISABLED
+        } else {
+            autoVal = Math.ceil(males.length / val) + Math.ceil(females.length / val);
+        }
+
+        if ((sizeElem.value != 0 && autoVal != 0) || !getSelectedStudents().length) {
+            if (x) {
+                sizeElem.value = autoVal;
+            } else {
+                groupElem.value = autoVal;
+            }
+            return val;
+        } else {
+            return null;
         }
     }
 </script>
