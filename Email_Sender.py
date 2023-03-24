@@ -7,26 +7,20 @@ from email import encoders
 smtp_port = 587
 smtp_server = "smtp.gmail.com"
 
-email_from = "EMAIL"
-email_list = ["EMAIL ARRAY"]
+TSU_EMAIL = "EMAIL"
 email_name = ["NAME ARRAY"]
 
 pswd = "I am not putting that "
 
-def send_emails(email_list):
+def send_emails(students, sub, body):
 
-    for person in email_list:
-
-        subject = "subject"
-
-        body = f"""
-        Dear , You have signed up for {trip}. How fun! For your trip, you must select people you would like to be roommates with. Please fill in the form below to choose your roommates.
-        """
+    for person in students:
+        body = body.replace("^", person[1])
 
         msg = MIMEMultipart()
-        msg['From'] = email_from
-        msg['To'] = person
-        msg['Subject'] = subject
+        msg['From'] = TSU_EMAIL
+        msg['To'] = person[2]
+        msg['Subject'] = sub
 
         msg.attach(MIMEText(body, 'plain'))
 
@@ -34,14 +28,20 @@ def send_emails(email_list):
 
         TIE_server = smtplib.SMTP(smtp_server, smpt_port)
         TIE_server.starttls()
-        TIE_server.login(email_from, pswd)
+        TIE_server.login(TSU_EMAIL, pswd)
 
 
 
-        TIE_server.sendmail(email_from, person, text)
+        TIE_server.sendmail(TSU_EMAIL, person, text)
 
     # Closes the port
     TIE_server.quit()
 
+test_subject = "TESTING"
+test_body = "Hello ^,\n\tThis is a test email so I hope this works. Please reply to this email ASAP so I know it works.\nThanks,\nACS Tech Startup Club (TSU)"
+test_students = [
+    (0, "Rohit Sundararaman", "rohitsundararaman@acs.sch.ae", 10, "M")
+]
 
-send_emails(email_list)
+print(test_body.replace('^', test_students[0][1]))
+#send_emails(test_students, test_subject, test_body)
