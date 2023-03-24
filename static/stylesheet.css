@@ -29,10 +29,6 @@ input[type=number]::-webkit-outer-spin-button {
     width: 320px !important;
 }
 
-.table {
-    width: 320px !important;
-}
-
 label {
     color: #014C43;
     font-weight: bold;
@@ -58,12 +54,23 @@ thead {
     border-color: #014c4350;
 }
 
+.complete {
+    background-color: rgba(0, 255, 0, 0.350) !important;
+    border-color: rgba(0, 255, 0, 0.350);
+}
+
+.incomplete {
+    background-color: rgba(255, 0, 0, 0.350) !important;
+    border-color: rgba(255, 0, 0, 0.350);
+}
+
 .completed {
     color: #014C43 !important;
     font-weight: bolder;
 }
 
 .table {
+    width: 320px !important;
     display: block !important;
     max-height: 500px !important;
     overflow: auto !important;
@@ -73,4 +80,10 @@ thead {
     display: block !important;
     max-height: 350px !important;
     overflow: auto !important;
+}
+
+thead {
+    top: 0;
+    position: sticky;
+    background-color: white;
 }

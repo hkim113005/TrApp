@@ -32,7 +32,7 @@ def send_emails(email_list):
 
         text = msg.as_string()
 
-        TIE_server = smtplib.SMTP(smtp_server, smtp_port)
+        TIE_server = smtplib.SMTP(smtp_server, smpt_port)
         TIE_server.starttls()
         TIE_server.login(email_from, pswd)
 
