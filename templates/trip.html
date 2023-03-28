@@ -15,7 +15,7 @@
 <label class="d-grid form-label mt-4 mx-auto">Group Size</label>
 <input name="group_size" id="group_size" type="number" min="0" oninput="this.value = updateGroupVal(this.value, false, false)" class="mt-3 mx-auto form-control" value={{sel_trip[4]}} placeholder="Max Group Size">
 
-<label class="d-grid form-label mt-4 mx-auto">Students</label>
+<label class="d-grid form-label mt-4 mx-auto">Students ({{sel_students | length}})</label>
 <table class="table table-sm table-hover mt-2 mx-auto">
     <thead>
         <tr>
@@ -45,8 +45,7 @@
         <div class="modal-content">
             <div class="modal-body">
                 <label class="d-grid form-label mx-auto">Add or Remove Students</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="search" onkeyup="search()"
-                    placeholder="Search">
+                <input type="text" class="mt-3 mx-auto form-control" id="search" onkeyup="search()" placeholder="Search">
                 <table class="table table-students table-sm table-hover mt-2 mx-auto" id="students_table">
                     <thead>
                         <tr>
@@ -55,7 +54,7 @@
                             <th class="text-center">Gender</th>
                         </tr>
                     </thead>
-                    <tbody id="all_students" class="table-group-divider">
+                    <tbody id="all_students" class="table-group-divider table-body">
                         {%for s in all_students%}
                         <tr id={{s[0]}}  onclick="updateRow(this.id)">
                             <td>{{s[1]}}</td>
@@ -124,9 +123,6 @@
         }
         var males = tripStudents.filter(s => s[4] == "M");
         var females = tripStudents.filter(s => s[4] == "F");
-        console.log(tripStudents);
-        console.log(males);
-        console.log(females);
 
         val = !!val && Math.abs(val) > 0 ? Math.abs(val) : null
         var groupElem = document.getElementById("num_groups");
@@ -249,7 +245,6 @@
                     window.location = window.location;
                 }
             });
-            console.log(JSON.parse('{{ sel_students | tojson | safe }}'))
         });
 
         

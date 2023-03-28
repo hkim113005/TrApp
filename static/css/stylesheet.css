@@ -35,10 +35,6 @@ label {
     font-size: large;
 }
 
-thead {
-    color: #014C43;
-}
-
 .modal-dialog {
     width: 360px !important;
     margin-left: auto !important;
@@ -77,6 +73,7 @@ thead {
 }
 
 .table-students {
+    width: 320px !important;
     display: block !important;
     max-height: 350px !important;
     overflow: auto !important;
@@ -84,6 +81,7 @@ thead {
 
 thead {
     top: 0;
+    color: #014C43;
     position: sticky;
     background-color: white;
 }
