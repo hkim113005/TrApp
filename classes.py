@@ -33,7 +33,7 @@ class Database:
         if "trips" not in tables:
             self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
         if "trip_students" not in tables:
-            self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
+            self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, group_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         if "trip_preferences" not in tables:
             self.cursor.execute("CREATE TABLE trip_preferences (trip_id TEXT, student_id INTEGER, a INTEGER, b INTEGER, c INTEGER, d INTEGER, e INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         self.conn.commit()
@@ -62,10 +62,6 @@ class Database:
     def get_all_trips(self):
         return sorted(self.cursor.execute('SELECT * FROM trips').fetchall(), key=lambda x: x[1])
     
-    @setup
-    def get_all_tripstudents(self):
-        return self.cursor.execute('SELECT * FROM trip_students').fetchall()
-    
     @setup 
     def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
@@ -86,8 +82,12 @@ class Database:
         
     @setup
     def add_student_to_trip(self, student_id, trip_id):
-        self.cursor.execute('INSERT INTO trip_students(trip_id, student_id) VALUES(?, ?)', (trip_id, student_id))
+        self.cursor.execute('INSERT INTO trip_students(trip_id, student_id, group_id) VALUES(?, ?, ?)', (trip_id, student_id, 0))
         self.conn.commit()
+
+    @setup
+    def get_all_trip_students(self):
+        return self.cursor.execute('select * from trip_students').fetchall()
 
     @setup
     def add_trip(self, trip):
@@ -135,6 +135,33 @@ class Database:
         self.remove_students_in_trip(trip_id)
         for new in students:
             self.add_student_to_trip(new, trip_id)
+    
+    @setup
+    def add_students_to_group(self, trip_id, group_id, students):
+        for student in students:
+            self.cursor.execute(f"UPDATE trip_students SET (group_id) = (?) WHERE trip_id = '{trip_id}' AND student_id = {student[0]}", (group_id))
+    
+    @setup
+    def get_students_in_group(self, trip_id, group_id):
+        ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}' AND group_id = {group_id}").fetchall()
+        ids = [x[0] for x in ids]
+        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
+        if students != []:
+            return students
+    
+    @setup
+    def get_groups_in_trip(self, trip_id):
+        no_group = self.get_students_in_group(trip_id, 0)
+        trip = self.get_trip_by_id(trip_id)
+
+        groups = [[] for _ in range(trip[3])]
+        for group in range(1, trip[3] + 1):
+            groups[group - 1] = self.get_students_in_group(trip_id, group)
+
+        return {
+            "groupless": no_group,
+            "groups": groups
+        }
 
 
 class Student:

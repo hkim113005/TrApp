@@ -112,7 +112,18 @@ def trips():
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
     if request.method == "GET":
-        return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = [db.check_student_preferences(trip_id, s[0]) for s in db.get_students_in_trip(trip_id)], all_students=db.get_all_students())
+        if db.get_trip_by_id(trip_id) != None:
+            return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = [db.check_student_preferences(trip_id, s[0]) for s in db.get_students_in_trip(trip_id)], all_students=db.get_all_students())
+        else:
+            return render_template("error.html")
+
+@app.route("/trips/<trip_id>/groups", methods=["GET", "POST"])
+def groups(trip_id):
+    if request.method == "GET":
+        if db.get_trip_by_id(trip_id) != None:
+            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = [db.check_student_preferences(trip_id, s[0]) for s in db.get_students_in_trip(trip_id)], groups = db.get_groups_in_trip(trip_id))
+        else:
+            return render_template("error.html")
 
 @app.route("/create_trip", methods=["POST"])
 def create_trip():

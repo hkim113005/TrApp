@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Groups
+{% endblock %}
+
+{% block stylesheets %}
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-4 mx-auto">Groupless Students</label>
+<table class="table table-sm table-hover mt-2 mx-auto">
+    <thead>
+        <tr>
+            <th style="width: 60%;">Name</th>
+            <th class="text-center">Grade</th>
+            <th class="text-center">Gender</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {%for student in groups["groupless"]%}
+        <tr>
+            <td>{{student[1]}}</td>
+            <td class="text-center">{{student[3]}}</td>
+            <td class="text-center">{{student[4]}}</td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+
+{%for group in groups["groups"]%}
+    <label class="d-grid form-label mt-4 mx-auto">Group {{loop.index}}</label>
+    <table class="table table-sm table-hover mt-2 mx-auto">
+        <thead>
+            <tr>
+                <th style="width: 60%;">Name</th>
+                <th class="text-center">Grade</th>
+                <th class="text-center">Gender</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {% if group is not none %}
+                {%for student in group%}
+                <tr>
+                    <td>{{student[1]}}</td>
+                    <td class="text-center">{{student[3]}}</td>
+                    <td class="text-center">{{student[4]}}</td>
+                </tr>
+                {%endfor%}
+            {% else %}
+                <td>-</td>
+                <td class="text-center">-</td>
+                <td class="text-center">-</td>
+            {%endif%}
+        </tbody>
+    </table>
+{%endfor%}
+
+{% endblock %}
