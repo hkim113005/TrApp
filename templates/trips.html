@@ -53,7 +53,7 @@ Active Trips
                     <input type="number" min="0" oninput="this.value = updateGroupVal(this.value, false)" class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_group_size" placeholder="Max Group Size">
 
-                    <label class="d-grid form-label mt-3 mx-auto">Students</label>
+                    <label id = "create_students_label" class="d-grid form-label mt-3 mx-auto">Students</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="searchStudents()"
                         placeholder="Search">
                     <table class="table table-students table-sm table-hover mt-2 mx-auto" id="students_table">
@@ -259,6 +259,7 @@ Active Trips
             }
         }
         updateGroupVal(document.getElementById("create_group_size").value, false)
+        document.getElementById("create_students_label").innerHTML = `Students (${getSelectedStudents().length})`;
     }
 
     function updateGroupVal(val, x) {
