@@ -29,7 +29,7 @@ Active Trips
     </tbody>
 </table>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal"
-    data-bs-target="#trip_create_modal">Create</button>
+    data-bs-target="#trip_create_modal">New Trip</button>
 
 <div class="modal fade" id="trip_create_modal" tabindex="-1" aria-labelledby="trip_create_modal_label"
     aria-hidden="true">
@@ -39,13 +39,13 @@ Active Trips
                 <form name="create_trip_form">
                     <label class="d-grid form-label mx-auto">Create a Trip</label>
 
-                    <label class="d-grid form-label mt-3 mx-auto">Name</label>
+                    <label class="d-grid form-label mt-3 mx-auto">Trip Name</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="create_name" placeholder="Name" onKeyup="checkform()">
 
                     <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkform()">
 
-                    <label class="d-grid form-label mt-3 mx-auto">Groups (Auto-Calculated)</label>
+                    <label class="d-grid form-label mt-3 mx-auto"># of Groups (Auto-Calculated)</label>
                     <input type="number" min="0" disabled class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
 
@@ -53,7 +53,7 @@ Active Trips
                     <input type="number" min="0" oninput="this.value = updateGroupVal(this.value, false)" class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_group_size" placeholder="Max Group Size">
 
-                    <label class="d-grid form-label mt-3 mx-auto">Add or Remove Students</label>
+                    <label class="d-grid form-label mt-3 mx-auto">Students</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="search2" onkeyup="searchStudents()"
                         placeholder="Search">
                     <table class="table table-students table-sm table-hover mt-2 mx-auto" id="students_table">
@@ -77,7 +77,7 @@ Active Trips
                 </form>
             </div>
             <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal"
-                disabled="disabled" id="create_button">Create</button>
+                disabled="disabled" id="create_button">Create Trip</button>
         </div>
     </div>
 </div>
