@@ -20,10 +20,10 @@
     </thead>
     <tbody class="table-group-divider">
         {%for student in groups["groupless"]%}
-        <tr>
-            <td>{{student[1]}}</td>
-            <td class="text-center">{{student[3]}}</td>
-            <td class="text-center">{{student[4]}}</td>
+        <tr class={{'complete' if student_prefs[student["id"]] else 'incomplete'}}>
+            <td>{{student.name}}</td>
+            <td class="text-center">{{student.grade}}</td>
+            <td class="text-center">{{student.gender}}</td>
         </tr>
         {%endfor%}
     </tbody>
@@ -42,10 +42,10 @@
         <tbody class="table-group-divider">
             {% if group is not none %}
                 {%for student in group%}
-                <tr>
-                    <td>{{student[1]}}</td>
-                    <td class="text-center">{{student[3]}}</td>
-                    <td class="text-center">{{student[4]}}</td>
+                <tr class={{'complete' if student_prefs[student["id"]] else 'incomplete'}}>
+                    <td>{{student.name}}</td>
+                    <td class="text-center">{{student.grade}}</td>
+                    <td class="text-center">{{student.gender}}</td>
                 </tr>
                 {%endfor%}
             {% else %}

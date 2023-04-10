@@ -20,10 +20,10 @@ Active Trips
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(all_trips|length)%}
-        <tr onclick="window.location='trips/{{all_trips[i][0]}}'">
-            <td>{{all_trips[i][1]}}</td>
-            <td class="text-center">{{all_trips[i][2]}}</td>
-            <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i][3] * all_trips[i][4]}}</td>
+        <tr onclick="window.location = 'trips/{{all_trips[i].id}}'">
+            <td>{{all_trips[i].name}}</td>
+            <td class="text-center">{{all_trips[i].organizer}}</td>
+            <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i].num_groups * all_trips[i].students_per_group}}</td>
         </tr>
         {%endfor%}
     </tbody>
@@ -66,10 +66,10 @@ Active Trips
                         </thead>
                         <tbody id = "all_students" class="table-group-divider">
                             {%for s in all_students%}
-                            <tr id={{s[0]}} onclick="updateRow(this.id)">
-                                <td>{{s[1]}}</td>
-                                <td class="text-center">{{s[3]}}</td>
-                                <td class="text-center">{{s[4]}}</td>
+                            <tr id={{s.id}} onclick="updateRow(this.id)">
+                                <td>{{s.name}}</td>
+                                <td class="text-center">{{s.grade}}</td>
+                                <td class="text-center">{{s.gender}}</td>
                             </tr>
                             {%endfor%}
                         </tbody>

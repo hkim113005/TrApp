@@ -7,6 +7,7 @@ import time
 def setup(f):
     def wrap(*args, **kwargs):
         args[0].conn = sqlite3.connect(Database.DEFAULT_DB, check_same_thread=False)
+        args[0].conn.row_factory = sqlite3.Row
         r = f(*args, **kwargs)
         args[0].conn.close()
         return r
@@ -19,6 +20,7 @@ class Database:
     def __init__(self, fn=None):
         self.csv = fn if fn is not None else Database.STUDENT_CSV
         self.conn = sqlite3.connect(Database.DEFAULT_DB, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         tables = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
         tables = [x[0] for x in tables]
@@ -31,42 +33,45 @@ class Database:
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
-            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, type TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
+            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, organizer TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
         if "trip_students" not in tables:
             self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, group_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         if "trip_preferences" not in tables:
             self.cursor.execute("CREATE TABLE trip_preferences (trip_id TEXT, student_id INTEGER, a INTEGER, b INTEGER, c INTEGER, d INTEGER, e INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         self.conn.commit()
     
+    def dict_converter(self, row):
+        return dict(zip(row.keys(), row))
+
     @setup
     def get_student_by_id(self, student_id):
         student = self.cursor.execute(f'SELECT * FROM students WHERE id = {student_id}').fetchall()
         if student != []:
             s = student[0]
-            return s
+            return self.dict_converter(s)
     
     @setup
     def get_trip_by_id(self, trip_id):
         trip = self.cursor.execute(f"SELECT * FROM trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:
             t = trip[0]
-            return t
+            return self.dict_converter(t)
         
     @setup
     def get_all_students(self, excluded = []):
         all = self.cursor.execute('select * from students').fetchall()
         all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
-        return all
+        return [self.dict_converter(student) for student in all]
 
     @setup
     def get_all_trips(self):
-        return sorted(self.cursor.execute('SELECT * FROM trips').fetchall(), key=lambda x: x[1])
+        return sorted([self.dict_converter(trip) for trip in self.cursor.execute('SELECT * FROM trips').fetchall()], key=lambda x: x["name"])
     
     @setup 
     def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
-        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
+        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
         return students
     
     @setup 
@@ -78,7 +83,7 @@ class Database:
     def get_students_by_attribute(self, grade, gender):
         students = self.cursor.execute(f"SELECT * FROM students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
-            return students
+            return [self.dict_converter(student) for student in students]
         
     @setup
     def add_student_to_trip(self, student_id, trip_id):
@@ -87,11 +92,11 @@ class Database:
 
     @setup
     def get_all_trip_students(self):
-        return self.cursor.execute('select * from trip_students').fetchall()
+        return [self.dict_converter(trip_student) for trip_student in self.cursor.execute('select * from trip_students').fetchall()]
 
     @setup
     def add_trip(self, trip):
-        self.cursor.execute('INSERT INTO trips(id, name, type, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+        self.cursor.execute('INSERT INTO trips(id, name, organizer, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
         self.conn.commit()
         for s in trip.get_students():
             self.add_student_to_trip(s, trip.get_id())
@@ -105,7 +110,7 @@ class Database:
     @setup
     def update_trip(self, trip):
         if self.get_trip_by_id(trip.get_id()) != None:
-            self.cursor.execute(f"UPDATE trips SET (id, name, type, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+            self.cursor.execute(f"UPDATE trips SET (id, name, organizer, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
             self.remove_students_in_trip(trip.get_id())
             for s in trip.get_students():
                 self.add_student_to_trip(s, trip.get_id())
@@ -114,7 +119,7 @@ class Database:
 
     @setup
     def get_all_trip_preferences(self):
-        return self.cursor.execute('SELECT * FROM trip_preferences').fetchall()
+        return [self.dict_converter(pref) for pref in self.cursor.execute('SELECT * FROM trip_preferences').fetchall()]
 
     @setup
     def check_student_preferences(self, trip_id, student_id):
@@ -139,13 +144,13 @@ class Database:
     @setup
     def add_students_to_group(self, trip_id, group_id, students):
         for student in students:
-            self.cursor.execute(f"UPDATE trip_students SET (group_id) = (?) WHERE trip_id = '{trip_id}' AND student_id = {student[0]}", (group_id))
+            self.cursor.execute(f"UPDATE trip_students SET (group_id) = (?) WHERE trip_id = '{trip_id}' AND student_id = {student['id']}", (group_id))
     
     @setup
     def get_students_in_group(self, trip_id, group_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}' AND group_id = {group_id}").fetchall()
         ids = [x[0] for x in ids]
-        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x[3], x[1]))
+        students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
         if students != []:
             return students
     
@@ -154,8 +159,8 @@ class Database:
         no_group = self.get_students_in_group(trip_id, 0)
         trip = self.get_trip_by_id(trip_id)
 
-        groups = [[] for _ in range(trip[3])]
-        for group in range(1, trip[3] + 1):
+        groups = [[] for _ in range(trip["num_groups"])]
+        for group in range(1, trip['num_groups'] + 1):
             groups[group - 1] = self.get_students_in_group(trip_id, group)
 
         return {
@@ -237,8 +242,8 @@ class Trip:
     def set_name(self, name):
         self.name = name
 
-    def set_organizer(self, type):
-        self.organizer = type
+    def set_organizer(self, organizer):
+        self.organizer = organizer
     
     def add_student(self, student):
         self.students.append(student)

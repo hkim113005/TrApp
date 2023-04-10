@@ -167,5 +167,6 @@ for i in tqdm(range(100)):
         results[count] += 1
 
     best_result = min(best_result, unhappy)
-            
-print(best_result)
+
+for group in groups:
+    print(group)

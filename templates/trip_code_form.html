@@ -13,12 +13,12 @@ Enter Trip Code
     <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Trip code</label>
 
     <div id="trip_code" class="inputs d-flex flex-row justify-content-center mt-3">
-        <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="first" name="first" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="second" name="second" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="third" name="third" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="fourth" name="fourth" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="fifth" name="fifth" placeholder="-" maxlength="1" />
-        <input class="ms-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (event.charCode >= 48 && event.charCode <= 90) ? this.value.toUpperCase() : null" id="sixth" name="sixth" placeholder="-" maxlength="1" />
+        <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="first" name="first" placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="second" name="second" placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="third" name="third" placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="fourth" name="fourth" placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="fifth" name="fifth" placeholder="-" maxlength="1" />
+        <input class="ms-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="sixth" name="sixth" placeholder="-" maxlength="1" />
     </div>
     <button id="code_submit" disabled="disabled" type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
 </form>
@@ -38,7 +38,7 @@ Enter Trip Code
                         if (i === inputs.length - 1 && inputs[i].value !== '') {
                             return true;
                         }
-                        else if (event.keyCode >= 48 && event.keyCode <= 90 && !event.metaKey) {
+                        else if (event.keyCode >= 48 && event.keyCode <= 90 && /^[A-Za-z0-9]*$/.test(event.key) && !event.metaKey) {
                             inputs[i].value = event.key.toUpperCase();
                             if (i !== inputs.length - 1) inputs[i + 1].focus();
                             event.preventDefault();
