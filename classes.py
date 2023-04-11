@@ -65,7 +65,7 @@ class Database:
 
     @setup
     def get_all_trips(self):
-        return sorted([self.dict_converter(trip) for trip in self.cursor.execute('SELECT * FROM trips').fetchall()], key=lambda x: x["name"])
+        return sorted([self.dict_converter(trip) for trip in self.cursor.execute('SELECT * FROM trips').fetchall()], key=lambda x: x['name'])
     
     @setup 
     def get_students_in_trip(self, trip_id):
@@ -106,6 +106,7 @@ class Database:
         self.cursor.execute(f"DELETE FROM trips WHERE id = '{trip_id}'")
         self.conn.commit()
         self.remove_students_in_trip(trip_id)
+        self.remove_trip_preferences(trip_id)
 
     @setup
     def update_trip(self, trip):
@@ -126,14 +127,24 @@ class Database:
         pref = self.cursor.execute(f"SELECT * FROM trip_preferences WHERE trip_id ='{trip_id}' AND student_id = {student_id}").fetchall()
         return pref != []
 
+    @setup 
+    def update_trip_preferences(self, trip_id, student_id, preferences):
+        self.cursor.execute(f"UPDATE trip_preferences SET (a, b, c, d, e) = (?, ?, ?, ?, ?) WHERE trip_id ='{trip_id}' AND student_id = {student_id}", preferences)
+
+    @setup
+    def remove_trip_preferences(self, trip_id):
+        self.cursor.execute(f"DELETE FROM trip_preferences WHERE trip_id ='{trip_id}'")
+    
     @setup
     def add_preferences(self, trip_id, student_id, preferences):
         for _ in range(5 - len(preferences)):
             preferences.append(None)
         if self.check_student_preferences(trip_id, student_id):
-            self.cursor.execute(f"UPDATE trip_preferences SET (a, b, c, d, e) = (?, ?, ?, ?, ?) WHERE trip_id ='{trip_id}' AND student_id = {student_id}", preferences)
+            self.update_trip_preferences(trip_id, student_id, preferences)
         else:
             self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
+    
+
 
     @setup
     def update_students_in_trip(self, trip_id, students):
@@ -144,7 +155,7 @@ class Database:
     @setup
     def add_students_to_group(self, trip_id, group_id, students):
         for student in students:
-            id = student["id"]
+            id = student['id']
             self.cursor.execute(f"UPDATE trip_students SET group_id = {group_id} WHERE trip_id = '{trip_id}' AND student_id = {id}")
     
     @setup
@@ -160,31 +171,27 @@ class Database:
         no_group = self.get_students_in_group(trip_id, 0)
         trip = self.get_trip_by_id(trip_id)
 
-        groups = [[] for _ in range(trip["num_groups"])]
+        groups = [[] for _ in range(trip['num_groups'])]
         for group in range(1, trip['num_groups'] + 1):
             groups[group - 1] = self.get_students_in_group(trip_id, group)
 
-        return {
-            "groupless": no_group,
-            "groups": groups
-        }
+        return { "groupless": no_group, "groups": groups }
     
-    # THIS IS TEMPORARY - THE ACTUAL GROUP GENERATING ALGORITHM WILL NEED TO BE IMPLIMENTED
+    # THIS IS TEMPORARY - THE ACTUAL GROUP GENERATING ALGORITHM WILL NEED TO BE IMPLEMENTED HERE
     @setup
     def generate_groups(self, trip_id):
         trip = self.get_trip_by_id(trip_id)
         students = self.get_students_in_trip(trip_id)
         
         for group_number in range(1, trip['num_groups'] + 1):
-            if students == []:
-                        break
-            gender = students[0]["gender"]
+            if not students:
+                break
+            gender = students[0]['gender']
             group = []
-            for i in range(trip['students_per_group']):
+            for _ in range(trip['students_per_group']):
                 for i, student in enumerate(students):
-                    if student["gender"] == gender:
-                        group.append(student)
-                        students.pop(i)
+                    if student['gender'] == gender:
+                        group.append(students.pop(i))
                         break
             self.add_students_to_group(trip_id, group_number, group)
 

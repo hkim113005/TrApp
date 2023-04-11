@@ -64,12 +64,12 @@ def trip_code_form():
     if request.method == "GET":
         return render_template("trip_code_form.html")
     else:
-        first = request.form["first"]
-        second = request.form["second"]
-        third = request.form["third"]
-        fourth = request.form["fourth"]
-        fifth = request.form["fifth"]
-        sixth = request.form["sixth"]
+        first = request.form['first']
+        second = request.form['second']
+        third = request.form['third']
+        fourth = request.form['fourth']
+        fifth = request.form['fifth']
+        sixth = request.form['sixth']
         return redirect("/" + first + second + third + fourth + fifth + sixth)
     
 @app.route("/<trip_id>", methods=["GET", "POST"])
@@ -107,7 +107,7 @@ def teacher_login_form():
 @app.route("/trips", methods=["GET", "POST"])
 def trips():
     if request.method == "GET":
-        return render_template("trips.html", all_trips = db.get_all_trips(), trip_studs = [db.get_students_in_trip(t["id"]) for t in db.get_all_trips()], all_students=db.get_all_students())
+        return render_template("trips.html", all_trips = db.get_all_trips(), trip_studs = [db.get_students_in_trip(t['id']) for t in db.get_all_trips()], all_students=db.get_all_students())
 
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
 def trip(trip_id):
@@ -115,7 +115,7 @@ def trip(trip_id):
         if db.get_trip_by_id(trip_id) != None:
             student_prefs = {}
             for s in db.get_students_in_trip(trip_id):
-                student_prefs[s["id"]] = db.check_student_preferences(trip_id, s["id"])
+                student_prefs[s['id']] = db.check_student_preferences(trip_id, s["id"])
             return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = student_prefs, all_students=db.get_all_students())
         else:
             return render_template("error.html")
@@ -126,8 +126,8 @@ def groups(trip_id):
         if db.get_trip_by_id(trip_id) != None:
             student_prefs = {}
             for s in db.get_students_in_trip(trip_id):
-                student_prefs[s["id"]] = db.check_student_preferences(trip_id, s["id"])
-            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id), groupFunc = db.generate_groups)
+                student_prefs[s['id']] = db.check_student_preferences(trip_id, s['id'])
+            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id))
         else:
             return render_template("error.html")
 
@@ -135,11 +135,11 @@ def groups(trip_id):
 def create_trip():
     if request.method == "POST":
         data = request.get_json()[0]
-        name = data["name"]
-        organizer = data["organizer"]
-        students = data["students"]
-        num_groups = data["num_groups"]
-        students_per_group = data["students_per_group"]
+        name = data['name']
+        organizer = data[organizer]
+        students = data['students']
+        num_groups = data['num_groups']
+        students_per_group = data['students_per_group']
         print(data)
         db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
         return redirect("/trips")
@@ -148,7 +148,7 @@ def create_trip():
 def delete_trip():
     if request.method == "POST":
         data = request.get_json()[0]
-        id = data["id"]
+        id = data['id']
         db.remove_trip(id)
         return redirect("/trips")
 
@@ -156,18 +156,27 @@ def delete_trip():
 def update_trip():
     if request.method == "POST":
         data = request.get_json()[0]
-        id = data["id"]
+        id = data['id']
         if "students" in data:
-            students = data["students"]
+            students = data['students']
             db.update_students_in_trip(id, students)
         else:
             trip = Trip.get_trip_with_id(id)
-            num_groups = data["numGroups"]
-            group_size = data["groupSize"]
+            num_groups = data['numGroups']
+            group_size = data['groupSize']
             trip.set_num_groups(num_groups)
             trip.set_students_per_group(group_size)
             db.update_trip(trip)
         return redirect(f"/trips/{id}")
+
+@app.route("/generate_groups", methods=["POST"])
+def generate_groups():
+    if request.method == "POST":
+        data = request.get_json()
+        id = data['id']
+        db.generate_groups(id)
+        return redirect(f"/trips/{id}")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")

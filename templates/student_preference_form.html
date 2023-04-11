@@ -12,8 +12,8 @@
 <form id = "preferences_form" action=/{{trip_id}} method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
-    <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="update(this.id); checkform();" aria-label=".form-select-sm example">
-        <option selected="selected" disabled selected>Name</option>
+    <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="updateChoices(this.id); checkform();" aria-label=".form-select-sm example">
+        <option selected="selected" selected>Name</option>
         {%for i in range(sel_students|length)%}
             <option value={{sel_students[i].id}}>{{sel_students[i].name}}</option>
         {%endfor%}
@@ -24,7 +24,7 @@
     <label class="d-grid form-label mt-5 mx-auto">Preferences</label>
 
     {%for i in range(num_prefs)%}
-    <select id={{'pref_' + (i+1)|string}} name={{'pref_' + (i+1)|string}} class="mt-3 mx-auto form-select" onchange="update(this.id); checkform();" aria-label=".form-select-sm example">
+    <select id={{'pref_' + (loop.index)|string}} name={{'pref_' + (loop.index)|string}} class="mt-3 mx-auto form-select" onchange="updateChoices(this.id); checkform();" aria-label=".form-select-sm example">
         <option selected="selected">Name</option>
         {%for j in range(sel_students|length)%}
             <option value={{sel_students[j].id}}>{{sel_students[j].name}}</option>
@@ -36,13 +36,42 @@
 </form>
 
 <script>
-    function update(id) {
+    let isMale = false;
+
+    function updateChoices(id) {
         let ids = [];
         let selected = [];
         let tripStudents = JSON.parse('{{ sel_students | tojson | safe }}');
+
         for (let i = 0; i <= JSON.parse('{{num_prefs}}'); i++) {
             ids.push(`pref_${i}`);
         }
+
+        if (id == "pref_0") {
+            let userId = document.getElementById("pref_0").value;
+            if(userId == "Name") {
+                disableChoices(true);
+                clearChoices();
+            } else {
+                userId = parseInt(userId);
+                if ((tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M") != isMale) {
+                    isMale = tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M";
+                    clearChoices();
+                }
+                for (let i = 0; i < document.forms["preferences_form"].elements.length; i++) {
+                    let pref = document.forms["preferences_form"].elements[i];
+                    if(["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].includes(pref.id)) {
+                        if (parseInt(pref.value) == userId) {
+                            pref.selectedIndex = 0;
+                        }
+                    }
+                }
+                disableChoices(false);
+            }
+        }
+
+        tripStudents = tripStudents.filter(x => x.gender == ((isMale) ? "M" : "F"));
+
         ids.forEach(id => {
             let options = document.querySelectorAll(`#${id} option`);
             options.forEach(o => {
@@ -50,7 +79,7 @@
             });
         });
         ids.splice(ids.indexOf(id), 1);
-        //ids.splice(ids.indexOf("pref_0"), 1); //Name box will show all names
+        ids.splice(ids.indexOf("pref_0"), 1); //Name box will show all names
         ids.forEach(id => {
             let options = document.querySelectorAll(`#${id} option`);
             options.forEach(o => {
@@ -60,6 +89,28 @@
                 document.getElementById(id).add(new Option(s.name, s.id), undefined)
             );
         });
+    }
+
+    function disableChoices(disabled) {
+        for (let i = 0; i < document.forms["preferences_form"].elements.length; i++) {
+            let pref = document.forms["preferences_form"].elements[i];
+            if(["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].includes(pref.id)) {
+                if (pref.disabled != disabled) {
+                    pref.disabled = disabled;
+                }
+            }
+        }
+    }
+    
+    function clearChoices() {
+        for (let i = 0; i < document.forms["preferences_form"].elements.length; i++) {
+            let pref = document.forms["preferences_form"].elements[i];
+            if(["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].includes(pref.id)) {
+                if (pref.selectedIndex != 0) {
+                    pref.selectedIndex = 0;
+                }
+            }
+        }
     }
 
     function checkform() {
@@ -72,5 +123,12 @@
 
         document.getElementById('pref_submit').disabled = !cansubmit;
     }
+
+    document.body.onload = () => {
+        if (document.getElementById("pref_0").value == "Name") {
+                disableChoices(true);
+                clearChoices();
+        }
+    };
 </script>
 {% endblock %}
