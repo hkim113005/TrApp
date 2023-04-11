@@ -127,7 +127,7 @@ def groups(trip_id):
             student_prefs = {}
             for s in db.get_students_in_trip(trip_id):
                 student_prefs[s["id"]] = db.check_student_preferences(trip_id, s["id"])
-            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id))
+            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id), groupFunc = db.generate_groups)
         else:
             return render_template("error.html")
 

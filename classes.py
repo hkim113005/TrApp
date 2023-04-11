@@ -144,7 +144,8 @@ class Database:
     @setup
     def add_students_to_group(self, trip_id, group_id, students):
         for student in students:
-            self.cursor.execute(f"UPDATE trip_students SET (group_id) = (?) WHERE trip_id = '{trip_id}' AND student_id = {student['id']}", (group_id))
+            id = student["id"]
+            self.cursor.execute(f"UPDATE trip_students SET group_id = {group_id} WHERE trip_id = '{trip_id}' AND student_id = {id}")
     
     @setup
     def get_students_in_group(self, trip_id, group_id):
@@ -167,6 +168,25 @@ class Database:
             "groupless": no_group,
             "groups": groups
         }
+    
+    # THIS IS TEMPORARY - THE ACTUAL GROUP GENERATING ALGORITHM WILL NEED TO BE IMPLIMENTED
+    @setup
+    def generate_groups(self, trip_id):
+        trip = self.get_trip_by_id(trip_id)
+        students = self.get_students_in_trip(trip_id)
+        
+        for group_number in range(1, trip['num_groups'] + 1):
+            if students == []:
+                        break
+            gender = students[0]["gender"]
+            group = []
+            for i in range(trip['students_per_group']):
+                for i, student in enumerate(students):
+                    if student["gender"] == gender:
+                        group.append(student)
+                        students.pop(i)
+                        break
+            self.add_students_to_group(trip_id, group_number, group)
 
 
 class Student:
