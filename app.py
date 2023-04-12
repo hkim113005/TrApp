@@ -24,6 +24,7 @@ db.add_trip(Trip(None, "Varsity Boys Soccer", "MESAC", 9, 3, "aaaaa", [21, 150, 
 db.add_trip(Trip(None, "HS Track & Field", "MESAC", 3, 3, "yyyyyy", [273, 220]))
 db.add_trip(Trip(None, "HS Tennis", "MESAC", 5, 2, "xxxxxxx", [288, 270, 242, 276]))
 db.add_trip(Trip(None, "HS Wrestling", "MESAC", 6, 2, "wwwwww", [204]))
+db.add_trip(Trip("TEST22", "Test Trip", "Tester", 3, 2, "aaaaa", [642, 631, 604, 573, 641]))
 db.update_trip(Trip(Trip.get_trips()[3].get_id(), "Varsity Boys Soccer", "MESAC", 9, 3, "updated soccer", [21, 150, 230, 190, 72, 110, 289, 280]))
 print(db.get_all_trips())
 
@@ -76,7 +77,7 @@ def trip_code_form():
 def student_preference_form(trip_id):
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
-            return render_template("student_preference_form.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), num_prefs = 5 if len(db.get_students_in_trip(trip_id)) - 1 > 5 else len(db.get_students_in_trip(trip_id)) - 1)
+            return render_template("student_preference_form.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id))
         else:
             return render_template("error.html")
     else:
@@ -136,7 +137,7 @@ def create_trip():
     if request.method == "POST":
         data = request.get_json()[0]
         name = data['name']
-        organizer = data[organizer]
+        organizer = data['organizer']
         students = data['students']
         num_groups = data['num_groups']
         students_per_group = data['students_per_group']
