@@ -37,13 +37,14 @@
 
 <script>
     let isMale = false;
+    let prefAmount = 5;
 
     function updateChoices(id) {
         let ids = [];
         let selected = [];
         let tripStudents = JSON.parse('{{ sel_students | tojson | safe }}');
 
-        for (let i = 0; i <= JSON.parse('{{num_prefs}}'); i++) {
+        for (let i = 0; i <= getPrefs().length; i++) {
             ids.push(`pref_${i}`);
         }
 
@@ -52,12 +53,11 @@
             if(userId == "Name") {
                 disableChoices(true);
                 clearChoices();
+                if (getPrefs().length < 5) {
+                    adjustPrefAmount(5);
+                }
             } else {
                 userId = parseInt(userId);
-                if ((tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M") != isMale) {
-                    isMale = tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M";
-                    clearChoices();
-                }
                 for (let i = 0; i < document.forms["preferences_form"].elements.length; i++) {
                     let pref = document.forms["preferences_form"].elements[i];
                     if(["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].includes(pref.id)) {
@@ -66,11 +66,18 @@
                         }
                     }
                 }
+                if ((tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M") != isMale) {
+                    isMale = tripStudents[tripStudents.map(s => s.id).indexOf(userId)].gender == "M";
+                    prefAmount = tripStudents.filter(x => x.gender == ((isMale) ? "M" : "F")).length - 1;
+                    clearChoices();
+                    adjustPrefAmount(prefAmount);
+                }
                 disableChoices(false);
             }
         }
 
         tripStudents = tripStudents.filter(x => x.gender == ((isMale) ? "M" : "F"));
+        console.log(tripStudents);
 
         ids.forEach(id => {
             let options = document.querySelectorAll(`#${id} option`);
@@ -109,6 +116,41 @@
                 if (pref.selectedIndex != 0) {
                     pref.selectedIndex = 0;
                 }
+            }
+        }
+    }
+
+    function getPrefs() {
+        let prefs = [];
+        for (let i = 0; i < document.forms["preferences_form"].elements.length; i++) {
+            let pref = document.forms["preferences_form"].elements[i];
+            if(["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].includes(pref.id)) {
+                prefs.push(pref);
+            }
+        }
+        return prefs
+    }
+
+    // TODO
+    function adjustPrefAmount(availableAmt) {
+        let prefElems = document.forms["preferences_form"].elements;
+        if (availableAmt < 5 && availableAmt < getPrefs().length) {
+            let extraIds = ["pref_1", "pref_2", "pref_3", "pref_4", "pref_5"].splice(availableAmt)
+            let prefElems = document.forms["preferences_form"].elements;
+
+            for (let i = prefElems.length - 1; i >= 0; i--) {
+                let pref = prefElems[i];
+                if(extraIds.includes(pref.id)) {
+                    pref.remove();
+                }
+            }
+        } else if (getPrefs().length < 5) {
+            var neededLength = 5 - prefAmount;
+            for (let i = getPrefs().length + 1; i < getPrefs().length + (6 - getPrefs().length); i++) {
+                let clonedPrefElem = document.forms["preferences_form"][0].cloneNode(true);
+                clonedPrefElem.id = `pref_${i}`;
+                clonedPrefElem.name = `pref_${i}`;
+                document.getElementById("preferences_form").insertBefore(clonedPrefElem, document.getElementById("pref_submit"));
             }
         }
     }
