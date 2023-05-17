@@ -1,11 +1,8 @@
 import math
 import random
-import copy
-from tqdm import tqdm
-import time
 
 SIZE = 12
-GROUP_SIZE = 3
+GROUP_SIZE = 5
 NUM_GROUP = math.ceil(SIZE / GROUP_SIZE)
 
 class Group:
@@ -84,30 +81,32 @@ preferences = [
     [4, 0, 8, 3, 11],
     [9, 6, 2, 7, 8]
 ]
-    
-for preference in preferences:
-    print(preference)
 
-print()
-
-for i in tqdm(range(100)):
+for i in range(100):
+    # Init students
     for j in range(SIZE):
         students.append(j)
 
+    #Init groups
     groups = []
     for i in range(NUM_GROUP):
         groups.append(Group())
 
+    #Randomize students
     random.shuffle(students)
 
+    #Add random student as group member
     for j in range(NUM_GROUP):
         groups[j].add(students.pop())
 
-    while len(students) != 0:
+
+    while len(students) > 0:
         for j in range(NUM_GROUP):
-            if groups[j].get_size() != GROUP_SIZE and len(students) != 0:
+            if groups[j].get_size() <= GROUP_SIZE and len(students) > 0:
                 students.remove(groups[j].add_best(students, preferences))
     
+    
+    """
     results = [0, 0, 0, 0]
 
     for j in range(NUM_GROUP):
@@ -122,6 +121,7 @@ for i in tqdm(range(100)):
                 count += 1
 
         results[count] += 1
+        """
 
     for j in range(15):
         for group1 in groups:
@@ -142,11 +142,10 @@ for i in tqdm(range(100)):
                             group1.add(member1)
                             group2.add(member2)
                         else:
-                            temp = member1
-                            member1 = member2
-                            member2 = temp
+                            member1, member2 = member2, member1
 
-    results = [0, 0, 0, 0]
+    """
+    results = [0, 0, 0, 0,0]
     unhappy = 0
 
     for j in range(NUM_GROUP):
@@ -167,6 +166,7 @@ for i in tqdm(range(100)):
         results[count] += 1
 
     best_result = min(best_result, unhappy)
+    """
 
 for group in groups:
     print(group)

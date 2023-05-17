@@ -1,54 +1,116 @@
+import math
 import random
 
-def create_groups(num_groups, group_size, students_choices):
-    # Create a list of student ids from the choices list
-    student_ids = [d['id'] for d in students_choices]
-    # Shuffle the list of student ids to randomize the order
-    random.shuffle(student_ids)
-    
-    # Create a dictionary to store the choices for each student
-    student_choices = {d['id']: set(d.values()) - {d['id']} for d in students_choices}
-    
-    # Create a list to store the groups
-    groups = [[] for _ in range(num_groups)]
-    
-    # Keep track of which students have been assigned to a group
-    assigned_students = set()
-    
-    # Iterate over the student ids and assign them to a group
-    for student_id in student_ids:
-        # Check if the student has any choices left that are not already in their group
-        available_choices = student_choices[student_id] - set(sum(groups, [])) - assigned_students
-        if available_choices and len(groups[student_id % num_groups]) < group_size:
-            # Choose a partner at random from the available choices
-            partner_id = random.choice(list(available_choices))
-            # Add the student and their partner to the same group
-            groups[student_id % num_groups].extend([student_id, partner_id])
-            # Remove the partner from the choices of all other students
-            for choice_set in student_choices.values():
-                if partner_id in choice_set:
-                    choice_set.remove(partner_id)
-            # Add both students to the set of assigned students
-            assigned_students.update([student_id, partner_id])
-    
-    # Add any remaining students to the groups at random
-    remaining_students = set(student_ids) - set(sum(groups, [])) - assigned_students
-    remaining_students = list(remaining_students)
-    random.shuffle(remaining_students)
-    for i, student_id in enumerate(remaining_students):
-        groups[i % num_groups].append(student_id)
-    
-    return groups
+GROUP_SIZE = 7
 
-students_choices = [
-    {'id': 0, 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5},
-    {'id': 1, 'a': 0, 'b': 2, 'c': 3, 'd': 4, 'e': 5},
-    {'id': 2, 'a': 0, 'b': 1, 'c': 3, 'd': 4, 'e': 5},
-    {'id': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 4, 'e': 5},
-    {'id': 4, 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 5},
-    {'id': 5, 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4},
+class Group:
+    members = []
+    preferences = []
+
+    def __init__(self):
+        self.members = []
+
+    def __str__(self):
+        return str(self.members)
+
+    def get_size(self):
+        return len(self.members)
+
+    def add(self, member):
+        self.members.append(member)
+
+    def remove(self, member):
+        self.members.remove(member)
+
+    def add_best(self, students, preferences):
+        student = self.get_best(students, preferences)
+        self.members.append(student)
+        return student
+
+    def get_value(self, preferences):
+        total = 0
+        for member1 in self.members:
+            for member2 in self.members:
+                if member1 == member2: continue
+                if member2 in preferences[member1]:
+                    total += 1
+                    break
+        return total
+
+    def get_best(self, students, preferences):
+        highest = -1
+        highest_student = -1
+        for student in students:
+            self.members.append(student)
+            value = self.get_value(preferences)
+            self.members.remove(student)
+            if value > highest:
+                highest = value
+                highest_student = student
+        
+        return highest_student
+
+students = []
+preferences = [
+    [5, 6, 3, 10, 4],
+    [0, 6, 8, 7, 4],
+    [11, 0, 4, 8, 1],
+    [9, 3, 2, 11, 4],
+    [8, 1, 10, 2, 6],
+    [6, 4, 1, 0, 2],
+    [10, 6, 1, 3, 5],
+    [1, 6, 8, 0, 2],
+    [10, 0, 1, 6, 2],
+    [3, 7, 10, 8, 9],
+    [4, 0, 8, 3, 11],
+    [9, 6, 2, 7, 8]
 ]
 
-groups = create_groups(num_groups=2, group_size=3, students_choices=students_choices)
+TOTAL_SIZE = len(preferences)
+NUM_GROUPS = math.ceil(TOTAL_SIZE / GROUP_SIZE)
 
-print(groups)
+for i in range(15):
+    # Init students
+    students = list(range(TOTAL_SIZE))
+
+    #Init groups
+    groups = [Group() for _ in range(NUM_GROUPS)]
+
+    #Randomize students
+    random.shuffle(students)
+
+    #Add random student as group member
+    for j in range(NUM_GROUPS):
+        groups[j].add(students.pop())
+    
+
+    while len(students) > 0:
+        for j in range(NUM_GROUPS):
+            while True:
+                if groups[j].get_size() >= GROUP_SIZE or len(students) == 0:
+                    break
+                students.remove(groups[j].add_best(students, preferences))
+
+    for j in range(15):
+        for group1 in groups:
+            for member1 in group1.members:
+                for group2 in groups:
+                    if group1 == group2:
+                        continue
+                    for member2 in group2.members:
+                        current_value = group1.get_value(preferences) + group2.get_value(preferences)
+                        group1.remove(member1)
+                        group2.remove(member2)
+                        group1.add(member2)
+                        group2.add(member1)
+                        possible_value = group1.get_value(preferences) + group2.get_value(preferences)
+                        if current_value >= possible_value:
+                            group1.remove(member2)
+                            group2.remove(member1)
+                            group1.add(member1)
+                            group2.add(member2)
+                        else:
+                            member1, member2 = member2, member1
+
+for group in groups:
+    print(group)

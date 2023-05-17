@@ -1,8 +1,6 @@
 import sqlite3
 import csv
 import random
-import string
-import time
 
 def setup(f):
     def wrap(*args, **kwargs):
@@ -33,7 +31,7 @@ class Database:
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
-            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, organizer TEXT, num_groups INTEGER, students_per_group INTEGER, preferences TEXT, PRIMARY KEY(id))")
+            self.cursor.execute("CREATE TABLE trips (id TEXT, name TEXT, organizer TEXT, num_groups INTEGER, group_size INTEGER, details TEXT, PRIMARY KEY(id))")
         if "trip_students" not in tables:
             self.cursor.execute("CREATE TABLE trip_students (trip_id TEXT, student_id INTEGER, group_id INTEGER, FOREIGN KEY(trip_id) REFERENCES trips(id))")
         if "trip_preferences" not in tables:
@@ -96,7 +94,7 @@ class Database:
 
     @setup
     def add_trip(self, trip):
-        self.cursor.execute('INSERT INTO trips(id, name, organizer, num_groups, students_per_group, preferences) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+        self.cursor.execute('INSERT INTO trips(id, name, organizer, num_groups, group_size, details) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_group_size(), trip.get_details()))
         self.conn.commit()
         for s in trip.get_students():
             self.add_student_to_trip(s, trip.get_id())
@@ -111,7 +109,7 @@ class Database:
     @setup
     def update_trip(self, trip):
         if self.get_trip_by_id(trip.get_id()) != None:
-            self.cursor.execute(f"UPDATE trips SET (id, name, organizer, num_groups, students_per_group, preferences) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_students_per_group(), trip.get_preferences()))
+            self.cursor.execute(f"UPDATE trips SET (id, name, organizer, num_groups, group_size, details) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_group_size(), trip.get_details()))
             self.remove_students_in_trip(trip.get_id())
             for s in trip.get_students():
                 self.add_student_to_trip(s, trip.get_id())
@@ -188,24 +186,23 @@ class Database:
                 break
             gender = students[0]['gender']
             group = []
-            for _ in range(trip['students_per_group']):
+            for _ in range(trip['group_size']):
                 for i, student in enumerate(students):
                     if student['gender'] == gender:
                         group.append(students.pop(i))
                         break
             self.add_students_to_group(trip_id, group_number, group)
 
-
 class Student:
     student_count = 0
-    def __init__(self, id, name, email, grade, gender, preferences=""):
+    def __init__(self, id, name, email, grade, gender, details=""):
         # Have either num_groups or max_per_group and calculate the other variable based on the one that wasn't entered
         self.name = str(name)
         self.id = id if id != None else (Student.student_count + 1)
         self.email = str(email)
         self.gender = str(gender)
         self.grade = int(grade)
-        self.preferences = str(preferences)
+        self.details = str(details)
         Student.student_count += 1
 
     def set_name(self, name):
@@ -220,8 +217,8 @@ class Student:
     def set_grade(self, grade):
         self.grade = grade
 
-    def set_preferences(self, preferences):
-        self.preferences = preferences
+    def set_details(self, details):
+        self.details = details
 
     def get_name(self):
         return self.name
@@ -238,8 +235,8 @@ class Student:
     def get_grade(self):
         return self.grade
     
-    def get_preferences(self):
-        return self.preferences
+    def get_details(self):
+        return self.details
 
     def __str__(self):
         s = "[STUDENT INFO - " + str(self.id) + "]"
@@ -247,22 +244,22 @@ class Student:
         s += "\nEmail: " + self.email
         s += "\nGender: " + self.gender
         s += "\nGrade: " + str(self.grade)
-        s += "\nPreferences: " + self.preferences
+        s += "\nDetails: " + self.details
         return s
 
 
 class Trip:
     trip_ids = []
     trips = []
-    def __init__(self, id, name, organizer, num_groups, students_per_group, preferences, students):
+    def __init__(self, id, name, organizer, num_groups, group_size, details, students):
         # Have either num_groups or max_per_group and calculate the other variable based on the one that wasn't entered
         self.name = name
         self.id = id if id != None else Trip.generate_id()
         self.organizer = organizer
         self.students = students
         self.num_groups = num_groups
-        self.students_per_group = students_per_group
-        self.preferences = preferences
+        self.group_size = group_size
+        self.details = details
         Trip.trips.append(self)
         Trip.trip_ids.append(self.id)
 
@@ -278,11 +275,11 @@ class Trip:
     def set_num_groups(self, groups):
         self.num_groups = groups
 
-    def set_students_per_group(self, max):
-        self.students_per_group = max
+    def set_group_size(self, max):
+        self.group_size = max
 
-    def set_preferences(self, preferences):
-        self.preferences = preferences
+    def set_details(self, details):
+        self.details = details
 
     def get_name(self):
         return self.name
@@ -299,11 +296,11 @@ class Trip:
     def get_num_groups(self):
         return self.num_groups
     
-    def get_students_per_group(self):
-        return self.students_per_group
+    def get_group_size(self):
+        return self.group_size
     
-    def get_preferences(self):
-        return self.preferences
+    def get_details(self):
+        return self.details
     
     @staticmethod
     def get_trips():
@@ -317,11 +314,12 @@ class Trip:
 
     @staticmethod
     def generate_id():
+        id_length = 6
         letters = "ABCDEFGHJKLMNPQRSTUVWXYZ" # No "I" or "O" (too confusing with 1 and 0 numbers)
         nums = "0123456789"
         id = ""
         while True:
-            id = ''.join(random.sample((letters + nums),6))
+            id = ''.join(random.sample((letters + nums), id_length))
             if(id not in Trip.trip_ids):
                 break
         return id
@@ -333,6 +331,53 @@ class Trip:
         s += "\nTotal Students: " + str(len(self.students))
         s += "\nStudent Ids: " + str(self.students)
         s += "\nNumber of groups: " + str(self.num_groups)
-        s += "\nStudents Per group: " + str(self.students_per_group)
-        s += "\nPreferences: " + self.preferences
+        s += "\nStudents Per group: " + str(self.group_size)
+        s += "\nDetails: " + self.details
         return s
+
+class Group:
+    members = []
+    preferences = []
+
+    def __init__(self):
+        self.members = []
+
+    def __str__(self):
+        return str(self.members)
+
+    def get_size(self):
+        return len(self.members)
+
+    def add(self, member):
+        self.members.append(member)
+
+    def remove(self, member):
+        self.members.remove(member)
+
+    def add_best(self, students, preferences):
+        student = self.get_best(students, preferences)
+        self.members.append(student)
+        return student
+
+    def get_value(self, preferences):
+        total = 0
+        for member1 in self.members:
+            for member2 in self.members:
+                if member1 == member2: continue
+                if member2 in preferences[member1]:
+                    total += 1
+                    break
+        return total
+
+    def get_best(self, students, preferences):
+        highest = -1
+        highest_student = -1
+        for student in students:
+            self.members.append(student)
+            value = self.get_value(preferences)
+            self.members.remove(student)
+            if value > highest:
+                highest = value
+                highest_student = student
+        
+        return highest_student

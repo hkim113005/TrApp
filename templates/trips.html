@@ -23,7 +23,7 @@ Active Trips
         <tr onclick="window.location = 'trips/{{all_trips[i].id}}'">
             <td>{{all_trips[i].name}}</td>
             <td class="text-center">{{all_trips[i].organizer}}</td>
-            <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i].num_groups * all_trips[i].students_per_group}}</td>
+            <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i].num_groups * all_trips[i].group_size}}</td>
         </tr>
         {%endfor%}
     </tbody>
@@ -45,8 +45,8 @@ Active Trips
                     <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
                     <input type="text" class="mt-3 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkform()">
 
-                    <label class="d-grid form-label mt-3 mx-auto"># of Groups (Auto-Calculated)</label>
-                    <input type="number" min="0" disabled class="mt-3 mx-auto form-control"
+                    <label class="d-grid form-label mt-3 mx-auto"># of Groups</label>
+                    <input type="number" min="0" class="mt-3 mx-auto form-control"
                         onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
 
                     <label class="d-grid form-label mt-3 mx-auto">Group Size</label>
@@ -135,7 +135,7 @@ Active Trips
                     "organizer": document.getElementById("create_organizer").value,
                     "students": getSelectedStudents().map(x => parseInt(x)),
                     "num_groups": document.getElementById("create_num_groups").value,
-                    "students_per_group": document.getElementById("create_group_size").value
+                    "group_size": document.getElementById("create_group_size").value
                 }
             ];
             let updatePost = $.ajax({

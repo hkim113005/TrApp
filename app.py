@@ -16,7 +16,7 @@ from classes import Database, Trip
 
 db = Database()
 
-# REMOVE LATER: Adds trip to database
+# REMOVE LATER: Adds example trips to database
 db.add_trip(Trip(None, "WWW 2023: Grade 6 (Greece)", "MS", 4, 2, "blah blah blah", [1, 2, 3, 4]))
 db.add_trip(Trip(None, "Viper Venture 2023: Thailand", "HS", 5, 3, "idk lol", [260, 261, 262]))
 db.add_trip(Trip("TEST11", "JV Boys Volleyball", "MESAC", 7, 2, "eeeeeee", [148, 100, 123, 90, 7,21, 150, 230, 190, 72, 110]))
@@ -140,9 +140,9 @@ def create_trip():
         organizer = data['organizer']
         students = data['students']
         num_groups = data['num_groups']
-        students_per_group = data['students_per_group']
+        group_size = data['group_size']
         print(data)
-        db.add_trip(Trip(None, name, organizer, num_groups, students_per_group, "", students))
+        db.add_trip(Trip(None, name, organizer, num_groups, group_size, "", students))
         return redirect("/trips")
 
 @app.route("/delete_trip", methods=["POST"])
@@ -166,7 +166,7 @@ def update_trip():
             num_groups = data['numGroups']
             group_size = data['groupSize']
             trip.set_num_groups(num_groups)
-            trip.set_students_per_group(group_size)
+            trip.set_group_size(group_size)
             db.update_trip(trip)
         return redirect(f"/trips/{id}")
 
@@ -180,4 +180,4 @@ def generate_groups():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port="4000")
