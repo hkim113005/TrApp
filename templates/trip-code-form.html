@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Enter Trip Code
+Find Trip
 {% endblock %}
 
 {% block stylesheets %}
@@ -9,7 +9,7 @@ Enter Trip Code
 {% endblock %}
 
 {% block main %}
-<form id = "trip_code_form" action="/trip" method="POST">
+<form id = "trip_code_form" action="/student/findTrip" method="POST">
     <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Trip code</label>
 
     <div id="trip_code" class="inputs d-flex flex-row justify-content-center mt-3">

@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block main %}
-<form id = "preferences_form" action=/{{trip_id}} method="POST">
+<form id = "preferences_form" action=/student/{{trip_id}} method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
     <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="updateChoices(this.id); checkform();" aria-label=".form-select-sm example">

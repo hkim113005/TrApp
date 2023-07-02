@@ -28,6 +28,7 @@ class Database:
             data = list(csv.DictReader(file, delimiter=","))
             file.close()
             students = [Student(None, s['name'], s['email'], int(s['grade']), s['gender'], "") for s in data]
+            students.append(Student(0, "Test Student", "tsu@acs.sch.ae", 9, "M", "")) # Test Student
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
@@ -57,13 +58,20 @@ class Database:
         
     @setup
     def get_all_students(self, excluded = []):
-        all = self.cursor.execute('select * from students').fetchall()
+        all = self.cursor.execute('SELECT * from students').fetchall()
         all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
         return [self.dict_converter(student) for student in all]
 
     @setup
     def get_all_trips(self):
         return sorted([self.dict_converter(trip) for trip in self.cursor.execute('SELECT * FROM trips').fetchall()], key=lambda x: x['name'])
+    
+    @setup
+    def get_trips_by_student(self, student_id):
+        trip_ids = self.cursor.execute(f"SELECT trip_id FROM trip_students WHERE student_id = {student_id}").fetchall()
+        trip_ids = [id[0] for id in trip_ids]
+        trips = [self.get_trip_by_id(id) for id in trip_ids]
+        return sorted(trips, key=lambda x: x['name'])
     
     @setup 
     def get_students_in_trip(self, trip_id):
@@ -142,8 +150,6 @@ class Database:
         else:
             self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
     
-
-
     @setup
     def update_students_in_trip(self, trip_id, students):
         self.remove_students_in_trip(trip_id)

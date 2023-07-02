@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Trip Not Found
+{% endblock %}
+
+{% block stylesheets %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+
+<label class="d-grid form-label mt-5 mx-auto error">ERROR! Trip does not exist!</label>
+<a href="javascript:history.back()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Back</a>
+{% endblock %}

@@ -35,6 +35,10 @@ label {
     font-size: large;
 }
 
+.error {
+    color: red !important;
+}
+
 .modal-dialog {
     width: 360px !important;
     margin-left: auto !important;

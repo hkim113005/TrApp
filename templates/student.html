@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{student.name}}
+{% endblock %}
+
+{% block stylesheets %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Name - {{student.name}}</label>
+<label class="d-grid form-label mt-3 mx-auto">Email - {{student.email}}</label>
+<label class="d-grid form-label mt-3 mx-auto">Grade - {{student.grade}}</label>
+<label class="d-grid form-label mt-5 mx-auto">Your Trips:</label>
+<table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
+    <thead>
+        <tr>
+            <th style="width: 60%;" scope="col">Name</th>
+            <th class="text-center" scope="col">By</th>
+            <th class="text-center" scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {%for i in range(student_trips|length)%}
+        <tr onclick="window.location = 'student/{{student_trips[i].id}}'">
+            <td>{{student_trips[i].name}}</td>
+            <td class="text-center">{{student_trips[i].organizer}}</td>
+            <td class="text-center">{{trip_studs[i]|length}}/{{student_trips[i].num_groups * student_trips[i].group_size}}</td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+<button type="button" onclick=window.location="student/findTrip" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Find Trip</button>
+
+
+<script>
+</script>
+{% endblock %}
