@@ -158,15 +158,23 @@ def update_trip():
     if request.method == "POST":
         data = request.get_json()[0]
         id = data['id']
+        trip = Trip.get_trip_with_id(id)
         if "students" in data:
             students = data['students']
             db.update_students_in_trip(id, students)
         else:
-            trip = Trip.get_trip_with_id(id)
-            num_groups = data['numGroups']
-            group_size = data['groupSize']
-            trip.set_num_groups(num_groups)
-            trip.set_group_size(group_size)
+            if "name" in data:
+                name = data['name']
+                trip.set_name(name)
+            if "organizer" in data:
+                organizer = data['organizer']
+                trip.set_organizer(organizer)
+            if "numGroups" in data:
+                num_groups = data['numGroups']
+                trip.set_num_groups(num_groups)
+            if "groupSize" in data:
+                group_size = data['groupSize']
+                trip.set_group_size(group_size)
             db.update_trip(trip)
         return redirect(f"/trips/{id}")
 

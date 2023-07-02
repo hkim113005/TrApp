@@ -9,11 +9,17 @@
 {% endblock %}
 
 {% block main %}
-<label class="d-grid form-label mt-5 mx-auto">Groups</label>
-<input name="num_groups" id="num_groups" type="number" min="0" onchange="syncGroupVals()" class="mt-3 mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
+<label class="d-grid form-label mt-3 mx-auto">Trip Name</label>
+<input name="trip_name" id="trip_name" type="text" onchange="syncTripName()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
 
-<label class="d-grid form-label mt-4 mx-auto">Group Size</label>
-<input name="group_size" id="group_size" type="number" min="0" oninput="this.value = updateGroupVal(this.value, false, false);" class="mt-3 mx-auto form-control" value={{sel_trip.group_size}} placeholder="Max Group Size">
+<label class="d-grid form-label mt-3 mx-auto">Organizer</label>
+<input name="trip_organizer" id="trip_organizer" type="text" onchange="syncTripOrganizer()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
+
+<label class="d-grid form-label mt-3 mx-auto">Groups</label>
+<input name="num_groups" id="num_groups" type="number" min="0" onchange="syncGroupVals()" class="mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
+
+<label class="d-grid form-label mt-3 mx-auto">Group Size</label>
+<input name="group_size" id="group_size" type="number" min="0" oninput="this.value = updateGroupVal(this.value, false, false);" class="mx-auto form-control" value={{sel_trip.group_size}} placeholder="Max Group Size">
 
 <label class="d-grid form-label mt-4 mx-auto">Students ({{sel_students | length}})</label>
 <table class="table table-sm table-hover mt-3 mx-auto">
@@ -156,7 +162,7 @@
                 "groupSize": sizeElem.value,
                 "numGroups": groupElem.value,
             }
-        ]
+        ];
         console.log(groupElem.value)
         console.log(sizeElem.value)
         console.log(JSON.parse('{{ sel_trip.num_groups | safe }}'))
@@ -170,6 +176,40 @@
                 dataType: "json"
             });
         }
+    }
+
+    function syncTripName() {
+        var nameElem = document.getElementById("trip_name");
+        var data = [
+            {
+                "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                "name": nameElem.value,
+            }
+        ];
+        $.ajax({
+            type: "POST",
+            url: "/update_trip",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json"
+        });
+    }
+
+    function syncTripOrganizer() {
+        var organizerElem = document.getElementById("trip_organizer");
+        var data = [
+            {
+                "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                "organizer": organizerElem.value,
+            }
+        ];
+        $.ajax({
+            type: "POST",
+            url: "/update_trip",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json"
+        });
     }
 
     function initRows() {

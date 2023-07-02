@@ -78,7 +78,7 @@
         ids.forEach(id => {
             let options = document.querySelectorAll(`#${id} option`);
             options.forEach(o => {
-                if(o.value != "Name" && o.selected) selected.push(parseInt(o.value));
+                if(o.value != "Name" && o.selected) selected.push({id: parseInt(o.value), name: o.innerHTML});
             });
         });
         ids.splice(ids.indexOf("pref_0"), 1); //Name box will show all names
@@ -87,7 +87,12 @@
             options.forEach(o => {
                 if(o.value != "Name" && !o.selected) o.remove()
             });
-            filteredStudents.filter(x => !selected.includes(x.id)).forEach(s =>
+            selected.forEach(s =>   {
+                let option = new Option(s.name, s.id);
+                option.disabled = true;
+                document.getElementById(id).add(option, undefined)
+            });
+            filteredStudents.filter(x => !selected.map(s => s.id).includes(x.id)).forEach(s =>
                 document.getElementById(id).add(new Option(s.name, s.id), undefined)
             );
         });
