@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Sign Up
+Register
 {% endblock %}
 
 {% block stylesheets %}
@@ -9,8 +9,8 @@ Sign Up
 {% endblock %}
 
 {% block main %}
-<form action="/signup" method="POST">
-    <label class="d-grid form-label mt-5 mx-auto">Sign Up</label>
+<form action="/register" method="POST">
+    <label class="d-grid form-label mt-5 mx-auto">Register New User</label>
 
     <input type="text" onchange="inputChecker()" class="mt-3 mx-auto form-control" id="email" placeholder="ACS Email">
 
@@ -18,7 +18,7 @@ Sign Up
 
     <input type="password" onchange="inputChecker()" class="mt-3 mx-auto form-control" id="password_confirm" placeholder="Confirm Password">
 
-    <button type="submit" disabled id="signup_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Sign Up</button>
+    <button type="submit" disabled id="register_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Register</button>
 </form>
 
 <script>
@@ -40,7 +40,7 @@ function checkPasswords() {
 
 function inputChecker() {
     let cansubmit = checkEmail() && checkPasswords();
-    document.getElementById('signup_submit').disabled = !cansubmit;
+    document.getElementById('register_submit').disabled = !cansubmit;
 }
 </script>
 

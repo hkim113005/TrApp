@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block main %}
-<form id = "preferences_form" action=/student/{{trip_id}} method="POST">
+<form id = "preferences_form" action=/search/{{trip_id}} method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Information</label>
 
     <select id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" onchange="updateChoices(this.id); checkform();" aria-label=".form-select-sm example">
@@ -38,12 +38,12 @@
 <script>
     let isMale = null;
 
-    function updateChoices(id) {
-        let ids = [];
+    function updateChoices(pref_id) {
+        let pref_ids = [];
         let selected = [];
         let filteredStudents = JSON.parse('{{ sel_students | tojson | safe }}');
 
-        if (id == "pref_0") {
+        if (pref_id == "pref_0") {
             let userId = document.getElementById("pref_0").value;
             if(userId == "Name") {
                 isMale = null;
@@ -72,22 +72,24 @@
         filteredStudents = filteredStudents.filter(x => x.gender == ((isMale) ? "M" : "F"));
 
         for (let i = 0; i <= getPrefs().length; i++) {
-            ids.push(`pref_${i}`);
+            pref_ids.push(`pref_${i}`);
         }
 
-        ids.forEach(id => {
+        pref_ids.forEach(id => {
             let options = document.querySelectorAll(`#${id} option`);
             options.forEach(o => {
                 if(o.value != "Name" && o.selected) selected.push({id: parseInt(o.value), name: o.innerHTML});
             });
         });
-        ids.splice(ids.indexOf("pref_0"), 1); //Name box will show all names
-        ids.forEach(id => {
+        pref_ids.splice(pref_ids.indexOf("pref_0"), 1); //Name box will show all names
+        pref_ids.forEach(id => {
+            let prefElem = document.getElementById(id);
             let options = document.querySelectorAll(`#${id} option`);
             options.forEach(o => {
                 if(o.value != "Name" && !o.selected) o.remove()
             });
             selected.forEach(s =>   {
+                if (id == pref_id || s.name == options[prefElem.selectedIndex].innerHTML) return;
                 let option = new Option(s.name, s.id);
                 option.disabled = true;
                 document.getElementById(id).add(option, undefined)

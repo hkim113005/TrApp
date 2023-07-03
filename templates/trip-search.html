@@ -9,8 +9,8 @@ Find Trip
 {% endblock %}
 
 {% block main %}
-<form id = "trip_code_form" action="/student/findTrip" method="POST">
-    <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Trip code</label>
+<form id = "trip_code_form" action="/search" method="POST">
+    <label for="trip_code" class="d-grid form-label mt-5 mx-auto">Find Trip - Enter Trip Code</label>
 
     <div id="trip_code" class="inputs d-flex flex-row justify-content-center mt-3">
         <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="first" name="first" placeholder="-" maxlength="1" />

@@ -2,7 +2,7 @@ import sqlite3
 import csv
 import random
 
-def setup(f):
+def db_setup(f):
     def wrap(*args, **kwargs):
         args[0].conn = sqlite3.connect(Database.DEFAULT_DB, check_same_thread=False)
         args[0].conn.row_factory = sqlite3.Row
@@ -28,7 +28,7 @@ class Database:
             data = list(csv.DictReader(file, delimiter=","))
             file.close()
             students = [Student(None, s['name'], s['email'], int(s['grade']), s['gender'], "") for s in data]
-            students.append(Student(0, "Test Student", "tsu@acs.sch.ae", 9, "M", "")) # Test Student
+            students.append(Student(0, "Test Student", "tsu@acs.sch.ae", 0, "M", "")) # Test Student
             for s in students:
                 self.cursor.execute("INSERT INTO students (id, name, email, grade, gender) VALUES(?, ?, ?, ?, ?)", (int(s.get_id()), str(s.get_name()), str(s.get_email()), int(s.get_grade()), str(s.get_gender())))
         if "trips" not in tables:
@@ -42,79 +42,79 @@ class Database:
     def dict_converter(self, row):
         return dict(zip(row.keys(), row))
 
-    @setup
+    @db_setup
     def get_student_by_id(self, student_id):
         student = self.cursor.execute(f'SELECT * FROM students WHERE id = {student_id}').fetchall()
         if student != []:
             s = student[0]
             return self.dict_converter(s)
     
-    @setup
+    @db_setup
     def get_trip_by_id(self, trip_id):
         trip = self.cursor.execute(f"SELECT * FROM trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:
             t = trip[0]
             return self.dict_converter(t)
         
-    @setup
+    @db_setup
     def get_all_students(self, excluded = []):
         all = self.cursor.execute('SELECT * from students').fetchall()
         all = sorted(list(set(all).difference(set(excluded))), key=lambda x: (x[3], x[1]) )
         return [self.dict_converter(student) for student in all]
 
-    @setup
+    @db_setup
     def get_all_trips(self):
         return sorted([self.dict_converter(trip) for trip in self.cursor.execute('SELECT * FROM trips').fetchall()], key=lambda x: x['name'])
     
-    @setup
+    @db_setup
     def get_trips_by_student(self, student_id):
         trip_ids = self.cursor.execute(f"SELECT trip_id FROM trip_students WHERE student_id = {student_id}").fetchall()
         trip_ids = [id[0] for id in trip_ids]
         trips = [self.get_trip_by_id(id) for id in trip_ids]
         return sorted(trips, key=lambda x: x['name'])
     
-    @setup 
+    @db_setup 
     def get_students_in_trip(self, trip_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}'").fetchall()
         ids = [x[0] for x in ids]
         students = sorted([self.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
         return students
     
-    @setup 
+    @db_setup 
     def remove_students_in_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trip_students WHERE trip_id = '{trip_id}'")
         self.conn.commit()
     
-    @setup 
+    @db_setup 
     def get_students_by_attribute(self, grade, gender):
         students = self.cursor.execute(f"SELECT * FROM students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
             return [self.dict_converter(student) for student in students]
         
-    @setup
+    @db_setup
     def add_student_to_trip(self, student_id, trip_id):
         self.cursor.execute('INSERT INTO trip_students(trip_id, student_id, group_id) VALUES(?, ?, ?)', (trip_id, student_id, 0))
         self.conn.commit()
 
-    @setup
+    @db_setup
     def get_all_trip_students(self):
         return [self.dict_converter(trip_student) for trip_student in self.cursor.execute('select * from trip_students').fetchall()]
 
-    @setup
+    @db_setup
     def add_trip(self, trip):
         self.cursor.execute('INSERT INTO trips(id, name, organizer, num_groups, group_size, details) VALUES(?, ?, ?, ?, ?, ?)', (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_group_size(), trip.get_details()))
         self.conn.commit()
         for s in trip.get_students():
             self.add_student_to_trip(s, trip.get_id())
 
-    @setup
+    @db_setup
     def remove_trip(self, trip_id):
         self.cursor.execute(f"DELETE FROM trips WHERE id = '{trip_id}'")
         self.conn.commit()
         self.remove_students_in_trip(trip_id)
         self.remove_trip_preferences(trip_id)
 
-    @setup
+    @db_setup
     def update_trip(self, trip):
         if self.get_trip_by_id(trip.get_id()) != None:
             self.cursor.execute(f"UPDATE trips SET (id, name, organizer, num_groups, group_size, details) = (?, ?, ?, ?, ?, ?) WHERE id = '{trip.get_id()}'", (trip.get_id(), trip.get_name(), trip.get_organizer(), trip.get_num_groups(), trip.get_group_size(), trip.get_details()))
@@ -124,24 +124,33 @@ class Database:
         else:
             self.add_trip(trip)
 
-    @setup
+    @db_setup
     def get_all_trip_preferences(self):
         return [self.dict_converter(pref) for pref in self.cursor.execute('SELECT * FROM trip_preferences').fetchall()]
 
-    @setup
-    def check_student_preferences(self, trip_id, student_id):
-        pref = self.cursor.execute(f"SELECT * FROM trip_preferences WHERE trip_id ='{trip_id}' AND student_id = {student_id}").fetchall()
-        return pref != []
+    @db_setup
+    def get_student_preferences(self, trip_id, student_id, return_prefs_only=False):
+        prefs = self.cursor.execute(f"SELECT * FROM trip_preferences WHERE trip_id ='{trip_id}' AND student_id = {student_id}").fetchall()
+        prefs = [self.dict_converter(pref) for pref in prefs]
+        if return_prefs_only:
+            p = prefs[0]
+            return [p['a'], p['b'], p['c'], p['d'], p['e']]
+        else:
+            return prefs
 
-    @setup 
+    @db_setup
+    def check_student_preferences(self, trip_id, student_id):
+        return self.get_student_preferences(trip_id, student_id) != []
+
+    @db_setup 
     def update_trip_preferences(self, trip_id, student_id, preferences):
         self.cursor.execute(f"UPDATE trip_preferences SET (a, b, c, d, e) = (?, ?, ?, ?, ?) WHERE trip_id ='{trip_id}' AND student_id = {student_id}", preferences)
 
-    @setup
+    @db_setup
     def remove_trip_preferences(self, trip_id):
         self.cursor.execute(f"DELETE FROM trip_preferences WHERE trip_id ='{trip_id}'")
     
-    @setup
+    @db_setup
     def add_preferences(self, trip_id, student_id, preferences):
         for _ in range(5 - len(preferences)):
             preferences.append(None)
@@ -150,19 +159,19 @@ class Database:
         else:
             self.cursor.execute("INSERT INTO trip_preferences(trip_id, student_id, a, b, c, d, e) VALUES(?, ?, ?, ?, ?, ?, ?)", (trip_id, student_id, preferences[0], preferences[1], preferences[2], preferences[3], preferences[4]))
     
-    @setup
+    @db_setup
     def update_students_in_trip(self, trip_id, students):
         self.remove_students_in_trip(trip_id)
         for new in students:
             self.add_student_to_trip(new, trip_id)
     
-    @setup
+    @db_setup
     def add_students_to_group(self, trip_id, group_id, students):
         for student in students:
             id = student['id']
             self.cursor.execute(f"UPDATE trip_students SET group_id = {group_id} WHERE trip_id = '{trip_id}' AND student_id = {id}")
     
-    @setup
+    @db_setup
     def get_students_in_group(self, trip_id, group_id):
         ids = self.cursor.execute(f"SELECT student_id FROM trip_students WHERE trip_id = '{trip_id}' AND group_id = {group_id}").fetchall()
         ids = [x[0] for x in ids]
@@ -170,7 +179,7 @@ class Database:
         if students != []:
             return students
     
-    @setup
+    @db_setup
     def get_groups_in_trip(self, trip_id):
         no_group = self.get_students_in_group(trip_id, 0)
         trip = self.get_trip_by_id(trip_id)
@@ -182,7 +191,7 @@ class Database:
         return { "groupless": no_group, "groups": groups }
     
     # THIS IS TEMPORARY - THE ACTUAL GROUP GENERATING ALGORITHM WILL NEED TO BE IMPLEMENTED HERE
-    @setup
+    @db_setup
     def generate_groups(self, trip_id):
         trip = self.get_trip_by_id(trip_id)
         students = self.get_students_in_trip(trip_id)
