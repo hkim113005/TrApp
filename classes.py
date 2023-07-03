@@ -90,6 +90,31 @@ class Database:
         students = self.cursor.execute(f"SELECT * FROM students WHERE grade = {grade} AND gender = '{gender.upper()}'").fetchall()
         if students != []:
             return [self.dict_converter(student) for student in students]
+    
+    @db_setup 
+    def update_student(self, student_id, data):
+        if self.get_student_by_id(student_id) != None:
+            if 'name' in data:
+                self.update_student_name(student_id, data['name'])
+            if 'grade' in data:
+                self.update_student_grade(student_id, data['grade'])
+            if 'gender' in data:
+                self.update_student_gender(student_id, data['gender'])
+
+    @db_setup 
+    def update_student_name(self, student_id, name):
+        if self.get_student_by_id(student_id) != None:
+            self.cursor.execute(f"UPDATE students SET name = '{name}' WHERE id = {student_id}")
+    
+    @db_setup 
+    def update_student_grade(self, student_id, grade):
+        if self.get_student_by_id(student_id) != None:
+            self.cursor.execute(f"UPDATE students SET (grade) = {grade} WHERE id = {student_id}")
+    
+    @db_setup 
+    def update_student_gender(self, student_id, gender):
+        if self.get_student_by_id(student_id) != None:
+            self.cursor.execute(f"UPDATE students SET (gender) = '{gender}' WHERE id = {student_id}")
         
     @db_setup
     def add_student_to_trip(self, student_id, trip_id):

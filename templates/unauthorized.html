@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Unauthorized
+{% endblock %}
+
+{% block stylesheets %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<form action="/" method="POST">
+    <label class="d-grid form-label mt-5 mx-auto error">You can't access this!</label>
+    <a href="/" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Home</a>
+</form>
+{% endblock %}

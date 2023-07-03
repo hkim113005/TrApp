@@ -42,12 +42,12 @@ class User (auth_db.Model, UserMixin):
     password = auth_db.Column(auth_db.String(80), nullable=False)
 """
 
-# Temporary Implimentation
+# Temporary Implementation
 TEACHER_LOGIN = {
     "username": "tsu@acs.sch.ae",
     "password": "ACSTeachers2023"
 }
-logged_in_user = {
+current_user = {
     "user": None,
     "is_logged_in": False,
     "is_teacher": False,
@@ -77,10 +77,10 @@ def login_not_required(f):
 
 @app.route("/", methods=["GET"])
 def start():
-    global logged_in_user
-    logged_in = logged_in_user['is_logged_in']
-    is_teacher = logged_in_user['is_teacher']
-    print(logged_in_user)
+    global current_user
+    logged_in = current_user['is_logged_in']
+    is_teacher = current_user['is_teacher']
+    print(current_user)
     return render_template("home.html", logged_in=logged_in, is_teacher=is_teacher)
 
 @app.errorhandler(404)
@@ -94,17 +94,17 @@ def register():
         return render_template("register.html")
     else:
         # Handle Sign Up Info
-        # Temporary Implimentation
-        global logged_in_user
-        logged_in_user['is_logged_in'] = True
-        logged_in_user['is_teacher'] = False
-        logged_in_user['student'] = None
+        # Temporary Implementation
+        global current_user
+        current_user['is_logged_in'] = True
+        current_user['is_teacher'] = False
+        current_user['student'] = None
         # Redirect to either "/trips" or "/student"
-        if logged_in_user['is_teacher']:
+        if current_user['is_teacher']:
             print(f"Logged in as Teacher")
             return redirect("/trips")
         else:
-            print(f"Logged in as {logged_in_user['student']['name']}")
+            print(f"Logged in as {current_user['student']['name']}")
             return redirect("/student")
 
 # TODO: User Login
@@ -114,15 +114,15 @@ def login():
         return render_template("login.html")
     else:
         # Handle Login Info
-        # Temporary Implimentation
-        global logged_in_user
-        logged_in_user['is_logged_in'] = True
-        logged_in_user['student'] = db.get_student_by_id(0)
-        print(f"Logged in as {logged_in_user['student']['name']}")
-        # Redirect to either "/trips" or "/student"
-        if logged_in_user['is_teacher']:
+        # Temporary Implementation
+        global current_user
+        current_user['is_logged_in'] = True
+        current_user['student'] = db.get_student_by_id(560)
+        # Redirect to "/trips" or "/student" depending on uer
+        if current_user['is_teacher']:
             return redirect("/trips")
         else:
+            print(f"Logged in as {current_user['student']['name']}")
             return redirect("/student")
 
 # TODO: User Logout
@@ -130,36 +130,46 @@ def login():
 def logout():
     # Log Out User
      if request.method == "POST":
-    # Temporary Implimentation
-        global logged_in_user
-        if logged_in_user['is_logged_in']:
+    # Temporary Implementation
+        global current_user
+        if current_user['is_logged_in']:
             print(f"Logged out")
-            logged_in_user['is_logged_in'] = False
-            logged_in_user['is_teacher'] = True # Temporary
-            logged_in_user['student'] = None
+            current_user['is_logged_in'] = False
+            current_user['is_teacher'] = False
+            current_user['student'] = None
         return render_template("logout.html")
 
 # TODO: Student Page
-# - Shows all trips the student has been added to
 # - Account Information:
-#   - Change Gender or Grade
+#   - Change Gender and Grade
 #   - Reset Password Option
-@app.route("/student")
+@app.route("/student", methods=["GET", "POST"])
 def student():
     if request.method == "GET":
-        global logged_in_user
-        if (logged_in_user['is_logged_in']):
-            student = logged_in_user['student']
+        global current_user
+        if (current_user['is_logged_in']):
+            student = current_user['student']
             student_trips = db.get_trips_by_student(student['id'])
             trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
             return render_template("student.html", student=student, student_trips=student_trips,trip_studs=trip_studs) # Needs to be setup
         else:
             return redirect("/login")
 
+@app.route("/update_student", methods=["POST"])
+def update_student():
+    if request.method == "POST":
+        data = request.get_json()[0]
+        db.update_student(data['id'], data)
+        current_user['student'] = db.get_student_by_id(current_user['student']['id'])
+        return student()
+
 @app.route("/search", methods=["GET", "POST"])
 def trip_search():
     if request.method == "GET":
-        return render_template("trip-search.html")
+        if not current_user['is_logged_in']:
+            return render_template("trip-search.html")
+        else:
+            return render_template("unauthorized.html")
     else:
         first = request.form['first']
         second = request.form['second']
@@ -168,24 +178,20 @@ def trip_search():
         fifth = request.form['fifth']
         sixth = request.form['sixth']
         return redirect("/search/" + first + second + third + fourth + fifth + sixth)
-    
+
 @app.route("/search/<trip_id>", methods=["GET", "POST"])
 def logged_out_preferences(trip_id):
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
-            global logged_in_user
+            global current_user
             sel_trip = db.get_trip_by_id(trip_id)
             sel_students = db.get_students_in_trip(trip_id)
             
-            # Autofill Preferences (if logged in)
-            prefs = []
-            if logged_in_user['is_logged_in']: # Example Implimentation
-                student = logged_in_user['student'] # Example Implimentation
-                prev_submitted = db.check_student_preferences(trip_id, student['id']) 
-                if prev_submitted:
-                    prefs = db.get_student_preferences(trip_id, student['id'])
-                    print(prefs)
-            return render_template("student-pref-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
+            # User clicks "Edit" after submitting (Post-login)
+            if current_user['is_logged_in']: # Example Implementation
+                return logged_in_preferences(trip_id)
+            else:
+                return render_template("student-pref-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students)
         else:
             return render_template("trip-error.html")
     else:
@@ -208,16 +214,16 @@ def logged_out_preferences(trip_id):
     
 @app.route("/student/<trip_id>", methods=["GET", "POST"])
 def logged_in_preferences(trip_id):
-    global logged_in_user
-    student = logged_in_user['student'] # Example Implimentation
+    global current_user
+    student = current_user['student'] # Example Implementation
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
             sel_trip = db.get_trip_by_id(trip_id)
             sel_students = db.get_students_in_trip(trip_id)
             sel_students.pop([s['id'] for s in sel_students].index(student['id'])) # Removes Logged-In Student
-            sel_students = list(filter(lambda x: x['gender'] == student['gender'], sel_students)) # Takes out opposite gender
+            gender_filter = lambda x: student['gender'] == "-" or x['gender'] == "-" or x['gender'] == student['gender']
+            sel_students = list(filter(gender_filter, sel_students)) # Takes out other gender
             num_prefs = len(sel_students) if len(sel_students) < 5 else 5
-            
             # Autofill Preferences (if logged in)
             prefs = []
             prev_submitted = db.check_student_preferences(trip_id, student['id']) 

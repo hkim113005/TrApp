@@ -9,11 +9,19 @@
 {% endblock %}
 
 {% block main %}
-<label class="d-grid form-label mt-3 mx-auto">NAME - {{student.name}}</label>
-<label class="d-grid form-label mt-3 mx-auto">EMAIL - {{student.email}}</label>
-<label class="d-grid form-label mt-3 mx-auto">GRADE - {{student.grade}}</label>
-<label class="d-grid form-label mt-3 mx-auto">GENDER - {{student.gender}}</label>
+<label class="d-grid form-label mt-3 mx-auto">Student Information:</label>
+<label class="d-grid info-label mt-3 mx-auto">Full Name</label> 
+<text class="d-grid mx-auto">{{student.name}}</text>
+<label class="d-grid info-label mt-3 mx-auto">Email</label> 
+<text class="d-grid mx-auto">{{student.email}}</text>
+<label class="d-grid info-label mt-3 mx-auto">Grade</label> 
+<text class="d-grid mx-auto">{{student.grade}}</text>
+<label class="d-grid info-label mt-3 mx-auto">Gender</label> 
+<text class="d-grid mx-auto">{{student.gender}}</text>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_edit_information">Edit Information</button>
+
 <label class="d-grid form-label mt-5 mx-auto">Your Trips:</label>
+
 <table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
@@ -25,18 +33,130 @@
     <tbody class="table-group-divider">
         {%for i in range(student_trips|length)%}
         <tr onclick="window.location = 'student/{{student_trips[i].id}}'">
-            <td>{{student_trips[i].name}}</td>
+            <td style="width: 70%;">{{student_trips[i].name}}</td>
             <td class="text-center">{{student_trips[i].organizer}}</td>
             <td class="text-center">{{trip_studs[i]|length}}/{{student_trips[i].num_groups * student_trips[i].group_size}}</td>
         </tr>
         {%endfor%}
     </tbody>
 </table>
+<button onclick="window.location='/'" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Home</button>
 <form action="/logout" method="POST">
     <button type="submit" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Logout</button>
 </form>
-<button onclick="window.location='/'" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Home</button>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="">Reset Password</button>
+
+<div class="modal fade" id="student_edit_information" tabindex="-1" aria-labelledby="student_edit_information_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <label class="d-grid form-label mx-auto">Edit student Information</label>
+
+                    <label id="name_label" class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="student_name" value="{{student.name}}" placeholder="Full Name" oninput="checkInfo()">
+
+                    <label id="email_label" class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input disabled type="text" class="mt-3 mx-auto form-control" id="student_email" value="{{student.email}}">
+
+                    <label id="grade_label" class="d-grid info-label mt-3 mx-auto">Grade</label>
+                    <select disabled id="student_grade" class="mt-3 mx-auto form-select" onchange="checkInfo()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Grade</option>
+                        {%for grade in range(1, 13)%}
+                            <option value={{grade}}>{{grade}}</option>
+                        {%endfor%}
+                    </select>
+
+                    <label id="gender_label" class="d-grid info-label mt-3 mx-auto">Gender</label>
+                    <select id="student_gender" class="mt-3 mx-auto form-select" onchange="checkInfo()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Gender</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="-">-</option>
+                    </select>
+                    <text class="d-grid mx-auto">* = Unsaved Changes!</text>
+                    <button onclick="postUpdateData()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_student_info">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    let data = {
+        id: parseInt(`{{student.id}}`),
+    };
+
+    function postUpdateData() {
+        let updatePost = $.ajax({
+                type: "POST",
+                url: "/update_student",
+                data: JSON.stringify([data]),
+                contentType: "application/json",
+                dataType: "json",
+                complete: function(response) {
+                    window.location = window.location;
+                }
+        });
+    }
+    
+    function checkInfo() {
+        let gradeElem = document.getElementById("student_grade");
+        let genderElem = document.getElementById("student_gender");
+        
+        let nameLabel = document.getElementById("name_label");
+        let gradeLabel = document.getElementById("grade_label");
+        let genderLabel = document.getElementById("gender_label");
+        
+        let currentName = document.getElementById("student_name").value;
+        let currentGrade = gradeElem.options[gradeElem.selectedIndex].value;
+        let currentGender = genderElem.options[genderElem.selectedIndex].value;
+
+        let nameChanged = currentName != `{{student.name}}`;
+        let gradeChanged = currentGrade != parseInt(`{{student.grade}}`);
+        let genderChanged = currentGender != `{{student.gender}}`;
+        
+        if (nameChanged) {
+            data.name = currentName;
+            nameLabel.innerHTML = "Full Name*";
+        } else {
+            nameLabel.innerHTML = "Full Name";
+        }
+        if (gradeChanged) {
+            data.grade = currentGrade;
+            gradeLabel.innerHTML = "Grade*";
+        } else {
+            gradeLabel.innerHTML = "Grade";
+        }
+        if (genderChanged) {
+            data.gender = currentGender;
+            genderLabel.innerHTML = "Gender*";
+        } else {
+            genderLabel.innerHTML = "Gender";
+        }
+        
+        document.getElementById('save_student_info').disabled = !(nameChanged || gradeChanged || genderChanged);
+    }
+
+    function autofillGradeAndGender() {
+        let gradeOptions = document.querySelectorAll(`#student_grade option`);
+        gradeOptions.forEach(o => {
+            if (`{{student.grade}}` == o.value) {
+                o.selected = true;
+            }
+        });
+
+        let genderOptions = document.querySelectorAll(`#student_gender option`);
+        genderOptions.forEach(o => {
+            if (`{{student.gender}}` == o.value) {
+                o.selected = true;
+            }
+        });
+    }
+
+    document.body.onload = () => {
+        autofillGradeAndGender();
+    };
 </script>
 {% endblock %}

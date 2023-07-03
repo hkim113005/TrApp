@@ -132,19 +132,17 @@ Active Trips
 
     window.addEventListener("load", () => {
         document.getElementById("create_button").addEventListener("click", () => {
-            var data = [
-                {
+            var data = {
                     "name": document.getElementById("create_name").value,
                     "organizer": document.getElementById("create_organizer").value,
                     "students": getSelectedStudents().map(x => parseInt(x)),
                     "num_groups": document.getElementById("create_num_groups").value,
                     "group_size": document.getElementById("create_group_size").value
-                }
-            ];
+            };
             let updatePost = $.ajax({
                 type: "POST",
                 url: "/create_trip",
-                data: JSON.stringify(data),
+                data: JSON.stringify([data]),
                 contentType: "application/json",
                 dataType: "json",
                 complete: function(response) {

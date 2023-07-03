@@ -10,10 +10,10 @@
 
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Trip Name</label>
-<input name="trip_name" id="trip_name" type="text" onchange="syncTripName()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
+<input name="trip_name" id="trip_name" type="text" oninput="syncTripName()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
 
 <label class="d-grid form-label mt-3 mx-auto">Organizer</label>
-<input name="trip_organizer" id="trip_organizer" type="text" onchange="syncTripOrganizer()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
+<input name="trip_organizer" id="trip_organizer" type="text" oninput="syncTripOrganizer()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
 
 <label class="d-grid form-label mt-3 mx-auto">Groups</label>
 <input name="num_groups" id="num_groups" type="number" min="0" onchange="syncGroupVals()" class="mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
@@ -180,6 +180,7 @@
 
     function syncTripName() {
         var nameElem = document.getElementById("trip_name");
+        if (nameElem.value == `{{sel_trip.name}}`) return;
         var data = [
             {
                 "id": JSON.parse('{{ trip_id | tojson | safe }}'),
@@ -197,6 +198,7 @@
 
     function syncTripOrganizer() {
         var organizerElem = document.getElementById("trip_organizer");
+        if (organizerElem.value == `{{sel_trip.organizer}}`) return;
         var data = [
             {
                 "id": JSON.parse('{{ trip_id | tojson | safe }}'),

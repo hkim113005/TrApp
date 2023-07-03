@@ -35,6 +35,16 @@ label {
     font-size: large;
 }
 
+.info-label {
+    width: 320px !important;
+    margin-left: auto;
+    font-size: medium;
+}
+
+text {
+    width: 320px !important;
+}
+
 .error {
     color: red !important;
 }
@@ -90,3 +100,8 @@ thead {
     background-color: white;
 }
 
+.home-logo {
+    width: 150px; 
+    display: block; 
+    margin: 0 auto;
+}

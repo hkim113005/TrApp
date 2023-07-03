@@ -1,198 +1,198 @@
 id,name,email,grade,gender
-,Miriam Abdulbaki,MiriamAbdulbaki@acs.sch.ae,12,F
-,Hamza Abulaila,HamzaAbulaila@acs.sch.ae,12,M
-,Zayed Alfalahi,ZayedAlfalahi@acs.sch.ae,12,M
-,Abdallah Aljamal,AbdallahAljamal@acs.sch.ae,12,M
-,Aicia AlKatheeri,AiciaAlKatheeri@acs.sch.ae,12,F
-,Omaya Alkudsi,OmayaAlkudsi@acs.sch.ae,12,F
-,Fatma AlOtaiba,FatmaAlOtaiba@acs.sch.ae,12,F
-,Hessa AlOtaiba,HessaAlOtaiba@acs.sch.ae,12,F
-,Elif Armour,ElifArmour@acs.sch.ae,12,F
-,Aliah Asharaf,AliahAsharaf@acs.sch.ae,12,F
-,Nicolai Askholt,NicolaiAskholt@acs.sch.ae,12,M
-,Qasim Aslam,QasimAslam@acs.sch.ae,12,M
-,Taha Azeem,TahaAzeem@acs.sch.ae,12,M
-,Abdullah Aziz,AbdullahAziz@acs.sch.ae,12,M
-,Anan Bagdi,AnanBagdi@acs.sch.ae,12,M
-,Lorenzo Bandini,LorenzoBandini@acs.sch.ae,12,M
-,Adrian Baramki,AdrianBaramki@acs.sch.ae,12,M
-,Emma Bartlett,EmmaBartlett@acs.sch.ae,12,F
-,Sami Belhadj Benayiba,SamiBelhadjBenayiba@acs.sch.ae,12,M
-,Parth Bhandari,ParthBhandari@acs.sch.ae,12,M
-,Victoria Bolanos,VictoriaBolanos@acs.sch.ae,12,F
-,Gabriel Candelario,GabrielCandelario@acs.sch.ae,12,M
-,Melanie Coendo,MelanieCoendo@acs.sch.ae,12,F
-,Robert Daniels,RobertDaniels@acs.sch.ae,12,M
-,Rachel De Semple,RachelDeSemple@acs.sch.ae,12,F
-,Tala El Guanaini,TalaElGuanaini@acs.sch.ae,12,F
-,Aliyah Fazal,AliyahFazal@acs.sch.ae,12,F
-,Tyler Garbutt,TylerGarbutt@acs.sch.ae,12,M
-,Holly Gardner,HollyGardner@acs.sch.ae,12,F
-,Adam Gasmi,AdamGasmi@acs.sch.ae,12,M
-,Abigail Gettman,AbigailGettman@acs.sch.ae,12,F
-,Farah Ghajar,FarahGhajar@acs.sch.ae,12,F
-,Mackenzie Gibson,MackenzieGibson@acs.sch.ae,12,F
-,Sarah Harden,SarahHarden@acs.sch.ae,12,F
-,Charles Hilgendorf,CharlesHilgendorf@acs.sch.ae,12,M
-,Rachel Hwang,RachelHwang@acs.sch.ae,12,F
-,Sophie Jones,SophieJones@acs.sch.ae,12,F
-,Akram Kabbani,AkramKabbani@acs.sch.ae,12,M
-,Taariq Karodia,TaariqKarodia@acs.sch.ae,12,M
-,Taimaa Kassab Bachi,TaimaaKassabBachi@acs.sch.ae,12,F
-,Shreyansh Kaushik,ShreyanshKaushik@acs.sch.ae,12,M
-,Theo Kekati,TheoKekati@acs.sch.ae,12,M
-,Mira Khan,MiraKhan@acs.sch.ae,12,F
-,Mohed Khan,MohedKhan@acs.sch.ae,12,M
-,Emile Khayat,EmileKhayat@acs.sch.ae,12,M
-,Tamara Khoury,TamaraKhoury@acs.sch.ae,12,F
-,Olivia Kroll,OliviaKroll@acs.sch.ae,12,F
-,Khalid Kuleib,KhalidKuleib@acs.sch.ae,12,M
-,Jessica Lawal,JessicaLawal@acs.sch.ae,12,F
-,Peyton Lee,PeytonLee@acs.sch.ae,12,F
-,Ingrid Lehmann,IngridLehmann@acs.sch.ae,12,
-,Alexis Lequeux,AlexisLequeux@acs.sch.ae,12,
-,Mia Liang,MiaLiang@acs.sch.ae,12,F
-,Morgan Lindsey,MorganLindsey@acs.sch.ae,12,F
-,Nour Mahgoub,NourMahgoub@acs.sch.ae,12,F
-,Azad Majari,AzadMajari@acs.sch.ae,12,
-,Ryan Masoud,RyanMasoud@acs.sch.ae,12,M
-,Harry Mc Kiernan,HarryMcKiernan@acs.sch.ae,12,M
-,Elias Messifat,EliasMessifat@acs.sch.ae,12,M
-,Ian Mihm,IanMihm@acs.sch.ae,12,M
-,Ramsey Mikati,RamseyMikati@acs.sch.ae,12,M
-,Emma Miseljic,EmmaMiseljic@acs.sch.ae,12,F
-,Mia Musfy,MiaMusfy@acs.sch.ae,12,F
-,Ahmad Nasser,AhmadNasser@acs.sch.ae,12,M
-,Lavinia Neal,LaviniaNeal@acs.sch.ae,12,F
+,Miriam Abdulbaki,miriamabdulbaki@acs.sch.ae,12,F
+,Hamza Abulaila,hamzaabulaila@acs.sch.ae,12,M
+,Zayed Alfalahi,zayedalfalahi@acs.sch.ae,12,M
+,Abdallah Aljamal,abdallahaljamal@acs.sch.ae,12,M
+,Aicia AlKatheeri,aiciaalkatheeri@acs.sch.ae,12,F
+,Omaya Alkudsi,omayaalkudsi@acs.sch.ae,12,F
+,Fatma AlOtaiba,fatmaalotaiba@acs.sch.ae,12,F
+,Hessa AlOtaiba,hessaalotaiba@acs.sch.ae,12,F
+,Elif Armour,elifarmour@acs.sch.ae,12,F
+,Aliah Asharaf,aliahasharaf@acs.sch.ae,12,F
+,Nicolai Askholt,nicolaiaskholt@acs.sch.ae,12,M
+,Qasim Aslam,qasimaslam@acs.sch.ae,12,M
+,Taha Azeem,tahaazeem@acs.sch.ae,12,M
+,Abdullah Aziz,abdullahaziz@acs.sch.ae,12,M
+,Anan Bagdi,ananbagdi@acs.sch.ae,12,M
+,Lorenzo Bandini,lorenzobandini@acs.sch.ae,12,M
+,Adrian Baramki,adrianbaramki@acs.sch.ae,12,M
+,Emma Bartlett,emmabartlett@acs.sch.ae,12,F
+,Sami Belhadj Benayiba,samibelhadjbenayiba@acs.sch.ae,12,M
+,Parth Bhandari,parthbhandari@acs.sch.ae,12,M
+,Victoria Bolanos,victoriabolanos@acs.sch.ae,12,F
+,Gabriel Candelario,gabrielcandelario@acs.sch.ae,12,M
+,Melanie Coendo,melaniecoendo@acs.sch.ae,12,F
+,Robert Daniels,robertdaniels@acs.sch.ae,12,M
+,Rachel De Semple,racheldesemple@acs.sch.ae,12,F
+,Tala El Guanaini,talaelguanaini@acs.sch.ae,12,F
+,Aliyah Fazal,aliyahfazal@acs.sch.ae,12,F
+,Tyler Garbutt,tylergarbutt@acs.sch.ae,12,M
+,Holly Gardner,hollygardner@acs.sch.ae,12,F
+,Adam Gasmi,adamgasmi@acs.sch.ae,12,M
+,Abigail Gettman,abigailgettman@acs.sch.ae,12,F
+,Farah Ghajar,farahghajar@acs.sch.ae,12,F
+,Mackenzie Gibson,mackenziegibson@acs.sch.ae,12,F
+,Sarah Harden,sarahharden@acs.sch.ae,12,F
+,Charles Hilgendorf,charleshilgendorf@acs.sch.ae,12,M
+,Rachel Hwang,rachelhwang@acs.sch.ae,12,F
+,Sophie Jones,sophiejones@acs.sch.ae,12,F
+,Akram Kabbani,akramkabbani@acs.sch.ae,12,M
+,Taariq Karodia,taariqkarodia@acs.sch.ae,12,M
+,Taimaa Kassab Bachi,taimaakassabbachi@acs.sch.ae,12,F
+,Shreyansh Kaushik,shreyanshkaushik@acs.sch.ae,12,M
+,Theo Kekati,theokekati@acs.sch.ae,12,M
+,Mira Khan,mirakhan@acs.sch.ae,12,F
+,Mohed Khan,mohedkhan@acs.sch.ae,12,M
+,Emile Khayat,emilekhayat@acs.sch.ae,12,M
+,Tamara Khoury,tamarakhoury@acs.sch.ae,12,F
+,Olivia Kroll,oliviakroll@acs.sch.ae,12,F
+,Khalid Kuleib,khalidkuleib@acs.sch.ae,12,M
+,Jessica Lawal,jessicalawal@acs.sch.ae,12,F
+,Peyton Lee,peytonlee@acs.sch.ae,12,F
+,Ingrid Lehmann,ingridlehmann@acs.sch.ae,12,-
+,Alexis Lequeux,alexislequeux@acs.sch.ae,12,-
+,Mia Liang,mialiang@acs.sch.ae,12,F
+,Morgan Lindsey,morganlindsey@acs.sch.ae,12,F
+,Nour Mahgoub,nourmahgoub@acs.sch.ae,12,F
+,Azad Majari,azadmajari@acs.sch.ae,12,-
+,Ryan Masoud,ryanmasoud@acs.sch.ae,12,M
+,Harry Mc Kiernan,harrymckiernan@acs.sch.ae,12,M
+,Elias Messifat,eliasmessifat@acs.sch.ae,12,M
+,Ian Mihm,ianmihm@acs.sch.ae,12,M
+,Ramsey Mikati,ramseymikati@acs.sch.ae,12,M
+,Emma Miseljic,emmamiseljic@acs.sch.ae,12,F
+,Mia Musfy,miamusfy@acs.sch.ae,12,F
+,Ahmad Nasser,ahmadnasser@acs.sch.ae,12,M
+,Lavinia Neal,lavinianeal@acs.sch.ae,12,F
 ,Sara Pardlo,gabriellapardlo@acs.sch.ae,12,F
-,Varun Parekh,VarunParekh@acs.sch.ae,12,M
-,Nicolo Pasqualetti,NicoloPasqualetti@acs.sch.ae,12,M
-,Zoe Lea Petroianu,ZoeLeaPetroianu@acs.sch.ae,12,F
-,Muhammad Rabeh,MuhammadRabeh@acs.sch.ae,12,M
-,Noah Rahmani,NoahRahmani@acs.sch.ae,12,M
-,Hassan Rammal,HassanRammal@acs.sch.ae,12,M
-,Maria Remon Sanchez,MariaRemonSanchez@acs.sch.ae,12,F
-,Selim Rezgui,SelimRezgui@acs.sch.ae,12,M
-,Clara Rice,ClaraRice@acs.sch.ae,12,F
-,Logan Rishard,LoganRishard@acs.sch.ae,12,M
-,Noor Saffarini,NoorSaffarini@acs.sch.ae,12,F
-,Ameen Sankari,AmeenSankari@acs.sch.ae,12,M
-,Aradhana Satheeshkumar,AradhanaSatheeshkumar@acs.sch.ae,12,F
-,Khalid Selim,KhalidSelim@acs.sch.ae,12,M
-,Giordano Serino,GiordanoSerino@acs.sch.ae,12,M
-,Pieter Snyman,PieterSnyman@acs.sch.ae,12,M
-,Amber Stiger,AmberStiger@acs.sch.ae,12,F
-,Edward Teo,EdwardTeo@acs.sch.ae,12,M
-,Wesley Thurston,WesleyThurston@acs.sch.ae,12,M
-,Yedidya Tibbo,YedidyaTibbo@acs.sch.ae,12,F
-,Mateo Toron Cahue,MateoToronCahue@acs.sch.ae,12,M
-,Marina Torres,MarinaTorres@acs.sch.ae,12,F
-,Joshua Torrez,JoshuaTorrez@acs.sch.ae,12,M
-,Dunya Toth,DunyaToth@acs.sch.ae,12,F
+,Varun Parekh,varunparekh@acs.sch.ae,12,M
+,Nicolo Pasqualetti,nicolopasqualetti@acs.sch.ae,12,M
+,Zoe Lea Petroianu,zoeleapetroianu@acs.sch.ae,12,F
+,Muhammad Rabeh,muhammadrabeh@acs.sch.ae,12,M
+,Noah Rahmani,noahrahmani@acs.sch.ae,12,M
+,Hassan Rammal,hassanrammal@acs.sch.ae,12,M
+,Maria Remon Sanchez,mariaremonsanchez@acs.sch.ae,12,F
+,Selim Rezgui,selimrezgui@acs.sch.ae,12,M
+,Clara Rice,clararice@acs.sch.ae,12,F
+,Logan Rishard,loganrishard@acs.sch.ae,12,M
+,Noor Saffarini,noorsaffarini@acs.sch.ae,12,F
+,Ameen Sankari,ameensankari@acs.sch.ae,12,M
+,Aradhana Satheeshkumar,aradhanasatheeshkumar@acs.sch.ae,12,F
+,Khalid Selim,khalidselim@acs.sch.ae,12,M
+,Giordano Serino,giordanoserino@acs.sch.ae,12,M
+,Pieter Snyman,pietersnyman@acs.sch.ae,12,M
+,Amber Stiger,amberstiger@acs.sch.ae,12,F
+,Edward Teo,edwardteo@acs.sch.ae,12,M
+,Wesley Thurston,wesleythurston@acs.sch.ae,12,M
+,Yedidya Tibbo,yedidyatibbo@acs.sch.ae,12,F
+,Mateo Toron Cahue,mateotoroncahue@acs.sch.ae,12,M
+,Marina Torres,marinatorres@acs.sch.ae,12,F
+,Joshua Torrez,joshuatorrez@acs.sch.ae,12,M
+,Dunya Toth,dunyatoth@acs.sch.ae,12,F
 ,Theo Ulander,theoulander@acs.sch.ae,12,M
-,Rani Youness,RaniYouness@acs.sch.ae,12,M
-,Dahnia Zarroug,DahniaZarroug@acs.sch.ae,12,F
+,Rani Youness,raniyouness@acs.sch.ae,12,M
+,Dahnia Zarroug,dahniazarroug@acs.sch.ae,12,F
 ,Andy Zhu,shengdizhu@acs.sch.ae,12,M
-,Khulood Abdulla,KhuloodAbdulla@acs.sch.ae,11,F
-,Rafael Aguilar Zelaya,RafaelAguilarZelaya@acs.sch.ae,11,M
+,Khulood Abdulla,khuloodabdulla@acs.sch.ae,11,F
+,Rafael Aguilar Zelaya,rafaelaguilarzelaya@acs.sch.ae,11,M
 ,Zak Ahmad,zakariaahmad@acs.sch.ae,11,M
-,Saif Akasha,SaifAkasha@acs.sch.ae,11,M
-,Adam Akhtar,AdamAkhtar@acs.sch.ae,11,M
+,Saif Akasha,saifakasha@acs.sch.ae,11,M
+,Adam Akhtar,adamakhtar@acs.sch.ae,11,M
 ,Basmah Al Nuwais,basmahalnuwais@acs.sch.ae,11,F
 ,Maysa Al-Busaidy,maysaalbusaidy@acs.sch.ae,11,F
-,Saif Alnuaimi,SaifAlnuaimi@acs.sch.ae,11,M
-,Laura Aloudat,LauraAloudat@acs.sch.ae,11,F
-,Danny Alsharaa,DannyAlsharaa@acs.sch.ae,11,M
-,Farah Al-Yacoub,FarahAl-Yacoub@acs.sch.ae,11,F
-,Ali Alzein,AliAlzein@acs.sch.ae,11,M
-,Ryan Atrak,RyanAtrak@acs.sch.ae,11,M
-,Abanoub Attallah,AbanoubAttallah@acs.sch.ae,11,M
-,Matthew Ayoub,MatthewAyoub@acs.sch.ae,11,M
-,Abdulwahab Baaj,AbdulwahabBaaj@acs.sch.ae,11,M
-,Sofia Babynine,SofiaBabynine@acs.sch.ae,11,F
-,Ameen Bakhache,AmeenBakhache@acs.sch.ae,11,M
-,Rahma Bayumi,RahmaBayumi@acs.sch.ae,11,F
-,Sydney Berry,SydneyBerry@acs.sch.ae,11,F
+,Saif Alnuaimi,saifalnuaimi@acs.sch.ae,11,M
+,Laura Aloudat,lauraaloudat@acs.sch.ae,11,F
+,Danny Alsharaa,dannyalsharaa@acs.sch.ae,11,M
+,Farah Al-Yacoub,farahal-yacoub@acs.sch.ae,11,F
+,Ali Alzein,alialzein@acs.sch.ae,11,M
+,Ryan Atrak,ryanatrak@acs.sch.ae,11,M
+,Abanoub Attallah,abanoubattallah@acs.sch.ae,11,M
+,Matthew Ayoub,matthewayoub@acs.sch.ae,11,M
+,Abdulwahab Baaj,abdulwahabbaaj@acs.sch.ae,11,M
+,Sofia Babynine,sofiababynine@acs.sch.ae,11,F
+,Ameen Bakhache,ameenbakhache@acs.sch.ae,11,M
+,Rahma Bayumi,rahmabayumi@acs.sch.ae,11,F
+,Sydney Berry,sydneyberry@acs.sch.ae,11,F
 ,Bella Boson,bellalouvisaboson@acs.sch.ae,11,F
-,Jayla Brown,JaylaBrown@acs.sch.ae,11,F
-,Karl Camato,KarlCamato@acs.sch.ae,11,M
-,Eric Carmi,EricCarmi@acs.sch.ae,11,M
-,Kirill Chapman,KirillChapman@acs.sch.ae,11,M
-,Juan Cifuentes Escalante,JuanCifuentesEscalante@acs.sch.ae,11,M
-,Joseph Clark,JosephClark@acs.sch.ae,11,M
-,Alainah Coppens,AlainahCoppens@acs.sch.ae,11,F
-,Arayah Coppens,ArayahCoppens@acs.sch.ae,11,F
-,Norah Coyle,NorahCoyle@acs.sch.ae,11,F
-,Sebastian Dagstani,SebastianDagstani@acs.sch.ae,11,M
-,Dawud Dajani,DawudDajani@acs.sch.ae,11,M
-,Damian Dujanic,DamianDujanic@acs.sch.ae,11,M
-,Ian Duthler,IanDuthler@acs.sch.ae,11,M
+,Jayla Brown,jaylabrown@acs.sch.ae,11,F
+,Karl Camato,karlcamato@acs.sch.ae,11,M
+,Eric Carmi,ericcarmi@acs.sch.ae,11,M
+,Kirill Chapman,kirillchapman@acs.sch.ae,11,M
+,Juan Cifuentes Escalante,juancifuentesescalante@acs.sch.ae,11,M
+,Joseph Clark,josephclark@acs.sch.ae,11,M
+,Alainah Coppens,alainahcoppens@acs.sch.ae,11,F
+,Arayah Coppens,arayahcoppens@acs.sch.ae,11,F
+,Norah Coyle,norahcoyle@acs.sch.ae,11,F
+,Sebastian Dagstani,sebastiandagstani@acs.sch.ae,11,M
+,Dawud Dajani,dawuddajani@acs.sch.ae,11,M
+,Damian Dujanic,damiandujanic@acs.sch.ae,11,M
+,Ian Duthler,ianduthler@acs.sch.ae,11,M
 ,Nour El-Bacha,nourel-bacha@acs.sch.ae,11,F
-,Omar El Masri,OmarElMasri@acs.sch.ae,11,M
-,Kareem Elkhatib,KareemElkhatib@acs.sch.ae,11,M
-,Serene Elmusharaf,SereneElmusharaf@acs.sch.ae,11,F
-,Francesca Fadel,FrancescaFadel@acs.sch.ae,11,F
-,Elsie Ficek,ElsieFicek@acs.sch.ae,11,F
+,Omar El Masri,omarelmasri@acs.sch.ae,11,M
+,Kareem Elkhatib,kareemelkhatib@acs.sch.ae,11,M
+,Serene Elmusharaf,sereneelmusharaf@acs.sch.ae,11,F
+,Francesca Fadel,francescafadel@acs.sch.ae,11,F
+,Elsie Ficek,elsieficek@acs.sch.ae,11,F
 ,Joey Gardner,josephgardner@acs.sch.ae,11,M
-,Noor Ghanem,NoorGhanem@acs.sch.ae,11,F
-,Janaki Gokul,JanakiGokul@acs.sch.ae,11,F
-,Giulia Gregotti,GiuliaGregotti@acs.sch.ae,11,F
-,Jazz Griffiths,JazzGriffiths@acs.sch.ae,11,F
-,Rayan Hamdan,RayanHamdan@acs.sch.ae,11,M
-,Ruby Haryanto,RubyHaryanto@acs.sch.ae,11,F
+,Noor Ghanem,noorghanem@acs.sch.ae,11,F
+,Janaki Gokul,janakigokul@acs.sch.ae,11,F
+,Giulia Gregotti,giuliagregotti@acs.sch.ae,11,F
+,Jazz Griffiths,jazzgriffiths@acs.sch.ae,11,F
+,Rayan Hamdan,rayanhamdan@acs.sch.ae,11,M
+,Ruby Haryanto,rubyharyanto@acs.sch.ae,11,F
 ,GT Heming,gordonheming@acs.sch.ae,11,M
-,Nell Herbert,NellHerbert@acs.sch.ae,11,F
-,Fatima Hufdhi Hasan,FatimaHufdhiHasan@acs.sch.ae,11,F
-,Anton Issak,AntonIssak@acs.sch.ae,11,M
-,Arko Kes,ArkoKes@acs.sch.ae,11,M
-,Soha Khan,SohaKhan@acs.sch.ae,11,F
-,Hyungjae Kim,HyungjaeKim@acs.sch.ae,11,M
-,Jiyun Kim,JiyunKim@acs.sch.ae,11,F
-,Sua Kim,SuaKim@acs.sch.ae,11,F
-,Asher Lambert,AsherLambert@acs.sch.ae,11,M
-,Rohan Litton,RohanLitton@acs.sch.ae,11,M
-,John Lobo,JohnLobo@acs.sch.ae,11,M
-,Esme Mackin,EsmeMackin@acs.sch.ae,11,F
+,Nell Herbert,nellherbert@acs.sch.ae,11,F
+,Fatima Hufdhi Hasan,fatimahufdhihasan@acs.sch.ae,11,F
+,Anton Issak,antonissak@acs.sch.ae,11,M
+,Arko Kes,arkokes@acs.sch.ae,11,M
+,Soha Khan,sohakhan@acs.sch.ae,11,F
+,Hyungjae Kim,hyungjaekim@acs.sch.ae,11,M
+,Jiyun Kim,jiyunkim@acs.sch.ae,11,F
+,Sua Kim,suakim@acs.sch.ae,11,F
+,Asher Lambert,asherlambert@acs.sch.ae,11,M
+,Rohan Litton,rohanlitton@acs.sch.ae,11,M
+,John Lobo,johnlobo@acs.sch.ae,11,M
+,Esme Mackin,esmemackin@acs.sch.ae,11,F
 ,Abby Madden,abigailmadden@acs.sch.ae,11,F
 ,Ben Madoyan,benjaminmadoyan@acs.sch.ae,11,M
 ,Anthony Mousa Mamdouh Zareh,anthonymamdouhzareh@acs.sch.ae,11,M
-,Archie Mather,ArchieMather@acs.sch.ae,11,M
-,Lara Memisoglu,LaraMemisoglu@acs.sch.ae,11,F
-,Emma Miller,EmmaMiller@acs.sch.ae,11,F
-,Diego Moreira,DiegoMoreira@acs.sch.ae,11,M
-,Frida Moujaes,FridaMoujaes@acs.sch.ae,11,F
-,Stuti Mull,StutiMull@acs.sch.ae,11,F
-,Soleil Omar,SoleilOmar@acs.sch.ae,11,F
-,Christian Onyegbule,ChristianOnyegbule@acs.sch.ae,11,M
-,Giselle Osley,GiselleOsley@acs.sch.ae,11,F
-,Paul Paetzold,PaulPaetzold@acs.sch.ae,11,M
-,Carissa Pistun,CarissaPistun@acs.sch.ae,11,F
-,Minal Qazi,MinalQazi@acs.sch.ae,11,F
-,Alia Rabiah,AliaRabiah@acs.sch.ae,11,F
-,Greenlee Rawls,GreenleeRawls@acs.sch.ae,11,F
-,Kyna Rochlani,KynaRochlani@acs.sch.ae,11,F
-,Felix Rodenberg,FelixRodenberg@acs.sch.ae,11,M
-,Henry Rossetti,HenryRossetti@acs.sch.ae,11,M
-,Sai Roy,SaiRoy@acs.sch.ae,11,M
-,Matteo Rozzoni,MatteoRozzoni@acs.sch.ae,11,M
-,Aksel Rudi,AkselRudi@acs.sch.ae,11,M
-,Aknan Saleh,AknanSaleh@acs.sch.ae,11,F
-,Abhishek Satheeshkumar,AbhishekSatheeshkumar@acs.sch.ae,11,M
-,Selah Scheideman,SelahScheideman@acs.sch.ae,11,F
-,Yazan Shehada,YazanShehada@acs.sch.ae,11,M
-,May Shehadeh,MayShehadeh@acs.sch.ae,11,F
-,Emily Shin,EmilyShin@acs.sch.ae,11,F
-,Ibrahim Siddiqi,IbrahimSiddiqi@acs.sch.ae,11,M
-,Meryam Siddiqi,MeryamSiddiqi@acs.sch.ae,11,F
+,Archie Mather,archiemather@acs.sch.ae,11,M
+,Lara Memisoglu,laramemisoglu@acs.sch.ae,11,F
+,Emma Miller,emmamiller@acs.sch.ae,11,F
+,Diego Moreira,diegomoreira@acs.sch.ae,11,M
+,Frida Moujaes,fridamoujaes@acs.sch.ae,11,F
+,Stuti Mull,stutimull@acs.sch.ae,11,F
+,Soleil Omar,soleilomar@acs.sch.ae,11,F
+,Christian Onyegbule,christianonyegbule@acs.sch.ae,11,M
+,Giselle Osley,giselleosley@acs.sch.ae,11,F
+,Paul Paetzold,paulpaetzold@acs.sch.ae,11,M
+,Carissa Pistun,carissapistun@acs.sch.ae,11,F
+,Minal Qazi,minalqazi@acs.sch.ae,11,F
+,Alia Rabiah,aliarabiah@acs.sch.ae,11,F
+,Greenlee Rawls,greenleerawls@acs.sch.ae,11,F
+,Kyna Rochlani,kynarochlani@acs.sch.ae,11,F
+,Felix Rodenberg,felixrodenberg@acs.sch.ae,11,M
+,Henry Rossetti,henryrossetti@acs.sch.ae,11,M
+,Sai Roy,sairoy@acs.sch.ae,11,M
+,Matteo Rozzoni,matteorozzoni@acs.sch.ae,11,M
+,Aksel Rudi,akselrudi@acs.sch.ae,11,M
+,Aknan Saleh,aknansaleh@acs.sch.ae,11,F
+,Abhishek Satheeshkumar,abhisheksatheeshkumar@acs.sch.ae,11,M
+,Selah Scheideman,selahscheideman@acs.sch.ae,11,F
+,Yazan Shehada,yazanshehada@acs.sch.ae,11,M
+,May Shehadeh,mayshehadeh@acs.sch.ae,11,F
+,Emily Shin,emilyshin@acs.sch.ae,11,F
+,Ibrahim Siddiqi,ibrahimsiddiqi@acs.sch.ae,11,M
+,Meryam Siddiqi,meryamsiddiqi@acs.sch.ae,11,F
 ,Sam Sievers,samuelsievers@acs.sch.ae,11,M
-,Batu Sinanoglu,BatuSinanoglu@acs.sch.ae,11,M
-,Ronak Siwatch,RonakSiwatch@acs.sch.ae,11,M
-,Nina Snyman,NinaSnyman@acs.sch.ae,11,F
-,Ariane Spruit,ArianeSpruit@acs.sch.ae,11,F
-,Harshini Sundararaman,HarshiniSundararaman@acs.sch.ae,11,F
-,Benjamin Terblanche,BenjaminTerblanche@acs.sch.ae,11,M
+,Batu Sinanoglu,batusinanoglu@acs.sch.ae,11,M
+,Ronak Siwatch,ronaksiwatch@acs.sch.ae,11,M
+,Nina Snyman,ninasnyman@acs.sch.ae,11,F
+,Ariane Spruit,arianespruit@acs.sch.ae,11,F
+,Harshini Sundararaman,harshinisundararaman@acs.sch.ae,11,F
+,Benjamin Terblanche,benjaminterblanche@acs.sch.ae,11,M
 ,AJ Timoshenko,andreytimoshenko@acs.sch.ae,11,M
-,Aneschka Van Zyl,AneschkaVanZyl@acs.sch.ae,11,F
+,Aneschka Van Zyl,aneschkavanzyl@acs.sch.ae,11,F
 ,Tia Abbas,tiaabbas@acs.sch.ae,10,F
 ,Noor Abu Yousef,noorabuyousef@acs.sch.ae,10,F
 ,Nicolas Achkar,nicolasachkar@acs.sch.ae,10,M
@@ -251,50 +251,50 @@ id,name,email,grade,gender
 ,Ayaan Khan,ayaankhan@acs.sch.ae,10,M
 ,Zara Khan,zarakhan@acs.sch.ae,10,F
 ,Ghazi Kheriba,ghazikheriba@acs.sch.ae,10,M
-,Shadi Khoury,ShadiKhoury@acs.sch.ae,10,M
-,Ryan Kim,RyanKim@acs.sch.ae,10,M
-,Daniel Lawal,DanielLawal@acs.sch.ae,10,M
-,Andrew Lee,JehyeokLee@acs.sch.ae,10,M
-,Brook Lee,BrookLee@acs.sch.ae,10,F
-,Michela Magnetti,MichelaMagnetti@acs.sch.ae,10,F
-,Tiana Martin,TianaMartin@acs.sch.ae,10,F
-,Jeremiah Mathew,JeremiahMathew@acs.sch.ae,10,M
-,Emma McCann,EmmaMcCann@acs.sch.ae,10,F
+,Shadi Khoury,shadikhoury@acs.sch.ae,10,M
+,Ryan Kim,ryankim@acs.sch.ae,10,M
+,Daniel Lawal,daniellawal@acs.sch.ae,10,M
+,Andrew Lee,jehyeoklee@acs.sch.ae,10,M
+,Brook Lee,brooklee@acs.sch.ae,10,F
+,Michela Magnetti,michelamagnetti@acs.sch.ae,10,F
+,Tiana Martin,tianamartin@acs.sch.ae,10,F
+,Jeremiah Mathew,jeremiahmathew@acs.sch.ae,10,M
+,Emma McCann,emmamccann@acs.sch.ae,10,F
 ,Nick Meisner,nicholasmeisner@acs.sch.ae,10,M
-,Jakob Mogensen,JakobMogensen@acs.sch.ae,10,M
-,Evan Moore,EvanMoore@acs.sch.ae,10,M
-,Yasmina Musfy,YasminaMusfy@acs.sch.ae,10,F
-,Jana Naman,JanaNaman@acs.sch.ae,10,F
-,Amani Nasser,AmaniNasser@acs.sch.ae,10,F
-,Nadine Nasser,NadineNasser@acs.sch.ae,10,F
-,Sami Noury,SamiNoury@acs.sch.ae,10,M
-,Kian O'Brien,KianO'Brien@acs.sch.ae,10,M
-,Manal Raza,ManalRaza@acs.sch.ae,10,F
-,Jayden Rencken,JaydenRencken@acs.sch.ae,10,M
-,Matthew Rice,MatthewRice@acs.sch.ae,10,M
-,Diego Rojas Frias,DiegoRojasFrias@acs.sch.ae,10,M
-,Hadi Sabbour,HadiSabbour@acs.sch.ae,10,M
-,Matthew Sado,MatthewSado@acs.sch.ae,10,M
-,Zade Saleh,ZadeSaleh@acs.sch.ae,10,M
-,Markus Schueller,MarkusSchueller@acs.sch.ae,10,M
-,Amelia Schulze,AmeliaSchulze@acs.sch.ae,10,F
-,Hamudi Selim Nasr,mohamedSelim@acs.sch.ae,10,M
-,Rashid Sesay,RashidSesay@acs.sch.ae,10,M
-,Taleen Sha,TaleenSha@acs.sch.ae,10,F
-,Maira Siddiqi,MairaSiddiqi@acs.sch.ae,10,F
-,Alizeh Siddiqui,AlizehSiddiqui@acs.sch.ae,10,F
-,Callum Smith,CallumSmith@acs.sch.ae,10,M
-,Jack Smith,JackSmith@acs.sch.ae,10,M
-,Drew Somheil,DrewSomheil@acs.sch.ae,10,M
-,Rohit Sundararaman,RohitSundararaman@acs.sch.ae,10,M
-,Yazan Tarazi,YazanTarazi@acs.sch.ae,10,M
-,Leyla Trinkl,LeylaTrinkl@acs.sch.ae,10,F
+,Jakob Mogensen,jakobmogensen@acs.sch.ae,10,M
+,Evan Moore,evanmoore@acs.sch.ae,10,M
+,Yasmina Musfy,yasminamusfy@acs.sch.ae,10,F
+,Jana Naman,jananaman@acs.sch.ae,10,F
+,Amani Nasser,amaninasser@acs.sch.ae,10,F
+,Nadine Nasser,nadinenasser@acs.sch.ae,10,F
+,Sami Noury,saminoury@acs.sch.ae,10,M
+,Kian O'Brien,kiano'brien@acs.sch.ae,10,M
+,Manal Raza,manalraza@acs.sch.ae,10,F
+,Jayden Rencken,jaydenrencken@acs.sch.ae,10,M
+,Matthew Rice,matthewrice@acs.sch.ae,10,M
+,Diego Rojas Frias,diegorojasfrias@acs.sch.ae,10,M
+,Hadi Sabbour,hadisabbour@acs.sch.ae,10,M
+,Matthew Sado,matthewsado@acs.sch.ae,10,M
+,Zade Saleh,zadesaleh@acs.sch.ae,10,M
+,Markus Schueller,markusschueller@acs.sch.ae,10,M
+,Amelia Schulze,ameliaschulze@acs.sch.ae,10,F
+,Hamudi Selim Nasr,mohamedselim@acs.sch.ae,10,M
+,Rashid Sesay,rashidsesay@acs.sch.ae,10,M
+,Taleen Sha,taleensha@acs.sch.ae,10,F
+,Maira Siddiqi,mairasiddiqi@acs.sch.ae,10,F
+,Alizeh Siddiqui,alizehsiddiqui@acs.sch.ae,10,F
+,Callum Smith,callumsmith@acs.sch.ae,10,M
+,Jack Smith,jacksmith@acs.sch.ae,10,M
+,Drew Somheil,drewsomheil@acs.sch.ae,10,M
+,Rohit Sundararaman,rohitsundararaman@acs.sch.ae,10,M
+,Yazan Tarazi,yazantarazi@acs.sch.ae,10,M
+,Leyla Trinkl,leylatrinkl@acs.sch.ae,10,F
 ,Shira Turbiner Hayek,shirahayek@acs.sch.ae,10,F
-,Robin Turner,RobinTurner@acs.sch.ae,10,M
-,Alia Waels,AliaWaels@acs.sch.ae,10,F
-,Hazel Whitaker,HazelWhitaker@acs.sch.ae,10,F
-,Dani Youness,DaniYouness@acs.sch.ae,10,M
-,Sami Zimmerman,SamiZimmerman@acs.sch.ae,10,M
+,Robin Turner,robinturner@acs.sch.ae,10,M
+,Alia Waels,aliawaels@acs.sch.ae,10,F
+,Hazel Whitaker,hazelwhitaker@acs.sch.ae,10,F
+,Dani Youness,daniyouness@acs.sch.ae,10,M
+,Sami Zimmerman,samizimmerman@acs.sch.ae,10,M
 ,Sarah Zimmerman,sarahzimmerman@acs.sch.ae,10,F
 ,Malak Abdulhalim,malakabdulhalim@acs.sch.ae,9,F
 ,Razan Abo Ryah Mokhalalati,razanmokhalalati@acs.sch.ae,9,F
@@ -388,263 +388,263 @@ id,name,email,grade,gender
 ,Yousif Zo Mot,yousifzomot@acs.sch.ae,9,M
 ,Julianna Zuchowski,juliannazuchowski@acs.sch.ae,9,F
 ,Malek Zuhdi,malekzuhdi@acs.sch.ae,9,M
-,Jana Abdelhaq,JanaAbdelhaq@acs.sch.ae,8,F
-,Nour AbdulRazzak,NourAbdulRazzak@acs.sch.ae,8,F
-,Lilia Abrenica,LiliaAbrenica@acs.sch.ae,8,F
-,Ahmad Abu-Adas,AhmadAbu-Adas@acs.sch.ae,8,M
-,Adam Al Asadi,AdamAlAsadi@acs.sch.ae,8,M
-,Farah Al Nowais,FarahAlNowais@acs.sch.ae,8,F
-,May Al Nuwais,MayAlNuwais@acs.sch.ae,8,F
-,Abdulla Al Suwaidi,AbdullaAlSuwaidi@acs.sch.ae,8,M
-,Issa Al Tenaiji,IssaAlTenaiji@acs.sch.ae,8,M
-,Mariam Al Zaabi,MariamAlZaabi@acs.sch.ae,8,F
-,Zaid Aljamal,ZaidAljamal@acs.sch.ae,8,M
-,Mansour Almarzooqi,MansourAlmarzooqi@acs.sch.ae,8,M
-,Zainab Aziz,ZainabAziz@acs.sch.ae,8,F
-,Malek Bakhache,MalekBakhache@acs.sch.ae,8,M
-,Marius Boesen,MariusBoesen@acs.sch.ae,8,M
-,Henry Bray,HenryBray@acs.sch.ae,8,M
-,Shaw Brown,ShawBrown@acs.sch.ae,8,M
-,Amigo Bugeaud Mata,AmigoBugeaudMata@acs.sch.ae,8,M
-,Majd Charara,MajdCharara@acs.sch.ae,8,M
-,Carlotta Citanna,CarlottaCitanna@acs.sch.ae,8,F
-,Hortense Citanna,HortenseCitanna@acs.sch.ae,8,F
-,Adam Clark,AdamClark@acs.sch.ae,8,M
-,Kate Coyle,KateCoyle@acs.sch.ae,8,F
-,Valeria Cronin,ValeriaCronin@acs.sch.ae,8,F
-,Pilar Datta,PilarDatta@acs.sch.ae,8,F
-,Margaret Decker,MargaretDecker@acs.sch.ae,8,F
-,Sophia Demille,SophiaDemille@acs.sch.ae,8,F
-,Aliakbar Devji,AliakbarDevji@acs.sch.ae,8,M
-,Sarah Eid,SarahEid@acs.sch.ae,8,F
-,Kayla El Guanaini,KaylaElGuanaini@acs.sch.ae,8,F
-,Fayrouz El Soukkary,FayrouzElSoukkary@acs.sch.ae,8,F
-,Lea El-Chaar,LeaEl-Chaar@acs.sch.ae,8,F
-,Paul Elfady,PaulElfady@acs.sch.ae,8,M
-,Ashleigh Evans,AshleighEvans@acs.sch.ae,8,F
-,Jack Gatehouse,JackGatehouse@acs.sch.ae,8,M
-,Sidra Gebirrebbi,SidraGebirrebbi@acs.sch.ae,8,F
-,Mahmoud Ghanem,MahmoudGhanem@acs.sch.ae,8,M
-,Lea Halimi,LeaHalimi@acs.sch.ae,8,F
-,Lily Haney,LilyHaney@acs.sch.ae,8,F
-,Ava Hawkins,AvaHawkins@acs.sch.ae,8,F
-,Eiad Hegazy,EiadHegazy@acs.sch.ae,8,M
-,Webb Herbert,WebbHerbert@acs.sch.ae,8,M
-,Jacobo Hernandez Erazo,JacoboHernandezErazo@acs.sch.ae,8,M
-,Lena Hilal,LenaHilal@acs.sch.ae,8,F
-,Zaid Hoda,ZaidHoda@acs.sch.ae,8,M
-,Marisa Hourani,MarisaHourani@acs.sch.ae,8,F
-,Zahra Iqbal,ZahraIqbal@acs.sch.ae,8,F
-,Joey Joundeya,JoeyJoundeya@acs.sch.ae,8,M
-,Mark Khayat,MarkKhayat@acs.sch.ae,8,M
-,Christine Lawal,ChristineLawal@acs.sch.ae,8,F
-,Kai Lickrish,KaiLickrish@acs.sch.ae,8,M
-,Riya Litton,RiyaLitton@acs.sch.ae,8,F
-,Alison Lobo,AlisonLobo@acs.sch.ae,8,F
-,Luca Magnetti,LucaMagnetti@acs.sch.ae,8,F
-,Brody Marsh,BrodyMarsh@acs.sch.ae,8,M
-,Caroline Meisner,CarolineMeisner@acs.sch.ae,8,F
-,Mark Mekhail,MarkMekhail@acs.sch.ae,8,M
-,Jay Mirchandaney,JayMirchandaney@acs.sch.ae,8,M
-,Mo Moin,MoMoin@acs.sch.ae,8,M
-,Mikaela Moon,MikaelaMoon@acs.sch.ae,8,F
-,Michael Moore,MichaelMoore@acs.sch.ae,8,M
-,Anay Mull,AnayMull@acs.sch.ae,8,M
-,Olivier Onyegbule,OlivierOnyegbule@acs.sch.ae,8,M
-,Juan Otero Orozco,JuanOteroOrozco@acs.sch.ae,8,M
-,Leah Panga,LeahPanga@acs.sch.ae,8,F
-,Jayden Parel,JaydenParel@acs.sch.ae,8,M
-,Laodice Perri,LaodicePerri@acs.sch.ae,8,F
-,Ella Prouty,EllaProuty@acs.sch.ae,8,F
-,Giorgia Rozzoni,GiorgiaRozzoni@acs.sch.ae,8,F
-,Ali Saleh,AliSaleh@acs.sch.ae,8,M
-,Anugraha Satheeshkumar,AnugrahaSatheeshkumar@acs.sch.ae,8,F
-,Ariel Scheideman,ArielScheideman@acs.sch.ae,8,F
-,Fouad Sema'an,FouadSema'an@acs.sch.ae,8,M
-,Delan Sha,DelanSha@acs.sch.ae,8,M
-,Himani Sharma,HimaniSharma@acs.sch.ae,8,F
-,Aya Shibel,AyaShibel@acs.sch.ae,8,F
-,Claire Thurston,ClaireThurston@acs.sch.ae,8,F
-,Sydney Toth,SydneyToth@acs.sch.ae,8,F
-,Bradyn Trescott,BradynTrescott@acs.sch.ae,8,M
-,Gabriele Troisi,GabrieleTroisi@acs.sch.ae,8,M
-,Victor Turrin,VictorTurrin@acs.sch.ae,8,M
-,Luke Williams,LukeWilliams@acs.sch.ae,8,M
-,Avvi Wilson,AvviWilson@acs.sch.ae,8,F
-,Khaled Younes,KhaledYounes@acs.sch.ae,8,M
-,Mariam Zakaria,MariamZakaria@acs.sch.ae,8,F
-,Rony Zentner,RonyZentner@acs.sch.ae,8,F
-,Adnan Abed,AdnanAbed@acs.sch.ae,7,M
-,Tameem Al Khalil,TameemAlKhalil@acs.sch.ae,7,M
-,Khalifa Al Mubarak,KhalifaAlMubarak@acs.sch.ae,7,M
-,Mansoor Al Suwaidi,MansoorAlSuwaidi@acs.sch.ae,7,M
-,Ayla Al-Busaidy,AylaAl-Busaidy@acs.sch.ae,7,F
-,Saifo Alhaj Ahmad,SaifoAlhajAhmad@acs.sch.ae,7,M
-,Deema Alkaabi,DeemaAlkaabi@acs.sch.ae,7,F
-,Mansour Alkudsi,MansourAlkudsi@acs.sch.ae,7,M
-,Judy Alsharaa,JudyAlsharaa@acs.sch.ae,7,F
-,Maysa Asfour,MaysaAsfour@acs.sch.ae,7,F
-,Kareem Awadalla,KareemAwadalla@acs.sch.ae,7,M
-,Kinza Baramki,KinzaBaramki@acs.sch.ae,7,F
-,Sienna Bawab,SiennaBawab@acs.sch.ae,7,F
-,Levi Benton,LeviBenton@acs.sch.ae,7,M
-,Ella Bontemps,EllaBontemps@acs.sch.ae,7,F
-,Ava Burreson,AvaBurreson@acs.sch.ae,7,F
-,Elijah Charles,ElijahCharles@acs.sch.ae,7,M
-,Ibrahim Chaudhary,IbrahimChaudhary@acs.sch.ae,7,M
-,Rachel Cho,RachelCho@acs.sch.ae,7,F
-,Navya Chowdhury,NavyaChowdhury@acs.sch.ae,7,F
-,Sabrina Claerhout,SabrinaClaerhout@acs.sch.ae,7,F
-,Cal Cooper,CalCooper@acs.sch.ae,7,M
-,Caterina Coscia,CaterinaCoscia@acs.sch.ae,7,F
-,Tristan DCunha,TristanDCunha@acs.sch.ae,7,M
-,Naimal Dogar,NaimalDogar@acs.sch.ae,7,F
-,Esin Edepli,EsinEdepli@acs.sch.ae,7,F
-,Nosha El Bacha,NoshaElBacha@acs.sch.ae,7,F
-,Lina Elgizawy,LinaElgizawy@acs.sch.ae,7,F
-,Sara Elramahi,SaraElramahi@acs.sch.ae,7,F
-,Farida Elsayed,FaridaElsayed@acs.sch.ae,7,F
-,Alisah Engineer,AlisahEngineer@acs.sch.ae,7,F
-,Matteo Fadel,MatteoFadel@acs.sch.ae,7,M
-,Leo Filenev,LeoFilenev@acs.sch.ae,7,M
-,Aadi Ghosh,AadiGhosh@acs.sch.ae,7,M
-,Ayla Graber,AylaGraber@acs.sch.ae,7,F
-,Laith Halaseh,LaithHalaseh@acs.sch.ae,7,M
-,Pablo Halvorson,PabloHalvorson@acs.sch.ae,7,M
-,Sammy Hamel,SammyHamel@acs.sch.ae,7,M
-,Noor Hassanieh,NoorHassanieh@acs.sch.ae,7,F
-,Charlotte Ibrayev,CharlotteIbrayev@acs.sch.ae,7,F
-,Jay Luca Jabbour,JayLucaJabbour@acs.sch.ae,7,M
-,Arhaan Jain,ArhaanJain@acs.sch.ae,7,M
-,Tiger Jing,TigerJing@acs.sch.ae,7,M
-,Abdul Rahman Kamran,AbdulRahmanKamran@acs.sch.ae,7,M
-,Oskar Kasa,OskarKasa@acs.sch.ae,7,M
-,Carma Kassab Bachi,CarmaKassabBachi@acs.sch.ae,7,F
-,Celine Khalil,CelineKhalil@acs.sch.ae,7,F
-,Hadiya Khan,HadiyaKhan@acs.sch.ae,7,F
-,Thea Khneisser,TheaKhneisser@acs.sch.ae,7,F
-,Nabih Khoury,NabihKhoury@acs.sch.ae,7,M
-,Melissa Kilincat,MelissaKilincat@acs.sch.ae,7,F
-,Nay Koteich,NayKoteich@acs.sch.ae,7,F
-,Clayton Kratzer,ClaytonKratzer@acs.sch.ae,7,M
-,Ahmad Kuleib,AhmadKuleib@acs.sch.ae,7,M
-,Ruiyang Luo,RuiyangLuo@acs.sch.ae,7,M
-,Corey Lywood,CoreyLywood@acs.sch.ae,7,M
-,Michelle Makarem,MichelleMakarem@acs.sch.ae,7,F
-,Tanya Mataniary,TanyaMataniary@acs.sch.ae,7,F
-,Khushi Matnani,KhushiMatnani@acs.sch.ae,7,F
-,Raya Mattar,RayaMattar@acs.sch.ae,7,F
-,Wael Mattar,WaelMattar@acs.sch.ae,7,M
-,Khalifa Mohammed,KhalifaMohammed@acs.sch.ae,7,M
-,Junior Moubarak,JuniorMoubarak@acs.sch.ae,7,M
-,Laith Munir,LaithMunir@acs.sch.ae,7,M
-,Serena Naaman,SerenaNaaman@acs.sch.ae,7,F
-,Awab Norain,AwabNorain@acs.sch.ae,7,M
-,Arman Noury,ArmanNoury@acs.sch.ae,7,M
-,Yousef Nuseibeh,YousefNuseibeh@acs.sch.ae,7,M
-,Masa Oklah,MasaOklah@acs.sch.ae,7,F
-,Bobby Pfeiffer,BobbyPfeiffer@acs.sch.ae,7,M
-,Azlan Qazi,AzlanQazi@acs.sch.ae,7,M
-,Abdel-Aziz Rabeh,Abdel-AzizRabeh@acs.sch.ae,7,M
-,Moosa Raza,MoosaRaza@acs.sch.ae,7,M
-,Nathan Rencken,NathanRencken@acs.sch.ae,7,M
-,Nawaf Saffarini,NawafSaffarini@acs.sch.ae,7,M
-,Joory Salah,JoorySalah@acs.sch.ae,7,F
-,Bassel Sankari,BasselSankari@acs.sch.ae,7,M
-,Jacob Shah,JacobShah@acs.sch.ae,7,M
-,Sanam Shah,SanamShah@acs.sch.ae,7,F
-,Habiba Sherif,HabibaSherif@acs.sch.ae,7,F
-,Anvi Shetty,AnviShetty@acs.sch.ae,7,F
-,Ashley Shin,AshleyShin@acs.sch.ae,7,F
-,Sophia Sleiman,SophiaSleiman@acs.sch.ae,7,F
-,Benedikt Sokol,BenediktSokol@acs.sch.ae,7,M
-,Isla Souster,IslaSouster@acs.sch.ae,7,
-,Cavin Stiger,CavinStiger@acs.sch.ae,7,M
-,Kaia Tarazi,KaiaTarazi@acs.sch.ae,7,F
-,Susie Walsh,SusieWalsh@acs.sch.ae,7,F
-,Reed Whitaker,ReedWhitaker@acs.sch.ae,7,M
-,Inho Yoon,InhoYoon@acs.sch.ae,7,M
-,Minseo Yoon,MinseoYoon@acs.sch.ae,7,F
-,Lia Abbas,LiaAbbas@acs.sch.ae,6,F
-,Zuhaa Ahmed,ZuhaaAhmed@acs.sch.ae,6,F
-,Annabella Al Achkar,AnnabellaAlAchkar@acs.sch.ae,6,F
-,Kinane Al Achkar,KinaneAlAchkar@acs.sch.ae,6,M
-,Lara Al Khalil,LaraAlKhalil@acs.sch.ae,6,F
-,Shaikha Al Suwaidi,ShaikhaAlSuwaidi@acs.sch.ae,6,F
-,Abdulla Al Zaabi,AbdullaAlZaabi@acs.sch.ae,6,M
-,Mohammed Alkaabi,MohammedAlkaabi@acs.sch.ae,6,M
-,Mona Al-Iobani,MonaAl-Iobani@acs.sch.ae,6,F
-,Ali Alnakhi Altamimi,AliAlnakhiAltamimi@acs.sch.ae,6,M
-,Sama Alnuaimi,SamaAlnuaimi@acs.sch.ae,6,F
-,Tala Alrakawi,TalaAlrakawi@acs.sch.ae,6,F
-,Noah AlShamsi,NoahAlShamsi@acs.sch.ae,6,M
-,Maryam Alteneiji,MaryamAlteneiji@acs.sch.ae,6,F
-,Luca Arlotto,LucaArlotto@acs.sch.ae,6,M
-,Colton Bengtzen,ColtonBengtzen@acs.sch.ae,6,M
-,Saachi Bhatia,SaachiBhatia@acs.sch.ae,6,F
-,Vera Boronina,VeraBoronina@acs.sch.ae,6,F
-,William Brannan,WilliamBrannan@acs.sch.ae,6,M
-,Luke Brown,LukeBrown@acs.sch.ae,6,M
-,Kai Bryant,KaiBryant@acs.sch.ae,6,M
-,Marco Cappellini,MarcoCappellini@acs.sch.ae,6,M
-,Paul Chaisomboonpan,PaulChaisomboonpan@acs.sch.ae,6,M
-,Hannah Chandy,HannahChandy@acs.sch.ae,6,F
-,Keyaan Chaudhry-Hussain,KeyaanChaudhry-Hussain@acs.sch.ae,6,M
-,Anika Chintakuntlawar,AnikaChintakuntlawar@acs.sch.ae,6,F
-,Aditya Chowdhury,AdityaChowdhury@acs.sch.ae,6,M
-,Leah Cooper,LeahCooper@acs.sch.ae,6,F
-,Lulu Cowell,LuluCowell@acs.sch.ae,6,F
-,Jacob Crowder,JacobCrowder@acs.sch.ae,6,M
-,Kate El Maalouli,KateElMaalouli@acs.sch.ae,6,F
-,Ayati Garg,AyatiGarg@acs.sch.ae,6,F
-,Emaline Green,EmalineGreen@acs.sch.ae,6,F
-,Habib Hawa,HabibHawa@acs.sch.ae,6,M
-,Adham Hegazy,AdhamHegazy@acs.sch.ae,6,M
-,Lily Hmaid,LillianHmaid@acs.sch.ae,6,F
-,Carmen Hourani,CarmenHourani@acs.sch.ae,6,F
-,Aanya Karumanchi,AanyaKarumanchi@acs.sch.ae,6,F
-,Tadaki Kishida,TadakiKishida@acs.sch.ae,6,M
-,William Kobersy,WilliamKobersy@acs.sch.ae,6,M
-,Sahana Krishnan,SahanaKrishnan@acs.sch.ae,6,F
-,Kayden Lampkin,KaydenLampkin@acs.sch.ae,6,M
-,Lila Le,AnLe@acs.sch.ae,6,F
-,Sophie Lee,HaneulLee@acs.sch.ae,6,F
-,Sydney Lewis,SydneyLewis@acs.sch.ae,6,F
-,Lachlan Lickrish,LachlanLickrish@acs.sch.ae,6,M
-,Marlee Mapstone,MarleeMapstone@acs.sch.ae,6,F
-,Hudson Marsh,HudsonMarsh@acs.sch.ae,6,M
-,Thavanesh Mehta,ThavaneshMehta@acs.sch.ae,6,M
-,Margaux Miller,MargauxMiller@acs.sch.ae,6,F
-,Anisa Moin,AnisaMoin@acs.sch.ae,6,F
-,Evan Moon,EvanMoon@acs.sch.ae,6,M
-,Hayden Moorefield,HaydenMoorefield@acs.sch.ae,6,M
-,Matthew Nahal,MatthewNahal@acs.sch.ae,6,M
-,Zayed Naseer,ZayedNaseer@acs.sch.ae,6,M
-,Charlie Peters,CharliePeters@acs.sch.ae,6,F
-,Mario Pons Romera,MarioPonsRomera@acs.sch.ae,6,M
-,Yousef Qandeel,YousefQandeel@acs.sch.ae,6,M
-,Isha Rama Rao,IshaRamaRao@acs.sch.ae,6,F
-,Marina Ravagli,MarinaRavagli@acs.sch.ae,6,F
-,Eliza Ray,ElizaRay@acs.sch.ae,6,F
-,John Rossetti,JohnRossetti@acs.sch.ae,6,M
-,Liv Sandberg Wersall,LivSandbergWersall@acs.sch.ae,6,F
-,Jack Schoorel,JackSchoorel@acs.sch.ae,6,M
-,Abigail Schulze,AbigailSchulze@acs.sch.ae,6,F
-,Ishaan Shah,IshaanShah@acs.sch.ae,6,M
-,Sarry Shehadeh,SarryShehadeh@acs.sch.ae,6,M
-,Tiana Shihadeh,TianaShihadeh@acs.sch.ae,6,F
-,Alex Shubeita,AlexShubeita@acs.sch.ae,6,M
-,Idris Siddiqi,IdrisSiddiqi@acs.sch.ae,6,M
-,Lea Skaf Halabi,LeaSkafHalabi@acs.sch.ae,6,F
-,Sabine Spindola Stanciole,SabineSpindolaStanciole@acs.sch.ae,6,F
-,Carolyne Stephenson,CarolyneStephenson@acs.sch.ae,6,F
-,Casimir Swislocki,CasimirSwislocki@acs.sch.ae,6,M
-,Adam Tadmori,AdamTadmori@acs.sch.ae,6,M
-,Alisa Taylor,AlisaTaylor@acs.sch.ae,6,F
-,Eli Thorstad,EliThorstad@acs.sch.ae,6,M
-,Ellie Tillotson,ElleanoreTillotson@acs.sch.ae,6,F
-,Jonathan Turbiner Hayek,JonathanTurbinerHayek@acs.sch.ae,6,M
-,Saif Wasfi,SaifWasfi@acs.sch.ae,6,M
-,Eileen Watkins,EileenWatkins@acs.sch.ae,6,F
-,Isaac Watts,IsaacWatts@acs.sch.ae,6,M
-,Gil Zentner,GilZentner@acs.sch.ae,6,M
+,Jana Abdelhaq,janaabdelhaq@acs.sch.ae,8,F
+,Nour AbdulRazzak,nourabdulrazzak@acs.sch.ae,8,F
+,Lilia Abrenica,liliaabrenica@acs.sch.ae,8,F
+,Ahmad Abu-Adas,ahmadabu-adas@acs.sch.ae,8,M
+,Adam Al Asadi,adamalasadi@acs.sch.ae,8,M
+,Farah Al Nowais,farahalnowais@acs.sch.ae,8,F
+,May Al Nuwais,mayalnuwais@acs.sch.ae,8,F
+,Abdulla Al Suwaidi,abdullaalsuwaidi@acs.sch.ae,8,M
+,Issa Al Tenaiji,issaaltenaiji@acs.sch.ae,8,M
+,Mariam Al Zaabi,mariamalzaabi@acs.sch.ae,8,F
+,Zaid Aljamal,zaidaljamal@acs.sch.ae,8,M
+,Mansour Almarzooqi,mansouralmarzooqi@acs.sch.ae,8,M
+,Zainab Aziz,zainabaziz@acs.sch.ae,8,F
+,Malek Bakhache,malekbakhache@acs.sch.ae,8,M
+,Marius Boesen,mariusboesen@acs.sch.ae,8,M
+,Henry Bray,henrybray@acs.sch.ae,8,M
+,Shaw Brown,shawbrown@acs.sch.ae,8,M
+,Amigo Bugeaud Mata,amigobugeaudmata@acs.sch.ae,8,M
+,Majd Charara,majdcharara@acs.sch.ae,8,M
+,Carlotta Citanna,carlottacitanna@acs.sch.ae,8,F
+,Hortense Citanna,hortensecitanna@acs.sch.ae,8,F
+,Adam Clark,adamclark@acs.sch.ae,8,M
+,Kate Coyle,katecoyle@acs.sch.ae,8,F
+,Valeria Cronin,valeriacronin@acs.sch.ae,8,F
+,Pilar Datta,pilardatta@acs.sch.ae,8,F
+,Margaret Decker,margaretdecker@acs.sch.ae,8,F
+,Sophia Demille,sophiademille@acs.sch.ae,8,F
+,Aliakbar Devji,aliakbardevji@acs.sch.ae,8,M
+,Sarah Eid,saraheid@acs.sch.ae,8,F
+,Kayla El Guanaini,kaylaelguanaini@acs.sch.ae,8,F
+,Fayrouz El Soukkary,fayrouzelsoukkary@acs.sch.ae,8,F
+,Lea El-Chaar,leael-chaar@acs.sch.ae,8,F
+,Paul Elfady,paulelfady@acs.sch.ae,8,M
+,Ashleigh Evans,ashleighevans@acs.sch.ae,8,F
+,Jack Gatehouse,jackgatehouse@acs.sch.ae,8,M
+,Sidra Gebirrebbi,sidragebirrebbi@acs.sch.ae,8,F
+,Mahmoud Ghanem,mahmoudghanem@acs.sch.ae,8,M
+,Lea Halimi,leahalimi@acs.sch.ae,8,F
+,Lily Haney,lilyhaney@acs.sch.ae,8,F
+,Ava Hawkins,avahawkins@acs.sch.ae,8,F
+,Eiad Hegazy,eiadhegazy@acs.sch.ae,8,M
+,Webb Herbert,webbherbert@acs.sch.ae,8,M
+,Jacobo Hernandez Erazo,jacobohernandezerazo@acs.sch.ae,8,M
+,Lena Hilal,lenahilal@acs.sch.ae,8,F
+,Zaid Hoda,zaidhoda@acs.sch.ae,8,M
+,Marisa Hourani,marisahourani@acs.sch.ae,8,F
+,Zahra Iqbal,zahraiqbal@acs.sch.ae,8,F
+,Joey Joundeya,joeyjoundeya@acs.sch.ae,8,M
+,Mark Khayat,markkhayat@acs.sch.ae,8,M
+,Christine Lawal,christinelawal@acs.sch.ae,8,F
+,Kai Lickrish,kailickrish@acs.sch.ae,8,M
+,Riya Litton,riyalitton@acs.sch.ae,8,F
+,Alison Lobo,alisonlobo@acs.sch.ae,8,F
+,Luca Magnetti,lucamagnetti@acs.sch.ae,8,F
+,Brody Marsh,brodymarsh@acs.sch.ae,8,M
+,Caroline Meisner,carolinemeisner@acs.sch.ae,8,F
+,Mark Mekhail,markmekhail@acs.sch.ae,8,M
+,Jay Mirchandaney,jaymirchandaney@acs.sch.ae,8,M
+,Mo Moin,momoin@acs.sch.ae,8,M
+,Mikaela Moon,mikaelamoon@acs.sch.ae,8,F
+,Michael Moore,michaelmoore@acs.sch.ae,8,M
+,Anay Mull,anaymull@acs.sch.ae,8,M
+,Olivier Onyegbule,olivieronyegbule@acs.sch.ae,8,M
+,Juan Otero Orozco,juanoteroorozco@acs.sch.ae,8,M
+,Leah Panga,leahpanga@acs.sch.ae,8,F
+,Jayden Parel,jaydenparel@acs.sch.ae,8,M
+,Laodice Perri,laodiceperri@acs.sch.ae,8,F
+,Ella Prouty,ellaprouty@acs.sch.ae,8,F
+,Giorgia Rozzoni,giorgiarozzoni@acs.sch.ae,8,F
+,Ali Saleh,alisaleh@acs.sch.ae,8,M
+,Anugraha Satheeshkumar,anugrahasatheeshkumar@acs.sch.ae,8,F
+,Ariel Scheideman,arielscheideman@acs.sch.ae,8,F
+,Fouad Sema'an,fouadsema'an@acs.sch.ae,8,M
+,Delan Sha,delansha@acs.sch.ae,8,M
+,Himani Sharma,himanisharma@acs.sch.ae,8,F
+,Aya Shibel,ayashibel@acs.sch.ae,8,F
+,Claire Thurston,clairethurston@acs.sch.ae,8,F
+,Sydney Toth,sydneytoth@acs.sch.ae,8,F
+,Bradyn Trescott,bradyntrescott@acs.sch.ae,8,M
+,Gabriele Troisi,gabrieletroisi@acs.sch.ae,8,M
+,Victor Turrin,victorturrin@acs.sch.ae,8,M
+,Luke Williams,lukewilliams@acs.sch.ae,8,M
+,Avvi Wilson,avviwilson@acs.sch.ae,8,F
+,Khaled Younes,khaledyounes@acs.sch.ae,8,M
+,Mariam Zakaria,mariamzakaria@acs.sch.ae,8,F
+,Rony Zentner,ronyzentner@acs.sch.ae,8,F
+,Adnan Abed,adnanabed@acs.sch.ae,7,M
+,Tameem Al Khalil,tameemalkhalil@acs.sch.ae,7,M
+,Khalifa Al Mubarak,khalifaalmubarak@acs.sch.ae,7,M
+,Mansoor Al Suwaidi,mansooralsuwaidi@acs.sch.ae,7,M
+,Ayla Al-Busaidy,aylaal-busaidy@acs.sch.ae,7,F
+,Saifo Alhaj Ahmad,saifoalhajahmad@acs.sch.ae,7,M
+,Deema Alkaabi,deemaalkaabi@acs.sch.ae,7,F
+,Mansour Alkudsi,mansouralkudsi@acs.sch.ae,7,M
+,Judy Alsharaa,judyalsharaa@acs.sch.ae,7,F
+,Maysa Asfour,maysaasfour@acs.sch.ae,7,F
+,Kareem Awadalla,kareemawadalla@acs.sch.ae,7,M
+,Kinza Baramki,kinzabaramki@acs.sch.ae,7,F
+,Sienna Bawab,siennabawab@acs.sch.ae,7,F
+,Levi Benton,levibenton@acs.sch.ae,7,M
+,Ella Bontemps,ellabontemps@acs.sch.ae,7,F
+,Ava Burreson,avaburreson@acs.sch.ae,7,F
+,Elijah Charles,elijahcharles@acs.sch.ae,7,M
+,Ibrahim Chaudhary,ibrahimchaudhary@acs.sch.ae,7,M
+,Rachel Cho,rachelcho@acs.sch.ae,7,F
+,Navya Chowdhury,navyachowdhury@acs.sch.ae,7,F
+,Sabrina Claerhout,sabrinaclaerhout@acs.sch.ae,7,F
+,Cal Cooper,calcooper@acs.sch.ae,7,M
+,Caterina Coscia,caterinacoscia@acs.sch.ae,7,F
+,Tristan DCunha,tristandcunha@acs.sch.ae,7,M
+,Naimal Dogar,naimaldogar@acs.sch.ae,7,F
+,Esin Edepli,esinedepli@acs.sch.ae,7,F
+,Nosha El Bacha,noshaelbacha@acs.sch.ae,7,F
+,Lina Elgizawy,linaelgizawy@acs.sch.ae,7,F
+,Sara Elramahi,saraelramahi@acs.sch.ae,7,F
+,Farida Elsayed,faridaelsayed@acs.sch.ae,7,F
+,Alisah Engineer,alisahengineer@acs.sch.ae,7,F
+,Matteo Fadel,matteofadel@acs.sch.ae,7,M
+,Leo Filenev,leofilenev@acs.sch.ae,7,M
+,Aadi Ghosh,aadighosh@acs.sch.ae,7,M
+,Ayla Graber,aylagraber@acs.sch.ae,7,F
+,Laith Halaseh,laithhalaseh@acs.sch.ae,7,M
+,Pablo Halvorson,pablohalvorson@acs.sch.ae,7,M
+,Sammy Hamel,sammyhamel@acs.sch.ae,7,M
+,Noor Hassanieh,noorhassanieh@acs.sch.ae,7,F
+,Charlotte Ibrayev,charlotteibrayev@acs.sch.ae,7,F
+,Jay Luca Jabbour,jaylucajabbour@acs.sch.ae,7,M
+,Arhaan Jain,arhaanjain@acs.sch.ae,7,M
+,Tiger Jing,tigerjing@acs.sch.ae,7,M
+,Abdul Rahman Kamran,abdulrahmankamran@acs.sch.ae,7,M
+,Oskar Kasa,oskarkasa@acs.sch.ae,7,M
+,Carma Kassab Bachi,carmakassabbachi@acs.sch.ae,7,F
+,Celine Khalil,celinekhalil@acs.sch.ae,7,F
+,Hadiya Khan,hadiyakhan@acs.sch.ae,7,F
+,Thea Khneisser,theakhneisser@acs.sch.ae,7,F
+,Nabih Khoury,nabihkhoury@acs.sch.ae,7,M
+,Melissa Kilincat,melissakilincat@acs.sch.ae,7,F
+,Nay Koteich,naykoteich@acs.sch.ae,7,F
+,Clayton Kratzer,claytonkratzer@acs.sch.ae,7,M
+,Ahmad Kuleib,ahmadkuleib@acs.sch.ae,7,M
+,Ruiyang Luo,ruiyangluo@acs.sch.ae,7,M
+,Corey Lywood,coreylywood@acs.sch.ae,7,M
+,Michelle Makarem,michellemakarem@acs.sch.ae,7,F
+,Tanya Mataniary,tanyamataniary@acs.sch.ae,7,F
+,Khushi Matnani,khushimatnani@acs.sch.ae,7,F
+,Raya Mattar,rayamattar@acs.sch.ae,7,F
+,Wael Mattar,waelmattar@acs.sch.ae,7,M
+,Khalifa Mohammed,khalifamohammed@acs.sch.ae,7,M
+,Junior Moubarak,juniormoubarak@acs.sch.ae,7,M
+,Laith Munir,laithmunir@acs.sch.ae,7,M
+,Serena Naaman,serenanaaman@acs.sch.ae,7,F
+,Awab Norain,awabnorain@acs.sch.ae,7,M
+,Arman Noury,armannoury@acs.sch.ae,7,M
+,Yousef Nuseibeh,yousefnuseibeh@acs.sch.ae,7,M
+,Masa Oklah,masaoklah@acs.sch.ae,7,F
+,Bobby Pfeiffer,bobbypfeiffer@acs.sch.ae,7,M
+,Azlan Qazi,azlanqazi@acs.sch.ae,7,M
+,Abdel-Aziz Rabeh,abdel-azizrabeh@acs.sch.ae,7,M
+,Moosa Raza,moosaraza@acs.sch.ae,7,M
+,Nathan Rencken,nathanrencken@acs.sch.ae,7,M
+,Nawaf Saffarini,nawafsaffarini@acs.sch.ae,7,M
+,Joory Salah,joorysalah@acs.sch.ae,7,F
+,Bassel Sankari,basselsankari@acs.sch.ae,7,M
+,Jacob Shah,jacobshah@acs.sch.ae,7,M
+,Sanam Shah,sanamshah@acs.sch.ae,7,F
+,Habiba Sherif,habibasherif@acs.sch.ae,7,F
+,Anvi Shetty,anvishetty@acs.sch.ae,7,F
+,Ashley Shin,ashleyshin@acs.sch.ae,7,F
+,Sophia Sleiman,sophiasleiman@acs.sch.ae,7,F
+,Benedikt Sokol,benediktsokol@acs.sch.ae,7,M
+,Isla Souster,islasouster@acs.sch.ae,7,-
+,Cavin Stiger,cavinstiger@acs.sch.ae,7,M
+,Kaia Tarazi,kaiatarazi@acs.sch.ae,7,F
+,Susie Walsh,susiewalsh@acs.sch.ae,7,F
+,Reed Whitaker,reedwhitaker@acs.sch.ae,7,M
+,Inho Yoon,inhoyoon@acs.sch.ae,7,M
+,Minseo Yoon,minseoyoon@acs.sch.ae,7,F
+,Lia Abbas,liaabbas@acs.sch.ae,6,F
+,Zuhaa Ahmed,zuhaaahmed@acs.sch.ae,6,F
+,Annabella Al Achkar,annabellaalachkar@acs.sch.ae,6,F
+,Kinane Al Achkar,kinanealachkar@acs.sch.ae,6,M
+,Lara Al Khalil,laraalkhalil@acs.sch.ae,6,F
+,Shaikha Al Suwaidi,shaikhaalsuwaidi@acs.sch.ae,6,F
+,Abdulla Al Zaabi,abdullaalzaabi@acs.sch.ae,6,M
+,Mohammed Alkaabi,mohammedalkaabi@acs.sch.ae,6,M
+,Mona Al-Iobani,monaal-iobani@acs.sch.ae,6,F
+,Ali Alnakhi Altamimi,alialnakhialtamimi@acs.sch.ae,6,M
+,Sama Alnuaimi,samaalnuaimi@acs.sch.ae,6,F
+,Tala Alrakawi,talaalrakawi@acs.sch.ae,6,F
+,Noah AlShamsi,noahalshamsi@acs.sch.ae,6,M
+,Maryam Alteneiji,maryamalteneiji@acs.sch.ae,6,F
+,Luca Arlotto,lucaarlotto@acs.sch.ae,6,M
+,Colton Bengtzen,coltonbengtzen@acs.sch.ae,6,M
+,Saachi Bhatia,saachibhatia@acs.sch.ae,6,F
+,Vera Boronina,veraboronina@acs.sch.ae,6,F
+,William Brannan,williambrannan@acs.sch.ae,6,M
+,Luke Brown,lukebrown@acs.sch.ae,6,M
+,Kai Bryant,kaibryant@acs.sch.ae,6,M
+,Marco Cappellini,marcocappellini@acs.sch.ae,6,M
+,Paul Chaisomboonpan,paulchaisomboonpan@acs.sch.ae,6,M
+,Hannah Chandy,hannahchandy@acs.sch.ae,6,F
+,Keyaan Chaudhry-Hussain,keyaanchaudhry-hussain@acs.sch.ae,6,M
+,Anika Chintakuntlawar,anikachintakuntlawar@acs.sch.ae,6,F
+,Aditya Chowdhury,adityachowdhury@acs.sch.ae,6,M
+,Leah Cooper,leahcooper@acs.sch.ae,6,F
+,Lulu Cowell,lulucowell@acs.sch.ae,6,F
+,Jacob Crowder,jacobcrowder@acs.sch.ae,6,M
+,Kate El Maalouli,kateelmaalouli@acs.sch.ae,6,F
+,Ayati Garg,ayatigarg@acs.sch.ae,6,F
+,Emaline Green,emalinegreen@acs.sch.ae,6,F
+,Habib Hawa,habibhawa@acs.sch.ae,6,M
+,Adham Hegazy,adhamhegazy@acs.sch.ae,6,M
+,Lily Hmaid,lillianhmaid@acs.sch.ae,6,F
+,Carmen Hourani,carmenhourani@acs.sch.ae,6,F
+,Aanya Karumanchi,aanyakarumanchi@acs.sch.ae,6,F
+,Tadaki Kishida,tadakikishida@acs.sch.ae,6,M
+,William Kobersy,williamkobersy@acs.sch.ae,6,M
+,Sahana Krishnan,sahanakrishnan@acs.sch.ae,6,F
+,Kayden Lampkin,kaydenlampkin@acs.sch.ae,6,M
+,Lila Le,anle@acs.sch.ae,6,F
+,Sophie Lee,haneullee@acs.sch.ae,6,F
+,Sydney Lewis,sydneylewis@acs.sch.ae,6,F
+,Lachlan Lickrish,lachlanlickrish@acs.sch.ae,6,M
+,Marlee Mapstone,marleemapstone@acs.sch.ae,6,F
+,Hudson Marsh,hudsonmarsh@acs.sch.ae,6,M
+,Thavanesh Mehta,thavaneshmehta@acs.sch.ae,6,M
+,Margaux Miller,margauxmiller@acs.sch.ae,6,F
+,Anisa Moin,anisamoin@acs.sch.ae,6,F
+,Evan Moon,evanmoon@acs.sch.ae,6,M
+,Hayden Moorefield,haydenmoorefield@acs.sch.ae,6,M
+,Matthew Nahal,matthewnahal@acs.sch.ae,6,M
+,Zayed Naseer,zayednaseer@acs.sch.ae,6,M
+,Charlie Peters,charliepeters@acs.sch.ae,6,F
+,Mario Pons Romera,marioponsromera@acs.sch.ae,6,M
+,Yousef Qandeel,yousefqandeel@acs.sch.ae,6,M
+,Isha Rama Rao,isharamarao@acs.sch.ae,6,F
+,Marina Ravagli,marinaravagli@acs.sch.ae,6,F
+,Eliza Ray,elizaray@acs.sch.ae,6,F
+,John Rossetti,johnrossetti@acs.sch.ae,6,M
+,Liv Sandberg Wersall,livsandbergwersall@acs.sch.ae,6,F
+,Jack Schoorel,jackschoorel@acs.sch.ae,6,M
+,Abigail Schulze,abigailschulze@acs.sch.ae,6,F
+,Ishaan Shah,ishaanshah@acs.sch.ae,6,M
+,Sarry Shehadeh,sarryshehadeh@acs.sch.ae,6,M
+,Tiana Shihadeh,tianashihadeh@acs.sch.ae,6,F
+,Alex Shubeita,alexshubeita@acs.sch.ae,6,M
+,Idris Siddiqi,idrissiddiqi@acs.sch.ae,6,M
+,Lea Skaf Halabi,leaskafhalabi@acs.sch.ae,6,F
+,Sabine Spindola Stanciole,sabinespindolastanciole@acs.sch.ae,6,F
+,Carolyne Stephenson,carolynestephenson@acs.sch.ae,6,F
+,Casimir Swislocki,casimirswislocki@acs.sch.ae,6,M
+,Adam Tadmori,adamtadmori@acs.sch.ae,6,M
+,Alisa Taylor,alisataylor@acs.sch.ae,6,F
+,Eli Thorstad,elithorstad@acs.sch.ae,6,M
+,Ellie Tillotson,elleanoretillotson@acs.sch.ae,6,F
+,Jonathan Turbiner Hayek,jonathanturbinerhayek@acs.sch.ae,6,M
+,Saif Wasfi,saifwasfi@acs.sch.ae,6,M
+,Eileen Watkins,eileenwatkins@acs.sch.ae,6,F
+,Isaac Watts,isaacwatts@acs.sch.ae,6,M
+,Gil Zentner,gilzentner@acs.sch.ae,6,M
