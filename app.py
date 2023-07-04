@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, session, redirect, url_for, send_from_directory, jsonify
+from flask import Flask, render_template, redirect, request, session, g, abort
 from flask_session import Session
-from flask_login import LoginManager, UserMixin
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 
@@ -40,6 +40,11 @@ TEACHER = {
     "password": "ACSTeachers2023"
 }
 
+current_user = {
+    "db_user": None,
+    "student": None
+}
+
 # TODO: User Class
 class User (auth_db.Model, UserMixin):
     id = auth_db.Column(auth_db.Integer, primary_key=True)
@@ -51,19 +56,10 @@ class User (auth_db.Model, UserMixin):
     email = auth_db.Column(auth_db.String(255), nullable=False)
     password = auth_db.Column(auth_db.String(255), nullable=False)
 
-current_user = {
-    "db_user": None,
-    "student": None
-}
-
 def login_required(f):
-    """
-    Decorate routes to require login.
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
-    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_id") is None:
+        if 'user_id' not in session:
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
@@ -71,11 +67,36 @@ def login_required(f):
 def login_not_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_id") is not None:
-            return redirect("/")
-        else:
-            return f(*args, **kwargs)
+        if 'user_id' in session:
+            abort(401)
+        return f(*args, **kwargs)
     return decorated_function
+
+def admin_only(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        if current_user['db_user'] is not None and not current_user['db_user'].is_admin:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated_function
+
+def teacher_only(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        if current_user['db_user'] is not None and not current_user['db_user'].is_teacher:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.before_request
+def before_request():
+    if current_user['db_user'] is None and 'user_id' in session:
+        current_user['db_user'] = auth_db.session.query(User).filter_by(id=session['user_id']).first()
+        g.user = current_user['db_user']
+        if current_user['db_user'].is_student:
+            current_user['student'] = db.get_student_by_id(current_user['db_user'].student_id)
 
 @app.route("/", methods=["GET"])
 def start():
@@ -90,14 +111,17 @@ def start():
     return render_template("home.html", logged_in=logged_in, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student)
 
 @app.errorhandler(404)
-def not_found():
-  return render_template("404.html")
+def not_found(e):
+  return render_template("error/404.html")
 
-# TODO: User Registration
+@app.errorhandler(401)
+def unauthorized(e):
+  return render_template("error/unauthorized.html")
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        return render_template("auth/register.html")
     else:
         global current_user
         # Get Register Info
@@ -106,7 +130,7 @@ def register():
         # Check if email is already used as a user
         if auth_db.session.query(User).filter_by(email=email).first() is not None:
             print("[REGISTER] USER ALREADY EXISTS!")
-            return render_template("register.html", account_exists=True)
+            return render_template("auth/register.html", account_exists=True)
         
         valid_email = db.check_student_email(email)
         # Check if email exists in student database
@@ -117,8 +141,8 @@ def register():
             new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=hashed_password)
             auth_db.session.add(new_user)
             auth_db.session.commit()
-            current_user['db_user'] = new_user
-            current_user['student'] = db.get_student_by_email(email)
+            session['user_id'] = new_user.id
+            session.permanent = True
             # Redirect to either "/trips" or "/student"
             if current_user['db_user'].is_teacher:
                 return redirect("/trips")
@@ -126,49 +150,50 @@ def register():
                 return redirect("/student")
         # Invalid Email (Doesn't exist as a student email)
         print("[REGISTER] INVALID EMAIL")
-        return render_template("register.html", invalid_email=True)
+        return render_template("auth/register.html", invalid_email=True)
 
-# TODO: User Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("auth/login.html")
     else:
-        global current_user
+        global current_user, session
         # Get Login Info
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
         login_user = auth_db.session.query(User).filter_by(email=email).first()
         if login_user is not None:
             if check_password_hash(login_user.password, password):
+                session.permanent = True
+                session['user_id'] = login_user.id
                 current_user['db_user'] = login_user
                 if current_user['db_user'].is_student:
-                    current_user['student'] = db.get_student_by_id(current_user['db_user'].student_id)
-                print(f"Succesfully Logged in as {current_user['db_user'].name}")
+                    current_user['student'] = db.get_student_by_id(login_user.student_id)
+                print(f"Succesfully Logged in as {login_user.name}")
                 if current_user['db_user'].is_admin:
                     return redirect("/admin")
                 if current_user['db_user'].is_teacher:
                     return redirect("/trips")
                 if current_user['db_user'].is_student:
                     return redirect("/student")
-        return render_template("login.html", invalid_login=True)
+        return render_template("auth/login.html", invalid_login=True)
 
-# TODO: User Logout
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     # Log Out User
-     if request.method == "POST":
-        global current_user
-        if current_user['db_user'] is not None:
-            print(f"{current_user['db_user'].name} Logging out")
+    global session
+    if request.method == "POST":
+        if 'user_id' in session:
+            session.clear()
             current_user['db_user'] = None
             current_user['student'] = None
         return redirect("/")
-        #return render_template("logout.html")
+        #return render_template("auth/logout.html")
 
 # TODO: Student Page
 #   - Reset Password Option
 @app.route("/student", methods=["GET", "POST"])
+@login_required
 def student():
     if request.method == "GET":
         global current_user
@@ -176,7 +201,7 @@ def student():
             student = current_user['student']
             student_trips = db.get_trips_by_student(student['id'])
             trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
-            return render_template("student.html", student=student, student_trips=student_trips,trip_studs=trip_studs) # Needs to be setup
+            return render_template("student/student.html", student=student, student_trips=student_trips,trip_studs=trip_studs) # Needs to be setup
         else:
             return redirect("/login")
 
@@ -189,12 +214,13 @@ def update_student():
         return student()
 
 @app.route("/search", methods=["GET", "POST"])
+@login_not_required
 def trip_search():
     if request.method == "GET":
         if not current_user['db_user'] is not None:
-            return render_template("trip-search.html")
+            return render_template("student/trip-search.html")
         else:
-            return render_template("unauthorized.html")
+            return render_template("error/unauthorized.html")
     else:
         first = request.form['first']
         second = request.form['second']
@@ -213,12 +239,12 @@ def logged_out_preferences(trip_id):
             sel_students = db.get_students_in_trip(trip_id)
             
             # User clicks "Edit" after submitting (Post-login)
-            if current_user['db_user'] is not None: # Example Implementation
+            if current_user['db_user'] is not None:
                 return logged_in_preferences(trip_id)
             else:
-                return render_template("student-pref-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students)
+                return render_template("student/pref-form-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students)
         else:
-            return render_template("trip-error.html")
+            return render_template("error/invalid-trip.html")
     else:
         self_id = pref_1 = pref_2 = pref_3 = pref_4 = pref_5 = None
         if 'pref_0' in request.form:
@@ -235,9 +261,10 @@ def logged_out_preferences(trip_id):
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
         #print(db.get_all_trip_preferences())
-        return render_template("success.html", sel_trip = db.get_trip_by_id(trip_id))
-    
+        return render_template("student/prefs-submitted.html", sel_trip = db.get_trip_by_id(trip_id))
+
 @app.route("/student/<trip_id>", methods=["GET", "POST"])
+@login_required
 def logged_in_preferences(trip_id):
     global current_user
     student = current_user['student'] # Example Implementation
@@ -254,9 +281,9 @@ def logged_in_preferences(trip_id):
             prev_submitted = db.check_student_preferences(trip_id, student['id']) 
             if prev_submitted:
                 prefs = db.get_student_preferences(trip_id, student['id'], return_prefs_only=True)
-            return render_template("student-pref-2.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
+            return render_template("student/pref-form-2.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
         else:
-            return render_template("trip-error.html")
+            return render_template("error/invalid-trip.html")
     else:
         pref_1 = pref_2 = pref_3 = pref_4 = pref_5 = None
         self_id = student['id']
@@ -272,38 +299,44 @@ def logged_in_preferences(trip_id):
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
         #print(db.get_all_trip_preferences())
-        return render_template("success.html", sel_trip = db.get_trip_by_id(trip_id))
+        return render_template("student/prefs-submitted.html", sel_trip = db.get_trip_by_id(trip_id))
     
 @app.route("/trips", methods=["GET", "POST"])
+@teacher_only
 def trips():
     if request.method == "GET":
-        return render_template("trips.html", all_trips = db.get_all_trips(), trip_studs = [db.get_students_in_trip(t['id']) for t in db.get_all_trips()], all_students=db.get_all_students())
+        return render_template("teacher/trips.html", all_trips = db.get_all_trips(), trip_studs = [db.get_students_in_trip(t['id']) for t in db.get_all_trips()], all_students=db.get_all_students())
 
 @app.route("/trips/<trip_id>", methods=["GET", "POST"])
+@teacher_only
 def trip(trip_id):
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
             student_prefs = {}
             for s in db.get_students_in_trip(trip_id):
                 student_prefs[s['id']] = db.check_student_preferences(trip_id, s["id"])
-            return render_template("trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = student_prefs, all_students=db.get_all_students())
+            return render_template("teacher/trip.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), sel_students = db.get_students_in_trip(trip_id), student_prefs = student_prefs, all_students=db.get_all_students())
         else:
-            return render_template("trip-error.html")
+            return render_template("error/invalid-trip.html")
 
 @app.route("/trips/<trip_id>/groups", methods=["GET", "POST"])
+@teacher_only
 def groups(trip_id):
     if request.method == "GET":
         if db.get_trip_by_id(trip_id) != None:
             student_prefs = {}
             for s in db.get_students_in_trip(trip_id):
                 student_prefs[s['id']] = db.check_student_preferences(trip_id, s['id'])
-            return render_template("groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id))
+            return render_template("teacher/groups.html", trip_id = trip_id, sel_trip = db.get_trip_by_id(trip_id), student_prefs = student_prefs, groups = db.get_groups_in_trip(trip_id))
         else:
-            return render_template("trip-error.html")
+            return render_template("error/invalid-trip.html")
 
 @app.route("/admin", methods=["GET", "POST"])
+@admin_only
 def admin():
-    return render_template("admin.html")
+    users = auth_db.session.query(User).all()
+    users = [u.__dict__ for u in users]
+    return render_template("admin/admin.html", users=users)
 
 # POST-Only Routes
 @app.route("/create_trip", methods=["POST"])
