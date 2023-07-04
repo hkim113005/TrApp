@@ -50,6 +50,19 @@ class Database:
             return self.dict_converter(s)
     
     @db_setup
+    def get_student_by_email(self, email):
+        student = self.cursor.execute(f"SELECT * FROM students WHERE email = '{email}'").fetchall()
+        if student != []:
+            s = student[0]
+            return self.dict_converter(s)
+    
+    @db_setup
+    def check_student_email(self, email):
+        students = self.get_all_students()
+        emails = [s['email'] for s in students]
+        return email.lower() in emails
+    
+    @db_setup
     def get_trip_by_id(self, trip_id):
         trip = self.cursor.execute(f"SELECT * FROM trips WHERE id = '{trip_id}'").fetchall()
         if trip != []:

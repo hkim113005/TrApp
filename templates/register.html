@@ -12,9 +12,9 @@ Register
 <form action="/register" method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Register New User</label>
 
-    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" placeholder="ACS Email">
+    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
 
-    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password" placeholder="Password">
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password" name="password" placeholder="Password">
 
     <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password_confirm" placeholder="Confirm Password">
 
@@ -32,7 +32,7 @@ function checkPasswords() {
     let password = document.getElementById("password").value;
     let passwordConfirm = document.getElementById("password_confirm").value;
     if (!(password && passwordConfirm)) return false;
-    if (password.length < 8) return false;
+    //if (password.length < 8) return false;
     if (password != passwordConfirm) return false;
     
     return true;

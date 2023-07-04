@@ -9,17 +9,16 @@ Login
 {% endblock %}
 
 {% block main %}
-<form action="/login" method="POST">
+<form id="login_form" action="/login" method="POST">
     <label class="d-grid form-label mt-5 mx-auto">Login</label>
 
-    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" placeholder="ACS Email">
+    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
 
-    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password" placeholder="Password">
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password" name="password" placeholder="Password">
 
     <button type="submit" disabled id="login_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Login</button>
-    
-    <a href="/register" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Register</a>
 </form>
+<a href="/register" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Register</a>
 
 <script>
     function checkEmail() {
@@ -31,7 +30,7 @@ Login
     function checkPassword() {
         let password = document.getElementById("password").value;
         if (!password) return false;
-        if (password.length < 8) return false;  
+        //if (password.length < 8) return false;  
         return true;
     }
     
@@ -41,5 +40,5 @@ Login
         let cansubmit = checkEmail() && checkPassword();
         document.getElementById('login_submit').disabled = !cansubmit;
     }
-    </script>
+</script>
 {% endblock %}

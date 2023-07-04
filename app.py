@@ -2,9 +2,8 @@ from flask import Flask, render_template, request, session, redirect, url_for, s
 from flask_session import Session
 from flask_login import LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 
-import pandas as pd
-import numpy as np
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 
@@ -25,32 +24,35 @@ db.update_trip(Trip(Trip.get_trips()[3].get_id(), "Varsity Boys Soccer", "MESAC"
 print(db.get_all_trips())
 
 app = Flask(__name__)
-
-# TODO: Auth Database Stuff (WIP)
-"""
-app.config['SESSION_TYPE'] = "filesystem"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///data/auth.db"
-app.config['SECRET_KEY'] = "ACS-TSU@2022"
-Session(app)
+app.config.from_pyfile('config.py')
+#Session(app)
 auth_db = SQLAlchemy(app)
 
-class User (auth_db.Model, UserMixin):
-    id = auth_db.Column(auth_db.Integer, primary_key=True)
-    teacher = auth_db.Column(auth_db.Boolean, nullable=False)
-    student_id = auth_db.Column(auth_db.Integer, nullable=False)
-    email = auth_db.Column(auth_db.String(20), nullable=False)
-    password = auth_db.Column(auth_db.String(80), nullable=False)
-"""
+# Teacher Login Credentials
+ADMIN = {
+    "email": "tsu@acs.sch.ae",
+    "password": "admin"
+}
 
-# Temporary Implementation
-TEACHER_LOGIN = {
-    "username": "tsu@acs.sch.ae",
+# Teacher Login Credentials
+TEACHER = {
+    "email": "//--@acs.sch.ae",
     "password": "ACSTeachers2023"
 }
+
+# TODO: User Class
+class User (auth_db.Model, UserMixin):
+    id = auth_db.Column(auth_db.Integer, primary_key=True)
+    is_admin = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    is_teacher = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    is_student = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    name = auth_db.Column(auth_db.String(255), nullable=False)
+    student_id = auth_db.Column(auth_db.Integer, nullable=True)
+    email = auth_db.Column(auth_db.String(255), nullable=False)
+    password = auth_db.Column(auth_db.String(255), nullable=False)
+
 current_user = {
-    "user": None,
-    "is_logged_in": False,
-    "is_teacher": False,
+    "db_user": None,
     "student": None
 }
 
@@ -78,13 +80,17 @@ def login_not_required(f):
 @app.route("/", methods=["GET"])
 def start():
     global current_user
-    logged_in = current_user['is_logged_in']
-    is_teacher = current_user['is_teacher']
+    logged_in = current_user['db_user'] is not None
+    is_teacher = is_student = is_admin = False
+    if logged_in:
+        is_admin = current_user['db_user'].is_admin
+        is_teacher = current_user['db_user'].is_teacher
+        is_student = current_user['db_user'].is_student
     print(current_user)
-    return render_template("home.html", logged_in=logged_in, is_teacher=is_teacher)
+    return render_template("home.html", logged_in=logged_in, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student)
 
 @app.errorhandler(404)
-def not_found(e):
+def not_found():
   return render_template("404.html")
 
 # TODO: User Registration
@@ -93,19 +99,34 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
     else:
-        # Handle Sign Up Info
-        # Temporary Implementation
         global current_user
-        current_user['is_logged_in'] = True
-        current_user['is_teacher'] = False
-        current_user['student'] = None
-        # Redirect to either "/trips" or "/student"
-        if current_user['is_teacher']:
-            print(f"Logged in as Teacher")
-            return redirect("/trips")
-        else:
-            print(f"Logged in as {current_user['student']['name']}")
-            return redirect("/student")
+        # Get Register Info
+        email = request.form['email'].lower().strip()
+        password = request.form['password'].strip()
+        # Check if email is already used as a user
+        if auth_db.session.query(User).filter_by(email=email).first() is not None:
+            print("[REGISTER] USER ALREADY EXISTS!")
+            return render_template("register.html", account_exists=True)
+        
+        valid_email = db.check_student_email(email)
+        # Check if email exists in student database
+        if valid_email:
+            student_id = db.get_student_by_email(email)['id']
+            student_name = db.get_student_by_email(email)['name']
+            hashed_password = generate_password_hash(password, method="scrypt")
+            new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=hashed_password)
+            auth_db.session.add(new_user)
+            auth_db.session.commit()
+            current_user['db_user'] = new_user
+            current_user['student'] = db.get_student_by_email(email)
+            # Redirect to either "/trips" or "/student"
+            if current_user['db_user'].is_teacher:
+                return redirect("/trips")
+            else:
+                return redirect("/student")
+        # Invalid Email (Doesn't exist as a student email)
+        print("[REGISTER] INVALID EMAIL")
+        return render_template("register.html", invalid_email=True)
 
 # TODO: User Login
 @app.route("/login", methods=["GET", "POST"])
@@ -113,41 +134,45 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
     else:
-        # Handle Login Info
-        # Temporary Implementation
         global current_user
-        current_user['is_logged_in'] = True
-        current_user['student'] = db.get_student_by_id(560)
-        # Redirect to "/trips" or "/student" depending on uer
-        if current_user['is_teacher']:
-            return redirect("/trips")
-        else:
-            print(f"Logged in as {current_user['student']['name']}")
-            return redirect("/student")
+        # Get Login Info
+        email = request.form['email'].lower().strip()
+        password = request.form['password'].strip()
+        login_user = auth_db.session.query(User).filter_by(email=email).first()
+        if login_user is not None:
+            if check_password_hash(login_user.password, password):
+                current_user['db_user'] = login_user
+                if current_user['db_user'].is_student:
+                    current_user['student'] = db.get_student_by_id(current_user['db_user'].student_id)
+                print(f"Succesfully Logged in as {current_user['db_user'].name}")
+                if current_user['db_user'].is_admin:
+                    return redirect("/admin")
+                if current_user['db_user'].is_teacher:
+                    return redirect("/trips")
+                if current_user['db_user'].is_student:
+                    return redirect("/student")
+        return render_template("login.html", invalid_login=True)
 
 # TODO: User Logout
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     # Log Out User
      if request.method == "POST":
-    # Temporary Implementation
         global current_user
-        if current_user['is_logged_in']:
-            print(f"Logged out")
-            current_user['is_logged_in'] = False
-            current_user['is_teacher'] = False
+        if current_user['db_user'] is not None:
+            print(f"{current_user['db_user'].name} Logging out")
+            current_user['db_user'] = None
             current_user['student'] = None
-        return render_template("logout.html")
+        return redirect("/")
+        #return render_template("logout.html")
 
 # TODO: Student Page
-# - Account Information:
-#   - Change Gender and Grade
 #   - Reset Password Option
 @app.route("/student", methods=["GET", "POST"])
 def student():
     if request.method == "GET":
         global current_user
-        if (current_user['is_logged_in']):
+        if current_user['db_user'] is not None:
             student = current_user['student']
             student_trips = db.get_trips_by_student(student['id'])
             trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
@@ -166,7 +191,7 @@ def update_student():
 @app.route("/search", methods=["GET", "POST"])
 def trip_search():
     if request.method == "GET":
-        if not current_user['is_logged_in']:
+        if not current_user['db_user'] is not None:
             return render_template("trip-search.html")
         else:
             return render_template("unauthorized.html")
@@ -188,7 +213,7 @@ def logged_out_preferences(trip_id):
             sel_students = db.get_students_in_trip(trip_id)
             
             # User clicks "Edit" after submitting (Post-login)
-            if current_user['is_logged_in']: # Example Implementation
+            if current_user['db_user'] is not None: # Example Implementation
                 return logged_in_preferences(trip_id)
             else:
                 return render_template("student-pref-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students)
@@ -276,6 +301,11 @@ def groups(trip_id):
         else:
             return render_template("trip-error.html")
 
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    return render_template("admin.html")
+
+# POST-Only Routes
 @app.route("/create_trip", methods=["POST"])
 def create_trip():
     if request.method == "POST":
@@ -332,4 +362,21 @@ def generate_groups():
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        inspector = auth_db.inspect(auth_db.engine)
+        if not "user" in inspector.get_table_names():
+            print("Creating user Databse Table")
+            auth_db.create_all()
+        
+        if auth_db.session.query(User.id).filter_by(id=0).first() is None:
+            print("Adding Admin to Database")
+            admin = User(id=0, is_admin=True, is_teacher=True,is_student=True, name="Admin", student_id=0,email=ADMIN['email'], password=generate_password_hash(ADMIN['password']))
+            auth_db.session.add(admin)
+            auth_db.session.commit()
+
+        if auth_db.session.query(User.id).filter_by(id=1).first() is None:
+            print("Adding Teacher to Database")
+            teacher = User(id=1, is_teacher=True,name="ACS Teacher", email=TEACHER['email'], password=generate_password_hash(TEACHER['password']))
+            auth_db.session.add(teacher)
+            auth_db.session.commit()
     app.run(host="0.0.0.0", port="4000", debug=True)
