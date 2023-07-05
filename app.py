@@ -3,6 +3,8 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 
+from datetime import datetime
+
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 
@@ -48,20 +50,17 @@ class User (auth_db.Model, UserMixin):
     is_student = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
     name = auth_db.Column(auth_db.String(255), nullable=False)
     student_id = auth_db.Column(auth_db.Integer, nullable=True)
+    date_created = auth_db.Column(auth_db.DateTime, nullable=False)
     email = auth_db.Column(auth_db.String(255), nullable=False)
-    email_verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    date_verified = auth_db.Column(auth_db.DateTime, nullable=True)
     verifiy_token = auth_db.Column(auth_db.String, nullable=True)
     hashed_password = auth_db.Column(auth_db.String, nullable=False)
     
-    def __init__(self, name, email, password, is_admin=False, is_teacher=False, is_student=False, student_id=None, **kwargs):
+    def __init__(self, password, **kwargs):
         super(User, self).__init__(**kwargs)
-        self.name = name
-        self.email = email
+        self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.is_admin = is_admin
-        self.is_teacher = is_teacher
-        self.is_student = is_student
-        self.student_id = student_id
         self.verify_token = "XXX" #TODO
     
     def create(self):
@@ -197,13 +196,13 @@ def register():
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
         # Check if email is already used as a user
+        valid_email = db.check_student_email(email)
         if User.check_exist_with_email(email):
             print("[REGISTER] USER ALREADY EXISTS!")
-            return render_template("auth/register.html", account_exists=True)
+            error = 'A user already exists with this email! Please <a href="/login">login</a> instead.' # TODO: Reset password option
         
-        valid_email = db.check_student_email(email)
         # Check if email exists in student database
-        if valid_email:
+        elif valid_email:
             student_id = db.get_student_by_email(email)['id']
             student_name = db.get_student_by_email(email)['name']
             new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=password)
@@ -214,9 +213,9 @@ def register():
                 return redirect("/trips")
             else:
                 return redirect("/student")
-        # Invalid Email (Doesn't exist as a student email)
-        print("[REGISTER] INVALID EMAIL")
-        return render_template("auth/register.html", invalid_email=True)
+        else:
+            error = "Invalid email! Please use an actual ACS email. Email tsu@acs.sch.ae if you think this is a mistake."
+        return render_template("auth/register.html", error=error)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -237,7 +236,11 @@ def login():
                     return redirect("/trips")
                 if current_user['db_user'].is_student:
                     return redirect("/student")
-        return render_template("auth/login.html", invalid_login=True)
+            else:
+                error = "Invalid password! Please try again."
+        else:
+            error = 'This email isn\'t linked to an account! Please <a href="/register">register</a>.' # TODO: Reset password option
+        return render_template("auth/login.html", error=error)
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
@@ -264,7 +267,8 @@ def student():
             student = current_user['student']
             student_trips = db.get_trips_by_student(student['id'])
             trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
-            return render_template("student/student.html", student=student, student_trips=student_trips,trip_studs=trip_studs) # Needs to be setup
+            creation_date = current_user['db_user'].date_created
+            return render_template("student/student.html", student=student, student_trips=student_trips,trip_studs=trip_studs, creation_date=creation_date)
         else:
             return redirect("/login")
 
@@ -399,7 +403,8 @@ def groups(trip_id):
 def admin():
     users = User.get_all_users()
     users = [u.__dict__ for u in users]
-    return render_template("admin/admin.html", users=users)
+    students = db.get_all_students()
+    return render_template("admin/admin.html", users=users, students=students)
 
 # POST-Only Routes
 @app.route("/create_trip", methods=["POST"])

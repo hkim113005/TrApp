@@ -9,8 +9,11 @@ Register
 {% endblock %}
 
 {% block main %}
+{% if error %}
+    <p class="error-card red"><strong>Error:</strong> {{ error | safe}}</p>
+{% endif %}
 <form action="/register" method="POST">
-    <label class="d-grid form-label mt-5 mx-auto">Register New User</label>
+    <label class="d-grid form-label {{"mt-3" if error else "mt-5"}} mx-auto">Register New User</label>
 
     <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
 

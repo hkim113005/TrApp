@@ -86,7 +86,14 @@ text {
     overflow: auto !important;
 }
 
-.table-students {
+.table-10-students {
+    width: 320px !important;
+    display: block !important;
+    max-height: 350px !important;
+    overflow: auto !important;
+}
+
+.table-5-students {
     width: 320px !important;
     display: block !important;
     max-height: 350px !important;
@@ -114,4 +121,37 @@ td {
 .table-border tbody td {
   border: 1px solid black;
   border-collapse: collapse;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+.icon-text-container {
+    display: flex; /* Use flexbox to arrange the icon and text horizontally */
+    align-items: center; /* Center the items vertically */
+}
+  
+.icon-text-container i {
+    margin-right: 5px; /* Add some spacing between the icon and text */
+}
+
+.center-div {
+    margin: auto;
+}
+
+.error-card {
+    margin: auto;
+    width: 300px;
+    background-color: #f8d7da;
+    border: 1px solid #f88f9a;
+    color: red;
+    padding: 10px;
+    margin-top: 50px;
+    border-radius: 10px;
+    font-size: small;
 }

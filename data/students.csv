@@ -155,7 +155,7 @@ id,name,email,grade,gender
 ,Esme Mackin,esmemackin@acs.sch.ae,11,F
 ,Abby Madden,abigailmadden@acs.sch.ae,11,F
 ,Ben Madoyan,benjaminmadoyan@acs.sch.ae,11,M
-,Anthony Mousa Mamdouh Zareh,anthonymamdouhzareh@acs.sch.ae,11,M
+,Anthony Mamdouh Zareh,anthonymamdouhzareh@acs.sch.ae,11,M
 ,Archie Mather,archiemather@acs.sch.ae,11,M
 ,Lara Memisoglu,laramemisoglu@acs.sch.ae,11,F
 ,Emma Miller,emmamiller@acs.sch.ae,11,F
@@ -289,7 +289,7 @@ id,name,email,grade,gender
 ,Rohit Sundararaman,rohitsundararaman@acs.sch.ae,10,M
 ,Yazan Tarazi,yazantarazi@acs.sch.ae,10,M
 ,Leyla Trinkl,leylatrinkl@acs.sch.ae,10,F
-,Shira Turbiner Hayek,shirahayek@acs.sch.ae,10,F
+,Shira Hayek,shirahayek@acs.sch.ae,10,F
 ,Robin Turner,robinturner@acs.sch.ae,10,M
 ,Alia Waels,aliawaels@acs.sch.ae,10,F
 ,Hazel Whitaker,hazelwhitaker@acs.sch.ae,10,F
@@ -297,7 +297,7 @@ id,name,email,grade,gender
 ,Sami Zimmerman,samizimmerman@acs.sch.ae,10,M
 ,Sarah Zimmerman,sarahzimmerman@acs.sch.ae,10,F
 ,Malak Abdulhalim,malakabdulhalim@acs.sch.ae,9,F
-,Razan Abo Ryah Mokhalalati,razanmokhalalati@acs.sch.ae,9,F
+,Razan Mokhalalati,razanmokhalalati@acs.sch.ae,9,F
 ,Jenna Abu-Ghali,jennaabu-ghali@acs.sch.ae,9,F
 ,Sophia Abulaila,sophiaabulaila@acs.sch.ae,9,F
 ,Beilasan Al Amir,beilasanalamir@acs.sch.ae,9,F
@@ -643,7 +643,7 @@ id,name,email,grade,gender
 ,Alisa Taylor,alisataylor@acs.sch.ae,6,F
 ,Eli Thorstad,elithorstad@acs.sch.ae,6,M
 ,Ellie Tillotson,elleanoretillotson@acs.sch.ae,6,F
-,Jonathan Turbiner Hayek,jonathanturbinerhayek@acs.sch.ae,6,M
+,Yehonathan Hayek,yehonathanhayek@acs.sch.ae,6,M
 ,Saif Wasfi,saifwasfi@acs.sch.ae,6,M
 ,Eileen Watkins,eileenwatkins@acs.sch.ae,6,F
 ,Isaac Watts,isaacwatts@acs.sch.ae,6,M
