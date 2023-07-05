@@ -109,3 +109,9 @@ thead {
 td {
     white-space: nowrap;
 }
+
+.table-border thead th,
+.table-border tbody td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}

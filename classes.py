@@ -300,7 +300,6 @@ class Student:
         s += "\nDetails: " + self.details
         return s
 
-
 class Trip:
     trip_ids = []
     trips = []

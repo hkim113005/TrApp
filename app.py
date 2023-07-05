@@ -1,5 +1,4 @@
-from flask import Flask, render_template, redirect, request, session, g, abort
-from flask_session import Session
+from flask import Flask, render_template, redirect, request, session, abort
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
@@ -25,7 +24,6 @@ print(db.get_all_trips())
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
-#Session(app)
 auth_db = SQLAlchemy(app)
 
 # Teacher Login Credentials
@@ -40,13 +38,10 @@ TEACHER = {
     "password": "ACSTeachers2023"
 }
 
-current_user = {
-    "db_user": None,
-    "student": None
-}
-
 # TODO: User Class
 class User (auth_db.Model, UserMixin):
+    is_initialized = False
+
     id = auth_db.Column(auth_db.Integer, primary_key=True)
     is_admin = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
     is_teacher = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
@@ -54,7 +49,78 @@ class User (auth_db.Model, UserMixin):
     name = auth_db.Column(auth_db.String(255), nullable=False)
     student_id = auth_db.Column(auth_db.Integer, nullable=True)
     email = auth_db.Column(auth_db.String(255), nullable=False)
-    password = auth_db.Column(auth_db.String(255), nullable=False)
+    email_verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    verifiy_token = auth_db.Column(auth_db.String, nullable=True)
+    hashed_password = auth_db.Column(auth_db.String, nullable=False)
+    
+    def __init__(self, name, email, password, is_admin=False, is_teacher=False, is_student=False, student_id=None, **kwargs):
+        super(User, self).__init__(**kwargs)
+        self.name = name
+        self.email = email
+        self.hashed_password = generate_password_hash(password, method="scrypt")
+        self.is_admin = is_admin
+        self.is_teacher = is_teacher
+        self.is_student = is_student
+        self.student_id = student_id
+        self.verify_token = "XXX" #TODO
+    
+    def create(self):
+        auth_db.session.add(self)
+        auth_db.session.commit()
+    
+    def login(self):
+        session.permanent = True
+        session['user_id'] = self.id
+        current_user['db_user'] = self
+        if current_user['db_user'].is_student:
+            current_user['student'] = db.get_student_by_id(self.student_id)
+        print(f"Succesfully Logged in as {self.name}")
+    
+    def check_password(self, plain_pass):
+        return check_password_hash(self.hashed_password, plain_pass)
+    
+    @staticmethod
+    def init_database():
+        with app.app_context():
+            inspector = auth_db.inspect(auth_db.engine)
+            if not "user" in inspector.get_table_names():
+                print("Creating user Databse Table")
+                auth_db.create_all()
+            if not User.check_exist_with_id(0):
+                print("Adding Admin to Database")
+                admin = User(id=0, is_admin=True, is_teacher=True,is_student=True, name="TSU Admin", student_id=0,email=ADMIN['email'], password=ADMIN['password'])
+                admin.create()
+            if not User.check_exist_with_id(1):
+                print("Adding Teacher to Database")
+                teacher = User(id=1, is_teacher=True,name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
+                teacher.create()
+            User.is_initialized = True
+            print("Initialization Complete")
+
+    @staticmethod
+    def get_all_users():
+        return auth_db.session.query(User).all()
+    
+    @staticmethod
+    def get_user_by_email(email):
+        return auth_db.session.query(User).filter_by(email=email).first()
+
+    @staticmethod
+    def get_user_by_id(id):
+        return auth_db.session.query(User).filter_by(id=id).first()
+
+    @staticmethod
+    def check_exist_with_email(email):
+        return User.get_user_by_email(email) is not None
+
+    @staticmethod
+    def check_exist_with_id(id):
+        return User.get_user_by_id(id) is not None
+
+current_user = {
+    "db_user": None,
+    "student": None
+}
 
 def login_required(f):
     @wraps(f)
@@ -92,11 +158,14 @@ def teacher_only(f):
 
 @app.before_request
 def before_request():
+    if not User.is_initialized:
+        print("Initializing...")
+        User.init_database()
     if current_user['db_user'] is None and 'user_id' in session:
-        current_user['db_user'] = auth_db.session.query(User).filter_by(id=session['user_id']).first()
-        g.user = current_user['db_user']
-        if current_user['db_user'].is_student:
-            current_user['student'] = db.get_student_by_id(current_user['db_user'].student_id)
+        if User.check_exist_with_id(session['user_id']):
+            current_user['db_user'] = User.get_user_by_id(session['user_id'])
+            if current_user['db_user'].is_student:
+                current_user['student'] = db.get_student_by_id(current_user['db_user'].student_id)
 
 @app.route("/", methods=["GET"])
 def start():
@@ -128,7 +197,7 @@ def register():
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
         # Check if email is already used as a user
-        if auth_db.session.query(User).filter_by(email=email).first() is not None:
+        if User.check_exist_with_email(email):
             print("[REGISTER] USER ALREADY EXISTS!")
             return render_template("auth/register.html", account_exists=True)
         
@@ -137,12 +206,9 @@ def register():
         if valid_email:
             student_id = db.get_student_by_email(email)['id']
             student_name = db.get_student_by_email(email)['name']
-            hashed_password = generate_password_hash(password, method="scrypt")
-            new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=hashed_password)
-            auth_db.session.add(new_user)
-            auth_db.session.commit()
-            session['user_id'] = new_user.id
-            session.permanent = True
+            new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=password)
+            new_user.create()
+            new_user.login()
             # Redirect to either "/trips" or "/student"
             if current_user['db_user'].is_teacher:
                 return redirect("/trips")
@@ -161,15 +227,10 @@ def login():
         # Get Login Info
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
-        login_user = auth_db.session.query(User).filter_by(email=email).first()
-        if login_user is not None:
-            if check_password_hash(login_user.password, password):
-                session.permanent = True
-                session['user_id'] = login_user.id
-                current_user['db_user'] = login_user
-                if current_user['db_user'].is_student:
-                    current_user['student'] = db.get_student_by_id(login_user.student_id)
-                print(f"Succesfully Logged in as {login_user.name}")
+        if User.check_exist_with_email(email):
+            login_user = User.get_user_by_email(email)
+            if login_user.check_password(password):
+                login_user.login()
                 if current_user['db_user'].is_admin:
                     return redirect("/admin")
                 if current_user['db_user'].is_teacher:
@@ -185,7 +246,9 @@ def logout():
     if request.method == "POST":
         if 'user_id' in session:
             session.clear()
+        if current_user['db_user'] is not None:
             current_user['db_user'] = None
+        if current_user['db_user'] is not None:
             current_user['student'] = None
         return redirect("/")
         #return render_template("auth/logout.html")
@@ -334,7 +397,7 @@ def groups(trip_id):
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():
-    users = auth_db.session.query(User).all()
+    users = User.get_all_users()
     users = [u.__dict__ for u in users]
     return render_template("admin/admin.html", users=users)
 
@@ -393,23 +456,5 @@ def generate_groups():
         db.generate_groups(id)
         return redirect(f"/trips/{id}")
 
-
 if __name__ == "__main__":
-    with app.app_context():
-        inspector = auth_db.inspect(auth_db.engine)
-        if not "user" in inspector.get_table_names():
-            print("Creating user Databse Table")
-            auth_db.create_all()
-        
-        if auth_db.session.query(User.id).filter_by(id=0).first() is None:
-            print("Adding Admin to Database")
-            admin = User(id=0, is_admin=True, is_teacher=True,is_student=True, name="Admin", student_id=0,email=ADMIN['email'], password=generate_password_hash(ADMIN['password']))
-            auth_db.session.add(admin)
-            auth_db.session.commit()
-
-        if auth_db.session.query(User.id).filter_by(id=1).first() is None:
-            print("Adding Teacher to Database")
-            teacher = User(id=1, is_teacher=True,name="ACS Teacher", email=TEACHER['email'], password=generate_password_hash(TEACHER['password']))
-            auth_db.session.add(teacher)
-            auth_db.session.commit()
     app.run(host="0.0.0.0", port="4000", debug=True)

@@ -29,13 +29,13 @@
 			<td class="text-center">{{users[i].id}}</td>
 			<td class="text-center">{{"-" if users[i].student_id == None else users[i].student_id}}</td>
 			<td class="text-center">
-				<i class="fa-solid {{'fa-check' if users[i].is_admin else 'fa-x'}}"></i>
+				<i class="fa-solid {{'green fa-check' if users[i].is_admin else 'red fa-x'}}"></i>
 			</td>
 			<td class="text-center">
-				<i class="fa-solid {{'fa-check' if users[i].is_teacher else 'fa-x'}}"></i>
+				<i class="fa-solid {{'green fa-check' if users[i].is_teacher else 'red fa-x'}}"></i>
 			</td>
 			<td class="text-center">
-				<i class="fa-solid {{'fa-check' if users[i].is_student else 'fa-x'}}"></i>
+				<i class="fa-solid {{'green fa-check' if users[i].is_student else 'red fa-x'}}"></i>
 			</td>
 			<td>{{users[i].name}}</td>
 			<td>{{users[i].email}}</td>
