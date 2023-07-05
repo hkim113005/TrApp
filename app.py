@@ -3,7 +3,8 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
@@ -40,7 +41,7 @@ TEACHER = {
     "password": "ACSTeachers2023"
 }
 
-# TODO: User Class
+# User Class
 class User (auth_db.Model, UserMixin):
     is_initialized = False
 
@@ -52,21 +53,41 @@ class User (auth_db.Model, UserMixin):
     student_id = auth_db.Column(auth_db.Integer, nullable=True)
     date_created = auth_db.Column(auth_db.DateTime, nullable=False)
     email = auth_db.Column(auth_db.String(255), nullable=False)
+    verifiy_code = auth_db.Column(auth_db.String(6), nullable=True)
+    date_verify_code = auth_db.Column(auth_db.DateTime, nullable=True)
     verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
     date_verified = auth_db.Column(auth_db.DateTime, nullable=True)
-    verifiy_token = auth_db.Column(auth_db.String, nullable=True)
     hashed_password = auth_db.Column(auth_db.String, nullable=False)
     
     def __init__(self, password, **kwargs):
         super(User, self).__init__(**kwargs)
         self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.verify_token = "XXX" #TODO
+        self.date_verify_code = datetime.now().replace(microsecond=0)
+        self.verify_token = User.get_new_code()
     
     def create(self):
         auth_db.session.add(self)
         auth_db.session.commit()
     
+    def check_time(self):
+        time_difference = datetime.now() - self.date_verify_code
+        return time_difference < timedelta(minutes=5)
+
+    def verify(self, code):
+        if not self.verified:
+            if self.check_time() and code == self.verifiy_code:
+                self.verified = True
+                self.date_verified = datetime.now().replace(microsecond=0)
+                auth_db.session.commit()
+                return True
+        return False
+    
+    def regenerate_verify_code(self):
+        self.date_verify_code = datetime.now().replace(microsecond=0)
+        self.verify_code = User.get_new_code()
+        auth_db.session.commit()
+
     def login(self):
         session.permanent = True
         session['user_id'] = self.id
@@ -97,8 +118,25 @@ class User (auth_db.Model, UserMixin):
             print("Initialization Complete")
 
     @staticmethod
-    def get_all_users():
-        return auth_db.session.query(User).all()
+    def get_new_code():
+        length = 6
+        chars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"
+        return ''.join(random.sample((chars), length))
+
+    @staticmethod
+    def get_all_users(return_dict=False):
+        users = auth_db.session.query(User).all()
+        convert = lambda row: {column.name: getattr(row, row.__mapper__.get_property_by_column(column).key) for column in row.__table__.columns}
+        if return_dict:
+            users = [convert(u) for u in users]
+            for u in users:
+                if u['date_created'] is not None:
+                    u['date_created'] = str(u['date_created'])
+                if u['date_verify_code'] is not None:
+                    u['date_verify_code'] = str(u['date_verify_code'])
+                if u['date_verified'] is not None:
+                    u['date_verified'] = str(u['date_verified'])
+        return users
     
     @staticmethod
     def get_user_by_email(email):
@@ -217,6 +255,14 @@ def register():
             error = "Invalid email! Please use an actual ACS email. Email tsu@acs.sch.ae if you think this is a mistake."
         return render_template("auth/register.html", error=error)
 
+# TODO: Email Verification
+@app.route("/verify", methods=["GET", "POST"])
+def verify():
+    if request.method == "GET":
+        return render_template("verify.html")
+    else:
+        return render_template("verify.html")
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
@@ -279,56 +325,6 @@ def update_student():
         db.update_student(data['id'], data)
         current_user['student'] = db.get_student_by_id(current_user['student']['id'])
         return student()
-
-@app.route("/search", methods=["GET", "POST"])
-@login_not_required
-def trip_search():
-    if request.method == "GET":
-        if not current_user['db_user'] is not None:
-            return render_template("student/trip-search.html")
-        else:
-            return render_template("error/unauthorized.html")
-    else:
-        first = request.form['first']
-        second = request.form['second']
-        third = request.form['third']
-        fourth = request.form['fourth']
-        fifth = request.form['fifth']
-        sixth = request.form['sixth']
-        return redirect("/search/" + first + second + third + fourth + fifth + sixth)
-
-@app.route("/search/<trip_id>", methods=["GET", "POST"])
-def logged_out_preferences(trip_id):
-    if request.method == "GET":
-        if db.get_trip_by_id(trip_id) != None:
-            global current_user
-            sel_trip = db.get_trip_by_id(trip_id)
-            sel_students = db.get_students_in_trip(trip_id)
-            
-            # User clicks "Edit" after submitting (Post-login)
-            if current_user['db_user'] is not None:
-                return logged_in_preferences(trip_id)
-            else:
-                return render_template("student/pref-form-1.html", trip_id = trip_id, sel_trip=sel_trip, sel_students=sel_students)
-        else:
-            return render_template("error/invalid-trip.html")
-    else:
-        self_id = pref_1 = pref_2 = pref_3 = pref_4 = pref_5 = None
-        if 'pref_0' in request.form:
-            self_id = request.form['pref_0']
-        if 'pref_1' in request.form:
-            pref_1 = request.form['pref_1']
-        if 'pref_2' in request.form:
-            pref_2 = request.form['pref_2']
-        if 'pref_3' in request.form:
-            pref_3 = request.form['pref_3']
-        if 'pref_4' in request.form:
-            pref_4 = request.form['pref_4']
-        if 'pref_5' in request.form:
-            pref_5 = request.form['pref_5']
-        db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
-        #print(db.get_all_trip_preferences())
-        return render_template("student/prefs-submitted.html", sel_trip = db.get_trip_by_id(trip_id))
 
 @app.route("/student/<trip_id>", methods=["GET", "POST"])
 @login_required
@@ -401,8 +397,8 @@ def groups(trip_id):
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():
-    users = User.get_all_users()
-    users = [u.__dict__ for u in users]
+    users = User.get_all_users(return_dict=True)
+    print(users)
     students = db.get_all_students()
     return render_template("admin/admin.html", users=users, students=students)
 

@@ -4,10 +4,6 @@
 	Home
 {% endblock %}
 
-{% block stylesheets %}
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
 {% block main %}
 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TrApp Logo" class="mt-3 home-logo">
 <div class="mt-5">
@@ -16,9 +12,6 @@
         <a href="login" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Login</a>
         <a href="register" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Register</a>
     {% else %}
-        {% if is_student %}
-            <button disabled="disabled" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Find Trip</button>
-        {% endif %}
         {% if is_teacher %}
             <a href="trips" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">View Trips</a>
         {% endif %}

@@ -4,10 +4,6 @@
 {{sel_trip.name}}
 {% endblock %}
 
-{% block stylesheets %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Trip Name</label>
 <input name="trip_name" id="trip_name" type="text" oninput="syncTripName()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">

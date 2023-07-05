@@ -4,10 +4,6 @@
 	Admin
 {% endblock %}
 
-{% block stylesheets %}
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Admin Dashboard</label>
 <label class="d-grid info-label mt-3 mx-auto">TrApp Users</label> 
@@ -36,7 +32,7 @@
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(users|length)%}
-        <tr onclick="updateInfoPanel(JSON.parse('{{users[i].id}}'))" data-toggle="modal" data-id={{users[i].id}} data-target="#user_info_modal">
+        <tr onclick="updateInfoPanel(JSON.parse('{{users[i].id}}'))" data-toggle="modal" data-target="#user_info_modal">
 			<td class="text-center">{{users[i].id}}</td>
 			<td class="text-center">{{"-" if users[i].student_id == None else users[i].student_id}}</td>
 			<td class="text-center">
@@ -97,8 +93,7 @@
 	</button>
 </form>
 
-<div class="modal fade" id="user_info_modal" tabindex="-1" aria-labelledby="user_info_modal_label"
-    aria-hidden="true">
+<div class="modal fade" id="user_info_modal" tabindex="-1" aria-labelledby="user_info_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-body">
@@ -117,13 +112,12 @@
     </div>
 </div>
 <script>
-	const users = JSON.parse(`{{users}}`);
+	const users = JSON.parse(`{{users | tojson | safe}}`);
 	function updateInfoPanel(id) {
-		let u = null;
-		//console.log(users);
-		//document.getElementById("user_info_name").innerHTML = u.name;
-		//document.getElementById("user_info_date_create").innerHTML = u.date_created;
-		//document.getElementById("user_info_date_verify").innerHTML = u.date_verified`;
+		let u = users[users.map(u => u.id).indexOf(id)];
+		document.getElementById("user_info_name").innerHTML = u.name;
+		document.getElementById("user_info_date_create").innerHTML = u.date_created;
+		document.getElementById("user_info_date_verify").innerHTML = (u.date_verified) ? u.date_verified : "User is not verified";
 	}
 
 	function searchStudents() {
@@ -145,5 +139,12 @@
             }
         }
     }
+
+	$(document).ready(function() {
+		$('tr[data-toggle="modal"]').on('click', function() {
+			var targetModal = $(this).data('target');
+			$(targetModal).modal('show');
+		});
+    });
 </script>
 {% endblock %}

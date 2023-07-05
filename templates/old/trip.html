@@ -4,10 +4,6 @@
 {{sel_trip[1]}}
 {% endblock %}
 
-{% block stylesheets %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
 {% block main %}
 <label class="d-grid form-label mt-5 mx-auto">Groups</label>
 <input name="num_groups" id="num_groups" type="number" min="0" oninput="this.value = update(this.value, true)" class="mt-3 mx-auto form-control" value={{sel_trip[3]}} placeholder="# of Groups">
