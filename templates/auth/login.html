@@ -28,7 +28,9 @@ Login
     function checkEmail() {
         const emailFilter = /@acs\.sch\.ae$/;
         let email = document.getElementById("email").value;
-        return emailFilter.test(email);
+        if (!email) return false;
+        //if (!emailFilter.test(email)) return false;
+        return true;
     }
     
     function checkPassword() {

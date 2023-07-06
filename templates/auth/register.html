@@ -15,39 +15,41 @@ Register
 <form action="/register" method="POST">
     <label class="d-grid form-label {{"mt-3" if error else "mt-5"}} mx-auto">Register New User</label>
 
-    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
+    <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" value="{{e if e}}" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
 
-    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password" name="password" placeholder="Password">
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" value="{{p1 if p1}}" id="password" name="password" placeholder="Password">
 
-    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password_confirm" placeholder="Confirm Password">
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password_confirm" name="password_confirm" placeholder="Repeat Password">
 
     <button type="submit" disabled id="register_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Register</button>
 </form>
 
 <script>
-function checkEmail() {
-    const emailFilter = /@acs\.sch\.ae$/;
-    let email = document.getElementById("email").value;
-    return emailFilter.test(email);
-}
+    function checkEmail() {
+            const emailFilter = /@acs\.sch\.ae$/;
+            let email = document.getElementById("email").value;
+            if (!email) return false;
+            //if (!emailFilter.test(email)) return false;
+            return true;
+    }
 
-function checkPasswords() {
-    let password = document.getElementById("password").value;
-    let passwordConfirm = document.getElementById("password_confirm").value;
-    if (!(password && passwordConfirm)) return false;
-    //if (password.length < 8) return false;
-    if (password != passwordConfirm) return false;
-    
-    return true;
-}
+    function checkPasswords() {
+        let password = document.getElementById("password").value;
+        let passwordConfirm = document.getElementById("password_confirm").value;
+        if (!(password && passwordConfirm)) return false;
+        //if (password.length < 8) return false;
+        //if (password != passwordConfirm) return false;
+        
+        return true;
+    }
 
-function inputChecker() {
-    document.getElementById("email").value = document.getElementById("email").value.replace(" ", "");
-    document.getElementById("password").value = document.getElementById("password").value.replace(" ", "");
-    document.getElementById("password_confirm").value =  document.getElementById("password_confirm").value.replace(" ", "");
-    let cansubmit = checkEmail() && checkPasswords();
-    document.getElementById('register_submit').disabled = !cansubmit;
-}
+    function inputChecker() {
+        document.getElementById("email").value = document.getElementById("email").value.replace(" ", "");
+        document.getElementById("password").value = document.getElementById("password").value.replace(" ", "");
+        document.getElementById("password_confirm").value =  document.getElementById("password_confirm").value.replace(" ", "");
+        let cansubmit = checkEmail() && checkPasswords();
+        document.getElementById('register_submit').disabled = !cansubmit;
+    }
 </script>
 
 {% endblock %}

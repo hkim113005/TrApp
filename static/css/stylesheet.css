@@ -86,17 +86,17 @@ text {
     overflow: auto !important;
 }
 
-.table-10-students {
+.table-10-rows {
     width: 320px !important;
     display: block !important;
     max-height: 350px !important;
     overflow: auto !important;
 }
 
-.table-5-students {
+.table-5-rows {
     width: 320px !important;
     display: block !important;
-    max-height: 350px !important;
+    max-height: 200px !important;
     overflow: auto !important;
 }
 
@@ -154,4 +154,32 @@ td {
     margin-top: 50px;
     border-radius: 10px;
     font-size: small;
+}
+
+.success-card {
+    margin: auto;
+    width: 300px;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 10px;
+    margin-top: 50px;
+    border-radius: 10px;
+    font-size: small;
+  }
+
+#timer {
+    font-weight: bold;
+}
+
+#countdown {
+    color: black; /* Default color */
+}
+
+#countdown.warning {
+    color: orange; /* Color when nearing expiration */
+}
+
+#countdown.danger {
+    color: red; /* Color when expired */
 }

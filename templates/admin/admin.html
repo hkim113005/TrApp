@@ -7,7 +7,7 @@
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Admin Dashboard</label>
 <label class="d-grid info-label mt-3 mx-auto">TrApp Users</label> 
-<table class="table table-sm table-hover mt-3 mx-auto" id="user_table">
+<table class="table table-5-rows table-sm table-hover mt-3 mx-auto" id="user_table">
     <thead>
         <tr>
 			<th class="text-center" scope="col">UID</th>
@@ -21,13 +21,7 @@
 			<th class="text-center" scope="col">
 				<i class="fas fa-graduation-cap"></i>
 			</th>
-            <th scope="col">Full Name</th>
-            <th scope="col">
-				<div class="icon-text-container">
-					<i class="fas fa-shield"></i>
-					<span>Email</span>
-				</div>
-			</th>
+            <th style="width: 60%;" scope="col">User Name</th>
         </tr>
     </thead>
     <tbody class="table-group-divider">
@@ -45,19 +39,14 @@
 				<i class="fa-solid fas {{'green fa-check' if users[i].is_student else 'red fa-x'}}"></i>
 			</td>
 			<td>{{users[i].name}}</td>
-			<td>
-				<div class="icon-text-container">
-				  <i class="fas {{'green fa-circle-check' if users[i].is_student else 'red fa-circle-xmark'}}"></i>
-				  <span>{{users[i].email}}</span>
-				</div>
-			  </td>
         </tr>
         {%endfor%}
     </tbody>
 </table>
+<text class="d-grid mx-auto">*Click on user for more info</text>
 <label class="d-grid info-label mt-5 mx-auto">TrApp Students</label> 
 <input type="text" class="mt-3 mx-auto form-control" id="student_search" onkeyup="searchStudents()" placeholder="Search Students">
-<table class="table-5-students table-sm table-hover mt-2 mx-auto" id="students_table">
+<table class="table-5-rows table-sm table-hover mt-2 mx-auto" id="students_table">
 	<thead>
 		<tr>
 			<th class="text-center">ID</th>
@@ -99,25 +88,58 @@
             <div class="modal-body">
 				<label id="user_info_title" class="d-grid form-label mx-auto">Additional User Details</label>
 
-				<label class="d-grid form-label mt-3 mx-auto">Full Name</label>
+				<label class="d-grid info-label mt-3 mx-auto">Name</label>
 				<text id="user_info_name" class="d-grid mx-auto"></text>
 
-				<label class="d-grid form-label mt-3 mx-auto">Date Created</label>
+				<label class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+				<text id="user_info_email" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Created</label>
 				<text id="user_info_date_create" class="d-grid mx-auto"></text>
 
-				<label class="d-grid form-label mt-3 mx-auto">Date Verified</label>
+				<label class="d-grid info-label mt-3 mx-auto">Email Verified</label>
+				<text id="user_info_verified" class="d-grid mx-auto"></text>
+				
+				<label class="d-grid info-label mt-3 mx-auto">Verify Attempts</label>
+				<text id="user_info_verify_att" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Verified</label>
 				<text id="user_info_date_verify" class="d-grid mx-auto"></text>
-            </div>
+            
+				<button onclick="deleteUser()" class="mb-4 d-grid mt-4 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" id="delete_button">
+					<div class="icon-text-container center-div">
+						<i class="fas fa-user-slash"></i>
+						<span>Delete User</span>
+					</div>
+				</button>
+			</div>
         </div>
     </div>
 </div>
 <script>
 	const users = JSON.parse(`{{users | tojson | safe}}`);
+	let u = null;
 	function updateInfoPanel(id) {
-		let u = users[users.map(u => u.id).indexOf(id)];
+		u = users[users.map(u => u.id).indexOf(id)];
 		document.getElementById("user_info_name").innerHTML = u.name;
+		document.getElementById("user_info_email").innerHTML = u.email;
 		document.getElementById("user_info_date_create").innerHTML = u.date_created;
-		document.getElementById("user_info_date_verify").innerHTML = (u.date_verified) ? u.date_verified : "User is not verified";
+		document.getElementById("user_info_verified").innerHTML = (u.is_verified) ? "YES" : "NO";
+		document.getElementById("user_info_verify_att").innerHTML = u.verify_attempts;
+		document.getElementById("user_info_date_verify").innerHTML = (u.date_verified) ? u.date_verified : "N/A";
+	}
+
+	function deleteUser() {
+		let updatePost = $.ajax({
+			type: "POST",
+			url: "/delete_user",
+			data: JSON.stringify([{id: u.id}]),
+			contentType: "application/json",
+			dataType: "json",
+			complete: function(response) {
+				window.location = window.location;
+			}
+		});
 	}
 
 	function searchStudents() {
@@ -128,7 +150,7 @@
 
         // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName("td")[0];
+            let td = tr[i].getElementsByTagName("td")[1];
             if (td) {
                 let txtValue = td.textContent || td.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {

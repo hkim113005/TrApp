@@ -8,7 +8,6 @@
 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TrApp Logo" class="mt-3 home-logo">
 <div class="mt-5">
     {% if not logged_in %}
-        <button onclick="window.location='search'" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Find Trip</button>
         <a href="login" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Login</a>
         <a href="register" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Register</a>
     {% else %}

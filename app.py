@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, request, session, abort
-from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 
@@ -28,6 +27,7 @@ print(db.get_all_trips())
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 auth_db = SQLAlchemy(app)
+mail = Mail(app)
 
 # Teacher Login Credentials
 ADMIN = {
@@ -42,9 +42,11 @@ TEACHER = {
 }
 
 # User Class
-class User (auth_db.Model, UserMixin):
+class User (auth_db.Model):
     is_initialized = False
+    verify_minutes = 5
 
+    # Database User Columns
     id = auth_db.Column(auth_db.Integer, primary_key=True)
     is_admin = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
     is_teacher = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
@@ -53,40 +55,72 @@ class User (auth_db.Model, UserMixin):
     student_id = auth_db.Column(auth_db.Integer, nullable=True)
     date_created = auth_db.Column(auth_db.DateTime, nullable=False)
     email = auth_db.Column(auth_db.String(255), nullable=False)
+    is_verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
+    verify_attempts = auth_db.Column(auth_db.Integer, nullable=True, default=0)
     verifiy_code = auth_db.Column(auth_db.String(6), nullable=True)
-    date_verify_code = auth_db.Column(auth_db.DateTime, nullable=True)
-    verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
-    date_verified = auth_db.Column(auth_db.DateTime, nullable=True)
+    date_last_verify = auth_db.Column(auth_db.DateTime, nullable=True)
     hashed_password = auth_db.Column(auth_db.String, nullable=False)
     
-    def __init__(self, password, **kwargs):
+    def __init__(self, password, verified=False,**kwargs):
         super(User, self).__init__(**kwargs)
         self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.date_verify_code = datetime.now().replace(microsecond=0)
-        self.verify_token = User.get_new_code()
-    
+        self.verifiy_code = User.get_new_code()
+        self.date_last_verify = self.date_created
+        if verified:
+            self.is_verified = verified;
+        if not self.is_verified:
+            self.verifiy_code = User.get_new_code()
+        
     def create(self):
         auth_db.session.add(self)
         auth_db.session.commit()
+        self.send_signup_email()
     
-    def check_time(self):
-        time_difference = datetime.now() - self.date_verify_code
-        return time_difference < timedelta(minutes=5)
+    def delete(self):
+        auth_db.session.delete(self)
+        auth_db.session.commit()
+    
+    def verify_time_expired(self):
+        time_difference = datetime.now() - self.date_last_verify
+        return time_difference > timedelta(minutes=User.verify_minutes)
 
-    def verify(self, code):
-        if not self.verified:
-            if self.check_time() and code == self.verifiy_code:
-                self.verified = True
-                self.date_verified = datetime.now().replace(microsecond=0)
-                auth_db.session.commit()
-                return True
+    def check_verify_code(self, code):
+        if code == self.verifiy_code:
+            return True
+        self.verify_attempts += 1
+        auth_db.session.merge(self)
+        auth_db.session.commit()
         return False
     
-    def regenerate_verify_code(self):
-        self.date_verify_code = datetime.now().replace(microsecond=0)
-        self.verify_code = User.get_new_code()
+    def verify(self):
+        self.is_verified = True
+        auth_db.session.merge(self)
         auth_db.session.commit()
+    
+    def regenerate_verify_code(self):
+        self.date_last_verify = datetime.now().replace(microsecond=0)
+        self.verify_code = User.get_new_code()
+        auth_db.session.merge(self)
+        auth_db.session.commit()
+        self.send_verify_email()
+    
+    def send_email(self, subject, template):
+        msg = Message(
+            subject,
+            recipients=[self.email],
+            html=template,
+            sender=app.config["MAIL_DEFAULT_SENDER"],
+        )
+        mail.send(msg)
+    
+    def send_verify_email(self):
+        html = render_template("email/verify.html", name=self.name, code=self.verify_code)
+        self.send_email("TrApp | Email Verification", html)
+    
+    def send_signup_email(self):
+        html = render_template("email/signup.html", name=self.name, code=self.verify_code)
+        self.send_email("TrApp | Signup & Email Verification", html)
 
     def login(self):
         session.permanent = True
@@ -96,8 +130,13 @@ class User (auth_db.Model, UserMixin):
             current_user['student'] = db.get_student_by_id(self.student_id)
         print(f"Succesfully Logged in as {self.name}")
     
-    def check_password(self, plain_pass):
-        return check_password_hash(self.hashed_password, plain_pass)
+    def check_password(self, plain_password):
+        return check_password_hash(self.hashed_password, plain_password)
+
+    def reset_password(self, new_password):
+        self.hashed_password = generate_password_hash(new_password)
+        auth_db.session.merge(self)
+        auth_db.session.commit()
     
     @staticmethod
     def init_database():
@@ -108,11 +147,11 @@ class User (auth_db.Model, UserMixin):
                 auth_db.create_all()
             if not User.check_exist_with_id(0):
                 print("Adding Admin to Database")
-                admin = User(id=0, is_admin=True, is_teacher=True,is_student=True, name="TSU Admin", student_id=0,email=ADMIN['email'], password=ADMIN['password'])
+                admin = User(id=0, is_admin=True, is_teacher=True, is_student=True, name="TSU Admin", verified=True, student_id=0, email=ADMIN['email'], password=ADMIN['password'])
                 admin.create()
             if not User.check_exist_with_id(1):
                 print("Adding Teacher to Database")
-                teacher = User(id=1, is_teacher=True,name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
+                teacher = User(id=1, is_teacher=True, verified=True, name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
                 teacher.create()
             User.is_initialized = True
             print("Initialization Complete")
@@ -159,34 +198,34 @@ current_user = {
     "student": None
 }
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated_function
+# Decorator for login-only routes, also forces verification
+def login_required(disable_verify=False):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session or current_user['db_user'] is None:
+                return redirect("/login")
+            elif not disable_verify and current_user['db_user'] is not None and not current_user['db_user'].is_verified:
+                return redirect("/verify")
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
-def login_not_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' in session:
-            abort(401)
-        return f(*args, **kwargs)
-    return decorated_function
 
+# Decorator for admin-only routes
 def admin_only(f):
     @wraps(f)
-    @login_required
+    @login_required()
     def decorated_function(*args, **kwargs):
         if current_user['db_user'] is not None and not current_user['db_user'].is_admin:
             abort(401)
         return f(*args, **kwargs)
     return decorated_function
 
+# Decorator for teacher-only routes
 def teacher_only(f):
     @wraps(f)
-    @login_required
+    @login_required()
     def decorated_function(*args, **kwargs):
         if current_user['db_user'] is not None and not current_user['db_user'].is_teacher:
             abort(401)
@@ -229,13 +268,26 @@ def register():
     if request.method == "GET":
         return render_template("auth/register.html")
     else:
+        e = None
+        p1 = None
         global current_user
         # Get Register Info
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
+        password_verify = request.form['password_confirm'].strip()
+        email_split = email.split("@")
         # Check if email is already used as a user
         valid_email = db.check_student_email(email)
-        if User.check_exist_with_email(email):
+        if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
+            error = "Invalid email! Please use an actual ACS (@acs.sch.ae) email."
+        elif len(password) < 8:
+            e = email
+            error = "Your password must be at least 8 characters!"
+        elif password != password_verify:
+            e = email
+            p1 = password
+            error = "Your passwords must match! Please repeat your password."
+        elif User.check_exist_with_email(email):
             print("[REGISTER] USER ALREADY EXISTS!")
             error = 'A user already exists with this email! Please <a href="/login">login</a> instead.' # TODO: Reset password option
         
@@ -252,16 +304,49 @@ def register():
             else:
                 return redirect("/student")
         else:
-            error = "Invalid email! Please use an actual ACS email. Email tsu@acs.sch.ae if you think this is a mistake."
-        return render_template("auth/register.html", error=error)
+            error = "This email doesn't exist! Please use an actual ACS email. Email tsu@acs.sch.ae if you think this is a mistake."
+        return render_template("auth/register.html", error=error, e=e, p1=p1)
 
 # TODO: Email Verification
 @app.route("/verify", methods=["GET", "POST"])
+@login_required(disable_verify=True)
 def verify():
     if request.method == "GET":
-        return render_template("verify.html")
+        if current_user["db_user"] is None:
+            return redirect("/login")
+        elif not current_user["db_user"].is_verified:
+            user = current_user['db_user']
+            email = user.email
+            time_diff = timedelta(minutes=User.verify_minutes) - (datetime.now() - user.date_last_verify)
+            time = time_diff.total_seconds() * 1000
+            if user.verify_time_expired():
+                time = 0
+            return render_template("auth/verify.html", email=email, time=time, student_id=user.student_id)
+        else:
+            return redirect("/")
     else:
-        return render_template("verify.html")
+        user = current_user['db_user']
+        first = request.form['first']
+        second = request.form['second']
+        third = request.form['third']
+        fourth = request.form['fourth']
+        fifth = request.form['fifth']
+        sixth = request.form['sixth']
+        verify_code = first + second + third + fourth + fifth + sixth
+
+        time_diff = timedelta(minutes=User.verify_minutes) - (datetime.now() - user.date_last_verify)
+        time = time_diff.total_seconds() * 1000
+        if user.verify_time_expired():
+            time = 0
+        if user.check_verify_code(verify_code):
+            if user.verify_time_expired():
+                error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
+            else:
+                user.verify()
+                return redirect("/")
+        else:
+            error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
+        return render_template("auth/verify.html", error=error, time=time, email=user.email, student_id=user.student_id)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -272,7 +357,10 @@ def login():
         # Get Login Info
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
-        if User.check_exist_with_email(email):
+        email_split = email.split("@")
+        if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
+            error = "Invalid email! Please use an actual ACS (@acs.sch.ae) email."
+        elif User.check_exist_with_email(email):
             login_user = User.get_user_by_email(email)
             if login_user.check_password(password):
                 login_user.login()
@@ -289,6 +377,7 @@ def login():
         return render_template("auth/login.html", error=error)
 
 @app.route("/logout", methods=["GET", "POST"])
+@login_required(disable_verify=True)
 def logout():
     # Log Out User
     global session
@@ -299,35 +388,27 @@ def logout():
             current_user['db_user'] = None
         if current_user['db_user'] is not None:
             current_user['student'] = None
-        return redirect("/")
+    return redirect("/")
         #return render_template("auth/logout.html")
 
 # TODO: Student Page
 #   - Reset Password Option
 @app.route("/student", methods=["GET", "POST"])
-@login_required
+@login_required()
 def student():
     if request.method == "GET":
         global current_user
-        if current_user['db_user'] is not None:
-            student = current_user['student']
-            student_trips = db.get_trips_by_student(student['id'])
-            trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
-            creation_date = current_user['db_user'].date_created
-            return render_template("student/student.html", student=student, student_trips=student_trips,trip_studs=trip_studs, creation_date=creation_date)
-        else:
-            return redirect("/login")
+        student = current_user['student']
+        student_trips = db.get_trips_by_student(student['id'])
+        trip_studs = [db.get_students_in_trip(trip['id']) for trip in student_trips]
 
-@app.route("/update_student", methods=["POST"])
-def update_student():
-    if request.method == "POST":
-        data = request.get_json()[0]
-        db.update_student(data['id'], data)
-        current_user['student'] = db.get_student_by_id(current_user['student']['id'])
-        return student()
+        user = current_user['db_user']
+        info = {"user_name": user.name, "date_created": user.date_created, "date_verified": user.date_last_verify}
+
+        return render_template("student/student.html", student=student, student_trips=student_trips,trip_studs=trip_studs, info=info)
 
 @app.route("/student/<trip_id>", methods=["GET", "POST"])
-@login_required
+@login_required()
 def logged_in_preferences(trip_id):
     global current_user
     student = current_user['student'] # Example Implementation
@@ -398,64 +479,92 @@ def groups(trip_id):
 @admin_only
 def admin():
     users = User.get_all_users(return_dict=True)
-    print(users)
     students = db.get_all_students()
     return render_template("admin/admin.html", users=users, students=students)
 
 # POST-Only Routes
+@app.route("/delete_user", methods=["POST"])
+@admin_only
+def delete_user():
+    id = request.get_json()[0]['id']
+    if User.check_exist_with_id(id):
+        User.get_user_by_id(id).delete()
+    return redirect("/admin")
+
 @app.route("/create_trip", methods=["POST"])
+@teacher_only
 def create_trip():
-    if request.method == "POST":
-        data = request.get_json()[0]
-        name = data['name']
-        organizer = data['organizer']
-        students = data['students']
-        num_groups = data['num_groups']
-        group_size = data['group_size']
-        print(data)
-        db.add_trip(Trip(None, name, organizer, num_groups, group_size, "", students))
-        return redirect("/trips")
+    data = request.get_json()[0]
+    name = data['name']
+    organizer = data['organizer']
+    students = data['students']
+    num_groups = data['num_groups']
+    group_size = data['group_size']
+    print(data)
+    db.add_trip(Trip(None, name, organizer, num_groups, group_size, "", students))
+    return redirect("/trips")
 
 @app.route("/delete_trip", methods=["POST"])
+@teacher_only
 def delete_trip():
-    if request.method == "POST":
-        data = request.get_json()[0]
-        id = data['id']
-        db.remove_trip(id)
-        return redirect("/trips")
+    data = request.get_json()[0]
+    id = data['id']
+    db.remove_trip(id)
+    return redirect("/trips")
 
 @app.route("/update_trip", methods=["POST"])
+@teacher_only
 def update_trip():
-    if request.method == "POST":
-        data = request.get_json()[0]
-        id = data['id']
-        trip = Trip.get_trip_with_id(id)
-        if "students" in data:
-            students = data['students']
-            db.update_students_in_trip(id, students)
-        else:
-            if "name" in data:
-                name = data['name']
-                trip.set_name(name)
-            if "organizer" in data:
-                organizer = data['organizer']
-                trip.set_organizer(organizer)
-            if "numGroups" in data:
-                num_groups = data['numGroups']
-                trip.set_num_groups(num_groups)
-            if "groupSize" in data:
-                group_size = data['groupSize']
-                trip.set_group_size(group_size)
-            db.update_trip(trip)
-        return redirect(f"/trips/{id}")
+    data = request.get_json()[0]
+    id = data['id']
+    trip = Trip.get_trip_with_id(id)
+    if "students" in data:
+        students = data['students']
+        db.update_students_in_trip(id, students)
+    else:
+        if "name" in data:
+            name = data['name']
+            trip.set_name(name)
+        if "organizer" in data:
+            organizer = data['organizer']
+            trip.set_organizer(organizer)
+        if "numGroups" in data:
+            num_groups = data['numGroups']
+            trip.set_num_groups(num_groups)
+        if "groupSize" in data:
+            group_size = data['groupSize']
+            trip.set_group_size(group_size)
+        db.update_trip(trip)
+    return redirect(f"/trips/{id}")
 
 @app.route("/generate_groups", methods=["POST"])
+@teacher_only
 def generate_groups():
+    data = request.get_json()
+    id = data['id']
+    db.generate_groups(id)
+    return redirect(f"/trips/{id}")
+
+@app.route("/update_student", methods=["POST"])
+@login_required()
+def update_student():
     if request.method == "POST":
-        data = request.get_json()
-        id = data['id']
-        db.generate_groups(id)
-        return redirect(f"/trips/{id}")
+        data = request.get_json()[0]
+        db.update_student(data['id'], data)
+        current_user['student'] = db.get_student_by_id(current_user['student']['id'])
+        return student()
+
+@app.route("/redo_verify", methods=["POST"])
+@login_required()
+def redo_verify():
+    if request.method == "POST":
+        id = request.get_json()[0]['id']
+        if User.check_exist_with_id(id):
+            u = User.get_user_by_id(id)
+            u.regenerate_verify_code()
+            u.send_verify_email()
+        return verify()
+    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="4000", debug=True)

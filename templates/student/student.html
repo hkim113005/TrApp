@@ -16,11 +16,12 @@
 <text class="d-grid mx-auto">{{student.grade}}</text>
 <label class="d-grid info-label mt-3 mx-auto">Gender</label> 
 <text class="d-grid mx-auto">{{student.gender}}</text>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_more_info">Additional Information</button>
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_edit_information">Edit Information</button>
 
 <label class="d-grid form-label mt-5 mx-auto">Your Trips:</label>
 
-<table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
+<table class="table table-10-rows table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
             <th style="width: 70%;" scope="col">Name</th>
@@ -81,16 +82,31 @@
     </div>
 </div>
 
-<script>
-    let data = {
-        id: parseInt(`{{student.id}}`),
-    };
+<div class="modal fade" id="student_more_info" tabindex="-1" aria-labelledby="student_more_info_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+				<label id="user_info_title" class="d-grid form-label mx-auto">Additional Information</label>
 
+				<label class="d-grid info-label mt-3 mx-auto">Name (User)</label>
+				<text id="user_info_name" class="d-grid mx-auto">{{info.user_name}}</text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Created</label>
+				<text id="user_info_date_create" class="d-grid mx-auto">{{info.date_created}}</text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Verified</label>
+				<text id="user_info_verified" class="d-grid mx-auto">{{info.date_verified}}</text>
+			</div>
+        </div>
+    </div>
+</div>
+
+<script>
     function postUpdateData() {
         let updatePost = $.ajax({
                 type: "POST",
                 url: "/update_student",
-                data: JSON.stringify([data]),
+                data: JSON.stringify([{id: parseInt(`{{student.id}}`)}]),
                 contentType: "application/json",
                 dataType: "json",
                 complete: function(response) {
