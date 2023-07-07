@@ -7,13 +7,14 @@
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Admin Dashboard</label>
 <label class="d-grid info-label mt-3 mx-auto">TrApp Users</label> 
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="user_search" onkeyup="searchUsers()" placeholder="&#xF002; Search Users">
 <table class="table table-5-rows table-sm table-hover mt-3 mx-auto" id="user_table">
     <thead>
         <tr>
 			<th class="text-center" scope="col">UID</th>
 			<th class="text-center" scope="col">SID</th>
 			<th class="text-center" scope="col">
-				<i class="fas fa-gear"></i>
+				<i class="fas fa-screwdriver-wrench"></i>
 			</th>
 			<th class="text-center" scope="col">
 				<i class="fas fa-person-chalkboard"></i>
@@ -45,12 +46,12 @@
 </table>
 <text class="d-grid mx-auto">*Click on user for more info</text>
 <label class="d-grid info-label mt-5 mx-auto">TrApp Students</label> 
-<input type="text" class="mt-3 mx-auto form-control" id="student_search" onkeyup="searchStudents()" placeholder="Search Students">
-<table class="table-5-rows table-sm table-hover mt-2 mx-auto" id="students_table">
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="student_search" onkeyup="searchStudents()" placeholder="&#xF002; Search Students">
+<table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="students_table">
 	<thead>
 		<tr>
 			<th class="text-center">ID</th>
-			<th style="width: 60%;">Name</th>
+			<th style="width: 60%;">Student Name</th>
 			<th data-type="number" class="text-center">Grade</th>
 			<th class="text-center">Gender</th>
 		</tr>
@@ -88,7 +89,7 @@
             <div class="modal-body">
 				<label id="user_info_title" class="d-grid form-label mx-auto">Additional User Details</label>
 
-				<label class="d-grid info-label mt-3 mx-auto">Name</label>
+				<label class="d-grid info-label mt-3 mx-auto">Student Name</label>
 				<text id="user_info_name" class="d-grid mx-auto"></text>
 
 				<label class="d-grid info-label mt-3 mx-auto">ACS Email</label>
@@ -121,12 +122,12 @@
 	let u = null;
 	function updateInfoPanel(id) {
 		u = users[users.map(u => u.id).indexOf(id)];
-		document.getElementById("user_info_name").innerHTML = u.name;
+		document.getElementById("user_info_name").innerHTML = (u.student) ? u.student.name : "N/A";
 		document.getElementById("user_info_email").innerHTML = u.email;
 		document.getElementById("user_info_date_create").innerHTML = u.date_created;
 		document.getElementById("user_info_verified").innerHTML = (u.is_verified) ? "YES" : "NO";
 		document.getElementById("user_info_verify_att").innerHTML = u.verify_attempts;
-		document.getElementById("user_info_date_verify").innerHTML = (u.date_verified) ? u.date_verified : "N/A";
+		document.getElementById("user_info_date_verify").innerHTML = (u.date_last_verify) ? u.date_last_verify : "N/A";
 	}
 
 	function deleteUser() {
@@ -161,6 +162,26 @@
             }
         }
     }
+
+	function searchUsers() {
+		let input = document.getElementById("user_search");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("user_table");
+        let tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td")[5];
+            if (td) {
+                let txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+	}
 
 	$(document).ready(function() {
 		$('tr[data-toggle="modal"]').on('click', function() {

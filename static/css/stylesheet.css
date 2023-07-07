@@ -183,3 +183,7 @@ td {
 #countdown.danger {
     color: red; /* Color when expired */
 }
+
+.fontAwesome {
+    font-family: 'Helvetica', FontAwesome, sans-serif;
+}

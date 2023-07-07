@@ -44,7 +44,7 @@ TEACHER = {
 # User Class
 class User (auth_db.Model):
     is_initialized = False
-    verify_minutes = 5
+    verify_minutes = 3
 
     # Database User Columns
     id = auth_db.Column(auth_db.Integer, primary_key=True)
@@ -263,15 +263,15 @@ def not_found(e):
 def unauthorized(e):
   return render_template("error/unauthorized.html")
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
     if request.method == "GET":
-        return render_template("auth/register.html")
+        return render_template("auth/signup.html")
     else:
         e = None
         p1 = None
         global current_user
-        # Get Register Info
+        # Get Sign Up Info
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
         password_verify = request.form['password_confirm'].strip()
@@ -305,41 +305,36 @@ def register():
                 return redirect("/student")
         else:
             error = "This email doesn't exist! Please use an actual ACS email. Email tsu@acs.sch.ae if you think this is a mistake."
-        return render_template("auth/register.html", error=error, e=e, p1=p1)
+        return render_template("auth/signup.html", error=error, e=e, p1=p1)
 
 # TODO: Email Verification
 @app.route("/verify", methods=["GET", "POST"])
 @login_required(disable_verify=True)
 def verify():
-    if request.method == "GET":
-        if current_user["db_user"] is None:
-            return redirect("/login")
-        elif not current_user["db_user"].is_verified:
-            code = request.args.get("code")
-            user = current_user['db_user']
-            email = user.email
-            time = user.get_remaining_time()
-            if user.verify_time_expired():
-                time = 0
-            return render_template("auth/verify.html", email=email, time=time, user_id=user.id, code=code)
-        else:
-            return redirect("/")
+    error = code = None
+    user = current_user['db_user']
+    email = user.email
+    user_id = user.id
+    if user.verify_time_expired():
+        error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
+        time = 0
     else:
-        user = current_user['db_user']
+        time = user.get_remaining_time()
+    
+    if request.method == "GET":
+        if current_user["db_user"].is_verified:
+            return redirect("/")
+        code = request.args.get("code")
+    else:
         verify_code = ""
         for i in range(1, 7):
             verify_code += request.form[f"ch_{i}"]
-
-        time = user.get_remaining_time()
-        if user.verify_time_expired():
-                time = 0
-                error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
-        elif user.check_verify_code(verify_code):
+        if user.check_verify_code(verify_code):
             user.verify()
             return redirect("/")
         else:
             error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
-        return render_template("auth/verify.html", error=error, time=time, email=user.email, user_id=user.id)
+    return render_template("auth/verify.html", error=error, time=time, email=email, user_id=user_id, code=code)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -366,7 +361,7 @@ def login():
             else:
                 error = "Invalid password! Please try again."
         else:
-            error = 'This email isn\'t linked to an account! Please <a href="/register">register</a>.' # TODO: Reset password option
+            error = 'This email isn\'t linked to an account! Please <a href="/signup">sign up</a>.' # TODO: Reset password option
         return render_template("auth/login.html", error=error)
 
 @app.route("/logout", methods=["GET", "POST"])
@@ -472,6 +467,11 @@ def groups(trip_id):
 @admin_only
 def admin():
     users = User.get_all_users(return_dict=True)
+    for u in users:
+        if u['student_id'] is not None:
+            u['student'] = db.get_student_by_id(u['student_id'])
+        else:
+            u['student'] = None
     students = db.get_all_students()
     return render_template("admin/admin.html", users=users, students=students)
 
@@ -554,9 +554,10 @@ def redo_verify():
         id = int(request.get_json()[0]['id'])
         if User.check_exist_with_id(id):
             u = User.get_user_by_id(id)
-            if not u.is_verified and u.verify_time_expired():
+            if  u.verify_time_expired():
                 u.regenerate_verify_code()
-                u.send_verify_email()
+                if not u.is_verified:
+                    u.send_verify_email()
         return redirect("/verify")
     
 

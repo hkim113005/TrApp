@@ -16,8 +16,18 @@
 <text class="d-grid mx-auto">{{student.grade}}</text>
 <label class="d-grid info-label mt-3 mx-auto">Gender</label> 
 <text class="d-grid mx-auto">{{student.gender}}</text>
-<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_more_info">Additional Information</button>
-<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_edit_information">Edit Information</button>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_more_info">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-circle-info"></i>
+        <span>Additional Information</span>
+    </div>
+</button>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_edit_information">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-pen"></i>
+        <span>Edit Information</span>
+    </div>
+</button>
 
 <label class="d-grid form-label mt-5 mx-auto">Your Trips:</label>
 
@@ -39,11 +49,26 @@
         {%endfor%}
     </tbody>
 </table>
-<button onclick="window.location='/'" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Home</button>
+<button onclick="window.location='/'" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </div>
+</button>
 <form action="/logout" method="POST">
-    <button type="submit" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Logout</button>
+    <button type="submit" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">
+        <div class="icon-text-container center-div">
+			<i class="fas fa-sign-out-alt"></i>
+			<span>Logout</span>
+		</div>
+    </button>
 </form>
-<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="">Reset Password</button>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-lock"></i>
+        <span>Change Password</span>
+    </div>
+</button>
 
 <div class="modal fade" id="student_edit_information" tabindex="-1" aria-labelledby="student_edit_information_label"
     aria-hidden="true">
@@ -75,7 +100,12 @@
                         <option value="-">-</option>
                     </select>
                     <text class="d-grid mx-auto">* = Unsaved Changes!</text>
-                    <button onclick="postUpdateData()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_student_info">Save</button>
+                    <button onclick="postUpdateData()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_student_info">
+                        <div class="icon-text-container center-div">
+                            <i class="fas fa-user-slash"></i>
+                            <span>Save Changes</span>
+                        </div>
+                    </button>
                 </form>
             </div>
         </div>

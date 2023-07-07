@@ -11,5 +11,10 @@ Trip Not Found
 {% block main %}
 
 <label class="d-grid form-label mt-5 mx-auto error">ERROR! Trip does not exist!</label>
-<a href="javascript:history.back()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Back</a>
+<a href="javascript:history.back()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </div>
+</a>
 {% endblock %}

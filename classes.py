@@ -233,6 +233,9 @@ class Database:
     def generate_groups(self, trip_id):
         trip = self.get_trip_by_id(trip_id)
         students = self.get_students_in_trip(trip_id)
+        for s in students:
+            s['preferences'] = self.get_student_preferences(trip_id, s['id'], return_prefs_only=True)
+        print(students)
         
         for group_number in range(1, trip['num_groups'] + 1):
             if not students:

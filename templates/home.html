@@ -8,23 +8,58 @@
 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TrApp Logo" class="mt-3 home-logo">
 <div class="mt-5">
     {% if not logged_in %}
-        <a href="login" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Login</a>
-        <a href="register" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Register</a>
+        <a href="login" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+            <div class="icon-text-container center-div">
+                <i class="fas fa-right-to-bracket"></i>
+                <span>Login</span>
+            </div>
+        </a>
+        <a href="signup" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+            <div class="icon-text-container center-div">
+                <i class="fas fa-user-plus"></i>
+                <span>Sign Up</span>
+            </div>
+        </a>
     {% else %}
         {% if is_teacher %}
-            <a href="trips" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">View Trips</a>
+            <a href="trips" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+                <div class="icon-text-container center-div">
+                    <i class="fas fa-suitcase"></i>
+                    <span>Manage Trips</span>
+                </div>
+            </a>
         {% endif %}
         {% if is_student %}
-            <a href="student" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Student Dashboard</a>
+            <a href="student" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+                <div class="icon-text-container center-div">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Student Dashboard</span>
+                </div>
+            </a>
         {% endif %}
         {% if is_admin %}
-            <a href="admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Admin Dashboard</a>
+            <a href="admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+                <div class="icon-text-container center-div">
+                    <i class="fas fa-screwdriver-wrench"></i>
+                    <span>Admin Dashboard</span>
+                </div>
+            </a>
         {% endif %}
         <form action="/logout" method="POST">
-            <button type="submit" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">Logout</button>
+            <button type="submit" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary">
+                <div class="icon-text-container center-div">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </button>
         </form>
     {% endif %}
-    <a href="" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#credits_modal_modal" role="button">Credits</a>
+    <a href="" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#credits_modal_modal" role="button">
+        <div class="icon-text-container center-div">
+            <i class="fas fa-code"></i>
+            <span>Credits</span>
+        </div>
+    </a>
 </div>
 
 <div class="modal fade" id="credits_modal_modal" tabindex="-1" aria-labelledby="credits_modal_label" aria-hidden="true">
@@ -32,9 +67,10 @@
         <div class="modal-content">
             <div class="modal-body">
                 <label class="d-grid form-label mx-auto">TrApp - Credits</label>
-                <p>Hyungjae Kim - Grade 12</p>
-                <p>Jeremiah Mathew - Grade 11</p>
-                <p>Ryan Ayoub - Grade 11</p>
+                <p>Hyungjae Kim (Grade 12)</p>
+                <p>Jeremiah Mathew (Grade 11)</p>
+                <p>Rohit Sundararaman (Grade 11)</p>
+                <p>Ryan Ayoub (Grade 11)</p>
             </div>
         </div>
     </div>
