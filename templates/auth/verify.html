@@ -14,12 +14,12 @@ Verify Email
     <p class="form-label mx-auto" id="countdown">Expires in: <span id="timer" class="danger"></span></p>
 
     <div id="email_code" class="inputs d-flex flex-row justify-content-center mt-3">
-        <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="first" name="first" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="second" name="second" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="third" name="third" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="fourth" name="fourth" placeholder="-" maxlength="1" />
-        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="fifth" name="fifth" placeholder="-" maxlength="1" />
-        <input class="ms-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id="sixth" name="sixth" placeholder="-" maxlength="1" />
+        <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_1 name=ch_1 placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_2 name=ch_2 placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_3 name=ch_3 placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_4 name=ch_4 placeholder="-" maxlength="1" />
+        <input class="mx-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_5 name=ch_5 placeholder="-" maxlength="1" />
+        <input class="ms-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_6 name=ch_6 placeholder="-" maxlength="1" />
     </div>
     <button id="code_submit" disabled="disabled" type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
 </form>
@@ -73,6 +73,9 @@ Verify Email
                 });
             }
         } OTPInput(); checkform();
+        if (`{{code}}` != "None" && `{{code}}`.length == 6) {
+            autoFillForm(`{{code}}`)
+        }
         startCountdown(JSON.parse(`{{time}}`));
     });
 
@@ -84,6 +87,13 @@ Verify Email
         }
 
         document.getElementById('code_submit').disabled = !cansubmit;
+    }
+
+    function autoFillForm(code) {
+        for (let i = 1; i <= code.length; i++) {
+            document.getElementById(`ch_${i}`).value = code[i-1];
+        }
+        checkform();
     }
     
     function startCountdown(durationInMilliseconds) {
@@ -134,10 +144,11 @@ Verify Email
     }
 
     function redoVerify() {
+        document.getElementById("reverify_button").disabled = true;
 		let updatePost = $.ajax({
 			type: "POST",
 			url: "/redo_verify",
-			data: JSON.stringify([{id: parseInt(`{{student_id}}`)}]),
+			data: JSON.stringify([{id: parseInt(`{{user_id}}`)}]),
 			contentType: "application/json",
 			dataType: "json",
 			complete: function(response) {

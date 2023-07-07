@@ -57,7 +57,7 @@ class User (auth_db.Model):
     email = auth_db.Column(auth_db.String(255), nullable=False)
     is_verified = auth_db.Column(auth_db.Boolean, nullable=False, default=False)
     verify_attempts = auth_db.Column(auth_db.Integer, nullable=True, default=0)
-    verifiy_code = auth_db.Column(auth_db.String(6), nullable=True)
+    verify_code = auth_db.Column(auth_db.String(6), nullable=True)
     date_last_verify = auth_db.Column(auth_db.DateTime, nullable=True)
     hashed_password = auth_db.Column(auth_db.String, nullable=False)
     
@@ -65,32 +65,34 @@ class User (auth_db.Model):
         super(User, self).__init__(**kwargs)
         self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.verifiy_code = User.get_new_code()
+        self.verify_code = User.get_new_code()
         self.date_last_verify = self.date_created
         if verified:
             self.is_verified = verified;
         if not self.is_verified:
-            self.verifiy_code = User.get_new_code()
+            self.verify_code = User.get_new_code()
         
     def create(self):
         auth_db.session.add(self)
         auth_db.session.commit()
-        self.send_signup_email()
     
     def delete(self):
         auth_db.session.delete(self)
         auth_db.session.commit()
+
+    def get_remaining_time(self):
+        return (timedelta(minutes=User.verify_minutes) - (datetime.now() - self.date_last_verify)).total_seconds() * 1000
     
     def verify_time_expired(self):
-        time_difference = datetime.now() - self.date_last_verify
-        return time_difference > timedelta(minutes=User.verify_minutes)
+        time_elapsed = datetime.now() - self.date_last_verify
+        return time_elapsed > timedelta(minutes=User.verify_minutes)
 
     def check_verify_code(self, code):
-        if code == self.verifiy_code:
-            return True
         self.verify_attempts += 1
         auth_db.session.merge(self)
         auth_db.session.commit()
+        if code == self.verify_code:
+            return True
         return False
     
     def verify(self):
@@ -103,7 +105,6 @@ class User (auth_db.Model):
         self.verify_code = User.get_new_code()
         auth_db.session.merge(self)
         auth_db.session.commit()
-        self.send_verify_email()
     
     def send_email(self, subject, template):
         msg = Message(
@@ -115,7 +116,7 @@ class User (auth_db.Model):
         mail.send(msg)
     
     def send_verify_email(self):
-        html = render_template("email/verify.html", name=self.name, code=self.verify_code)
+        html = render_template("email/verification.html", name=self.name, code=self.verify_code)
         self.send_email("TrApp | Email Verification", html)
     
     def send_signup_email(self):
@@ -128,6 +129,8 @@ class User (auth_db.Model):
         current_user['db_user'] = self
         if current_user['db_user'].is_student:
             current_user['student'] = db.get_student_by_id(self.student_id)
+        auth_db.session.merge(self)
+        auth_db.session.commit()
         print(f"Succesfully Logged in as {self.name}")
     
     def check_password(self, plain_password):
@@ -171,10 +174,8 @@ class User (auth_db.Model):
             for u in users:
                 if u['date_created'] is not None:
                     u['date_created'] = str(u['date_created'])
-                if u['date_verify_code'] is not None:
-                    u['date_verify_code'] = str(u['date_verify_code'])
-                if u['date_verified'] is not None:
-                    u['date_verified'] = str(u['date_verified'])
+                if u['date_last_verify'] is not None:
+                    u['date_last_verify'] = str(u['date_last_verify'])
         return users
     
     @staticmethod
@@ -211,7 +212,6 @@ def login_required(disable_verify=False):
         return decorated_function
     return decorator
 
-
 # Decorator for admin-only routes
 def admin_only(f):
     @wraps(f)
@@ -235,9 +235,9 @@ def teacher_only(f):
 @app.before_request
 def before_request():
     if not User.is_initialized:
-        print("Initializing...")
+        print("Initialization Started")
         User.init_database()
-    if current_user['db_user'] is None and 'user_id' in session:
+    if 'user_id' in session:
         if User.check_exist_with_id(session['user_id']):
             current_user['db_user'] = User.get_user_by_id(session['user_id'])
             if current_user['db_user'].is_student:
@@ -288,7 +288,6 @@ def register():
             p1 = password
             error = "Your passwords must match! Please repeat your password."
         elif User.check_exist_with_email(email):
-            print("[REGISTER] USER ALREADY EXISTS!")
             error = 'A user already exists with this email! Please <a href="/login">login</a> instead.' # TODO: Reset password option
         
         # Check if email exists in student database
@@ -298,6 +297,7 @@ def register():
             new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=password)
             new_user.create()
             new_user.login()
+            new_user.send_signup_email()
             # Redirect to either "/trips" or "/student"
             if current_user['db_user'].is_teacher:
                 return redirect("/trips")
@@ -315,38 +315,31 @@ def verify():
         if current_user["db_user"] is None:
             return redirect("/login")
         elif not current_user["db_user"].is_verified:
+            code = request.args.get("code")
             user = current_user['db_user']
             email = user.email
-            time_diff = timedelta(minutes=User.verify_minutes) - (datetime.now() - user.date_last_verify)
-            time = time_diff.total_seconds() * 1000
+            time = user.get_remaining_time()
             if user.verify_time_expired():
                 time = 0
-            return render_template("auth/verify.html", email=email, time=time, student_id=user.student_id)
+            return render_template("auth/verify.html", email=email, time=time, user_id=user.id, code=code)
         else:
             return redirect("/")
     else:
         user = current_user['db_user']
-        first = request.form['first']
-        second = request.form['second']
-        third = request.form['third']
-        fourth = request.form['fourth']
-        fifth = request.form['fifth']
-        sixth = request.form['sixth']
-        verify_code = first + second + third + fourth + fifth + sixth
+        verify_code = ""
+        for i in range(1, 7):
+            verify_code += request.form[f"ch_{i}"]
 
-        time_diff = timedelta(minutes=User.verify_minutes) - (datetime.now() - user.date_last_verify)
-        time = time_diff.total_seconds() * 1000
+        time = user.get_remaining_time()
         if user.verify_time_expired():
-            time = 0
-        if user.check_verify_code(verify_code):
-            if user.verify_time_expired():
+                time = 0
                 error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
-            else:
-                user.verify()
-                return redirect("/")
+        elif user.check_verify_code(verify_code):
+            user.verify()
+            return redirect("/")
         else:
             error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
-        return render_template("auth/verify.html", error=error, time=time, email=user.email, student_id=user.student_id)
+        return render_template("auth/verify.html", error=error, time=time, email=user.email, user_id=user.id)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -425,7 +418,7 @@ def logged_in_preferences(trip_id):
             prev_submitted = db.check_student_preferences(trip_id, student['id']) 
             if prev_submitted:
                 prefs = db.get_student_preferences(trip_id, student['id'], return_prefs_only=True)
-            return render_template("student/pref-form-2.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
+            return render_template("student/pref-form.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
         else:
             return render_template("error/invalid-trip.html")
     else:
@@ -442,7 +435,7 @@ def logged_in_preferences(trip_id):
         if 'pref_5' in request.form:
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
-        #print(db.get_all_trip_preferences())
+        print(db.get_all_trip_preferences())
         return render_template("student/prefs-submitted.html", sel_trip = db.get_trip_by_id(trip_id))
     
 @app.route("/trips", methods=["GET", "POST"])
@@ -555,15 +548,16 @@ def update_student():
         return student()
 
 @app.route("/redo_verify", methods=["POST"])
-@login_required()
+@login_required(disable_verify=True)
 def redo_verify():
     if request.method == "POST":
-        id = request.get_json()[0]['id']
+        id = int(request.get_json()[0]['id'])
         if User.check_exist_with_id(id):
             u = User.get_user_by_id(id)
-            u.regenerate_verify_code()
-            u.send_verify_email()
-        return verify()
+            if not u.is_verified and u.verify_time_expired():
+                u.regenerate_verify_code()
+                u.send_verify_email()
+        return redirect("/verify")
     
 
 if __name__ == "__main__":

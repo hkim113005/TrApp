@@ -2,21 +2,21 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}{% endblock %}</title>
+  <title>TrApp</title>
 </head>
 <body style="font-family: Arial, sans-serif;">
 
   <table cellpadding="0" cellspacing="0" border="0" width="100%">
     <tr>
       <td align="center" style="padding: 40px 0;">
-        <h1>{% block title %}{% endblock %}</h1>
+        <h1 style="color: #014C43;">{% block title %}{% endblock %}</h1>
       </td>
     </tr>
     <tr>
       <td align="center">
-        {% block content %}{% endblock %}
-        <p>Your verification code is: <strong>{{code}}</strong></p>
-        <p>To complete your registration, please enter this code after logging in, or <a href="domain.com/verify">click here</a>.</p>
+        <p>Thank you for signing up to TrApp, {{name}}!</p>
+        <p>Your verification code is: <strong style="color: #014C43;">{{code}}</strong></p>
+        <p>To complete email verification, please enter this code after logging in, or <a href="http://127.0.0.1:5000/verify?code={{code}}">click here</a>.</p>
       </td>
     </tr>
     <tr>
@@ -27,7 +27,7 @@
     <tr>
       <td align="center" style="padding-top: 20px;">
         <p>If you did not request this, please contact us:</p>
-        <p>Email: tsu@acs.sch.ae</p>
+        <p>tsu@acs.sch.ae</p>
       </td>
     </tr>
   </table>
