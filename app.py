@@ -379,8 +379,7 @@ def logout():
     return redirect("/")
         #return render_template("auth/logout.html")
 
-# TODO: Student Page
-#   - Reset Password Option
+# TODO: Reset Password Option
 @app.route("/student", methods=["GET", "POST"])
 @login_required()
 def student():
@@ -413,7 +412,7 @@ def logged_in_preferences(trip_id):
             prev_submitted = db.check_student_preferences(trip_id, student['id']) 
             if prev_submitted:
                 prefs = db.get_student_preferences(trip_id, student['id'], return_prefs_only=True)
-            return render_template("student/pref-form.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
+            return render_template("student/preference-form.html", student=student, trip_id=trip_id, sel_trip=sel_trip,num_prefs=num_prefs, sel_students=sel_students, autofill=prev_submitted, prefs=prefs)
         else:
             return render_template("error/invalid-trip.html")
     else:
@@ -431,7 +430,7 @@ def logged_in_preferences(trip_id):
             pref_5 = request.form['pref_5']
         db.add_preferences(trip_id, self_id, (pref_1, pref_2, pref_3, pref_4, pref_5))
         print(db.get_all_trip_preferences())
-        return render_template("student/prefs-submitted.html", sel_trip = db.get_trip_by_id(trip_id))
+        return render_template("student/prefs-submitted.html", trip_id=trip_id)
     
 @app.route("/trips", methods=["GET", "POST"])
 @teacher_only
@@ -463,6 +462,12 @@ def groups(trip_id):
         else:
             return render_template("error/invalid-trip.html")
 
+# TODO: User/Student Control:
+# - Edit User Details
+# - Add New User
+# - Edit Student Details
+# - Add New Student
+# - Delete Student
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():

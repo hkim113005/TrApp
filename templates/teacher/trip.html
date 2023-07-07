@@ -48,6 +48,7 @@
         <span>Delete Trip</span>
     </div>
 </button>
+
 <button type="button" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="window.location+='/groups'">
     <div class="icon-text-container center-div">
         <i class="fas fa-people-group"></i>
@@ -55,12 +56,19 @@
     </div>
 </button>
 
+<a href="/trips" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back To All Trips</span>
+    </div>
+</a>
+
 <div class="modal fade" id="student_edit_modal" tabindex="-1" aria-labelledby="student_edit_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-body">
                 <label id = "edit_students_label" class="d-grid form-label mx-auto">Edit Students</label>
-                <input type="text" class="mt-3 mx-auto form-control" id="search" onkeyup="search()" placeholder="Search">
+                <input type="text" class="mt-3 mx-auto form-control fontAwesome" id="search" onkeyup="search()" placeholder="&#xF002; Search Students">
                 <table class="table table-10-students table-sm table-hover mt-2 mx-auto" id="students_table">
                     <thead>
                         <tr>

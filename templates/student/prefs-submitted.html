@@ -5,11 +5,17 @@ Submitted!
 {% endblock %}
 
 {% block main %}
-<label class="d-grid form-label mt-5 mx-auto">Preferences Submitted</label>
-<a href="javascript:history.back()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+<label class="d-grid form-label mt-3 mx-auto">Preferences Submitted</label>
+<a href="/student/{{trip_id}}" class="mt-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
     <div class="icon-text-container center-div">
         <i class="fas fa-user-pen"></i>
         <span>Edit Preferences</span>
+    </div>
+</a>
+<a href="/student" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Student Dashboard</span>
     </div>
 </a>
 <a href="/" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">

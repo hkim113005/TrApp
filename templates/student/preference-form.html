@@ -9,14 +9,16 @@
 {% endblock %}
 
 {% block main %}
+<label class="d-grid form-label mt-3 mx-auto">{{sel_trip["name"]}}</label>
+<label class="d-grid form-label mx-auto">Student Preferences:</label>
 <form id = "preferences_form" action=/student/{{trip_id}} method="POST">
-    <label class="d-grid form-label mt-5 mx-auto">Information</label>
+    <label class="d-grid info-label mt-4 mx-auto">Student</label>
 
     <select disabled id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" aria-label=".form-select-sm example">
         <option selected="selected" value={{student.id}} >{{student.name}}</option>
     </select>
 
-    <label class="d-grid form-label mt-5 mx-auto">Preferences</label>
+    <label class="d-grid info-label mt-5 mx-auto">Preferences</label>
 
     {%for _ in range(num_prefs)%}
     <select id={{'pref_' + (loop.index)|string}} name={{'pref_' + (loop.index)|string}} class="mt-3 mx-auto form-select" onchange="updateChoices(this.id); checkform();" aria-label=".form-select-sm example">
@@ -26,8 +28,14 @@
         {%endfor%}
     </select>
     {%endfor%}
-
-    <button id = "pref_submit" disabled="disabled" type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Continue</button>
+    <text style="font-size: small;" class="d-grid mx-auto mt-3">NOTE: Preferences are collected in order from top to bottom, allowing you to prioritize your choices accordingly. Choose wisely!</text>
+    <button id = "pref_submit" disabled="disabled" type="submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Submit</button>
+    <a href="/student" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+        <div class="icon-text-container center-div">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back To Student Dashboard</span>
+        </div>
+    </a>
 </form>
 
 <script>

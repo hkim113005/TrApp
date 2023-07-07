@@ -171,8 +171,11 @@ class Database:
         prefs = self.cursor.execute(f"SELECT * FROM trip_preferences WHERE trip_id ='{trip_id}' AND student_id = {student_id}").fetchall()
         prefs = [self.dict_converter(pref) for pref in prefs]
         if return_prefs_only:
-            p = prefs[0]
-            return [p['a'], p['b'], p['c'], p['d'], p['e']]
+            if prefs != []:
+                p = prefs[0]
+                return [p['a'], p['b'], p['c'], p['d'], p['e']]
+            else:
+                return [None for _ in range(5)]
         else:
             return prefs
 
@@ -235,7 +238,6 @@ class Database:
         students = self.get_students_in_trip(trip_id)
         for s in students:
             s['preferences'] = self.get_student_preferences(trip_id, s['id'], return_prefs_only=True)
-        print(students)
         
         for group_number in range(1, trip['num_groups'] + 1):
             if not students:
