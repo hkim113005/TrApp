@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Active Trips
+Trips
 {% endblock %}
 
 {% block main %}
@@ -16,7 +16,7 @@ Active Trips
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(all_trips|length)%}
-        <tr onclick="window.location = 'trips/{{all_trips[i].id}}'">
+        <tr onclick="window.location = 'trips/{{all_trips[i].code}}'">
             <td>{{all_trips[i].name}}</td>
             <td class="text-center">{{all_trips[i].organizer}}</td>
             <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i].num_groups * all_trips[i].group_size}}</td>
@@ -60,7 +60,7 @@ Active Trips
                         onKeyup="checkform()" id="create_group_size" placeholder="Max Group Size">
 
                     <label id = "create_students_label" class="d-grid info-label mt-3 mx-auto">Students</label>
-                    <input type="text" class="mt-2 mx-auto form-control fontAwesome id="search2" onkeyup="searchStudents()" placeholder="&#xF002; Search Trips">
+                    <input type="text" class="mt-2 mx-auto form-control fontAwesome" id="search2" onkeyup="searchStudents()" placeholder="&#xF002; Search Trips">
                     <table class="table table-10-rows table-sm table-hover mt-2 mx-auto" id="students_table">
                         <thead>
                             <tr>

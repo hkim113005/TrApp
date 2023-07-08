@@ -175,7 +175,7 @@
         var sizeElem = document.getElementById("group_size");
         var data = [
             {
-                "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
                 "groupSize": sizeElem.value,
                 "numGroups": groupElem.value,
             }
@@ -200,7 +200,7 @@
         if (nameElem.value == `{{sel_trip.name}}`) return;
         var data = [
             {
-                "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
                 "name": nameElem.value,
             }
         ];
@@ -218,7 +218,7 @@
         if (organizerElem.value == `{{sel_trip.organizer}}`) return;
         var data = [
             {
-                "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
                 "organizer": organizerElem.value,
             }
         ];
@@ -288,7 +288,7 @@
         document.getElementById("delete_yes").addEventListener("click", () => {
             var data = [
                 {
-                    "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                    "code": JSON.parse('{{ trip_code | tojson | safe }}'),
                 }
             ];
             $.ajax({
@@ -303,7 +303,7 @@
         document.getElementById("save_trip").addEventListener("click", () => {
             var data = [
                 {
-                    "id": JSON.parse('{{ trip_id | tojson | safe }}'),
+                    "code": JSON.parse('{{ trip_code | tojson | safe }}'),
                     "students": getSelectedStudents().map(x => parseInt(x))
                 }
             ];

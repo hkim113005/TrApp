@@ -4,14 +4,10 @@
 {{sel_trip["name"]}}
 {% endblock %}
 
-{% block stylesheets %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">{{sel_trip["name"]}}</label>
 <label class="d-grid form-label mx-auto">Student Preferences:</label>
-<form id = "preferences_form" action=/student/{{trip_id}} method="POST">
+<form id = "preferences_form" action=/student/{{trip_code}} method="POST">
     <label class="d-grid info-label mt-4 mx-auto">Student</label>
 
     <select disabled id="pref_0" name="pref_0" class="mt-3 mx-auto form-select" aria-label=".form-select-sm example">
@@ -81,7 +77,7 @@
         var cansubmit = true;
 
         for (var i = 0; i < f.length; i++) {
-            if (f[i].id != "pref_submit" && (f[i].value == "Name")) cansubmit = false;
+            if (f[i].type == "select-one" && (f[i].value == "Name")) cansubmit = false;
         }
 
         document.getElementById('pref_submit').disabled = !cansubmit;

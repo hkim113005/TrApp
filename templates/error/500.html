@@ -1,13 +1,15 @@
 {% extends "layout.html" %}
 
 {% block title %}
-404
+Server Error
 {% endblock %}
 
 {% block main %}
 <form action="/" method="POST">
-    <label class="d-grid form-label mt-4 mx-auto error">404 - Page Not Found!</label>
-    <text class="d-grid mx-auto">Oops! The page you are looking for does not exist.</text>
+    <label class="d-grid form-label mt-4 mx-auto error">500 - Server Error</label>
+    <text class="d-grid mx-auto">Uh Oh. Something just broke.</text>
+    <text class="d-grid mx-auto">If this problem persists, please contact:</text>
+    <text class="d-grid mx-auto">tsu@acs.sch.ae</text>
     <a href="/" class="mt-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
         <div class="icon-text-container center-div">
             <i class="fas fa-home"></i>

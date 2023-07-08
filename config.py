@@ -1,6 +1,6 @@
 SESSION_TYPE = "filesystem"
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///../data/auth.db"
+SQLALCHEMY_DATABASE_URI = "sqlite:///../data/TrApp.db"
 SECRET_KEY = "ACS-TSU@2023.VerYvERySeCreT"
 
 MAIL_SERVER = "smtp.gmail.com"

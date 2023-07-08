@@ -41,7 +41,7 @@
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(student_trips|length)%}
-        <tr onclick="window.location = 'student/{{student_trips[i].id}}'">
+        <tr onclick="window.location = 'student/{{student_trips[i].code}}'">
             <td style="width: 70%;">{{student_trips[i].name}}</td>
             <td class="text-center">{{student_trips[i].organizer}}</td>
             <td class="text-center">{{trip_studs[i]|length}}/{{student_trips[i].num_groups * student_trips[i].group_size}}</td>
@@ -126,11 +126,14 @@
 </div>
 
 <script>
+    let data = {
+        id: parseInt(`{{student.id}}`)
+    };
     function postUpdateData() {
         let updatePost = $.ajax({
                 type: "POST",
                 url: "/update_student",
-                data: JSON.stringify([{id: parseInt(`{{student.id}}`)}]),
+                data: JSON.stringify([data]),
                 contentType: "application/json",
                 dataType: "json",
                 complete: function(response) {
@@ -173,7 +176,6 @@
         } else {
             genderLabel.innerHTML = "Gender";
         }
-        
         document.getElementById('save_student_info').disabled = !(nameChanged || gradeChanged || genderChanged);
     }
 
