@@ -173,13 +173,11 @@
     function syncGroupVals() {
         var groupElem = document.getElementById("num_groups");
         var sizeElem = document.getElementById("group_size");
-        var data = [
-            {
-                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                "groupSize": sizeElem.value,
-                "numGroups": groupElem.value,
-            }
-        ];
+        var data = {
+            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
+            "groupSize": sizeElem.value,
+            "numGroups": groupElem.value,
+        };
         console.log(groupElem.value)
         console.log(sizeElem.value)
         console.log(JSON.parse('{{ sel_trip.num_groups | safe }}'))
@@ -198,12 +196,10 @@
     function syncTripName() {
         var nameElem = document.getElementById("trip_name");
         if (nameElem.value == `{{sel_trip.name}}`) return;
-        var data = [
-            {
-                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                "name": nameElem.value,
-            }
-        ];
+        var data = {
+            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
+            "name": nameElem.value,
+        }
         $.ajax({
             type: "POST",
             url: "/update_trip",
@@ -216,12 +212,10 @@
     function syncTripOrganizer() {
         var organizerElem = document.getElementById("trip_organizer");
         if (organizerElem.value == `{{sel_trip.organizer}}`) return;
-        var data = [
-            {
-                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                "organizer": organizerElem.value,
-            }
-        ];
+        var data = {
+            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
+            "organizer": organizerElem.value,
+        };
         $.ajax({
             type: "POST",
             url: "/update_trip",
@@ -286,11 +280,9 @@
 
     window.addEventListener("load", () => {
         document.getElementById("delete_yes").addEventListener("click", () => {
-            var data = [
-                {
-                    "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                }
-            ];
+            var data = {
+                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
+            };
             $.ajax({
                 type: "POST",
                 url: "/delete_trip",
@@ -301,20 +293,18 @@
         })
 
         document.getElementById("save_trip").addEventListener("click", () => {
-            var data = [
-                {
-                    "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                    "students": getSelectedStudents().map(x => parseInt(x))
-                }
-            ];
+            var data = {
+                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
+                "students": getSelectedStudents().map(x => parseInt(x))
+            };
             let updatePost = $.ajax({
                 type: "POST",
                 url: "/update_trip",
                 data: JSON.stringify(data),
                 contentType: "application/json",
                 dataType: "json",
-                complete: function(response) {
-                    window.location = window.location;
+                complete: (e) => {
+                    window.location.reload();
                 }
             });
         });

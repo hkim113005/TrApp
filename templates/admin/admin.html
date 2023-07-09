@@ -125,8 +125,11 @@
 	function deleteUser() {
 		let updatePost = $.ajax({
 			type: "POST",
-			url: "/delete_user",
-			data: JSON.stringify([{id: u.id}]),
+			url: window.location.href,
+			data: JSON.stringify({ 
+				cmd: "deleteUser",
+				id: u.id 
+			}),
 			contentType: "application/json",
 			dataType: "json",
 			complete: function(response) {

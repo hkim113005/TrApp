@@ -1,5 +1,11 @@
-{% extends "email/verify-layout.html" %}
+{% extends "email/email-layout.html" %}
 
 {% block title %}
 	Welcome to TrApp!
+{% endblock %}
+
+{% block body %}
+	<p>Thank you for signing up to TrApp, {{name}}!</p>
+	<p>Your verification code is: <strong style="color: #014C43;">{{code}}</strong></p>
+	<p>To complete email verification, please enter this code after logging in, or <a href="http://127.0.0.1:5000/verify?code={{code}}">click here</a>.</p>
 {% endblock %}

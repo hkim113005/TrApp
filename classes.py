@@ -160,13 +160,26 @@ class User (db.Model):
         )
         mail.send(msg)
     
+    def send_signup_email(self):
+        name = self.name.split(" ")[0]
+        html = render_template("email/signup.html", name=name, code=self.verify_code)
+        self.send_email("TrApp | Signup & Email Verification", html)
+
     def send_verify_email(self):
-        html = render_template("email/verification.html", name=self.name, code=self.verify_code)
+        html = render_template("email/verification.html", code=self.verify_code)
         self.send_email("TrApp | Email Verification", html)
     
-    def send_signup_email(self):
-        html = render_template("email/signup.html", name=self.name, code=self.verify_code)
-        self.send_email("TrApp | Signup & Email Verification", html)
+    def send_preferences_email(self, trip_id, updated=False):
+        name = self.name.split(" ")[0]
+        trip = Trip.get_trip_by_id(trip_id)
+        preferences = StudentPreference.get_preferences(trip_id, self.student_id, return_prefs_only=True)
+        preferences = list(filter(lambda x: x is not None, preferences))
+        preferences = [Student.get_student_by_id(id) for id in preferences]
+
+        file_name = "preferences-2" if updated else "preferences-1"
+        email_subject = f"Preferences {'Updated ' if updated else ''}for {trip.name}" 
+        html = render_template(f"email/{file_name}.html", name=name, trip=trip, preferences=preferences)
+        self.send_email(f"TrApp | {email_subject}", html)
 
     def login(self):
         session.permanent = True
@@ -472,6 +485,10 @@ class StudentPreference(db.Model):
     def update(self, preferences):
         self.a, self.b, self.c, self.d, self.e = preferences[:5]
         self.sync()
+
+    @staticmethod
+    def check_different_preferences(trip_id, student_id, preferences):
+        return StudentPreference.get_preferences(trip_id, student_id, return_prefs_only=True) != preferences
 
     @staticmethod
     def check_student_preferences(trip_id, student_id):

@@ -21,7 +21,6 @@ if not DB.initialized:
 
 
 # |------------------------------------------------------------------------{ Permission Decorators }------------------------------------------------------------------------|
-
 # Decorator for login-only routes, also forces verification
 def login_required(disable_verify=False):
     def decorator(f):
@@ -57,7 +56,6 @@ def teacher_only(f):
 
 
 # |------------------------------------------------------------------------{ Main Flask App Routes }------------------------------------------------------------------------|
-
 # Triggered before every request, updates 'current_user' using session id
 @app.before_request
 def before_request():
@@ -201,7 +199,7 @@ def login():
         email_split = email.split("@")
 
         # Check if email has proper structure, acs.sch.ae domain, and exists in ACS student database
-        if len(email_split) != 2 or email_split[1] != "acs.sch.ae" or not Student.check_student_email(email):
+        if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
             error = "Invalid email! Please use an actual ACS (@acs.sch.ae) student email."
         
         # Check if user exists, continue login process
@@ -249,10 +247,9 @@ def logout():
 @app.route("/student", methods=["GET", "POST"])
 @login_required()
 def student():
+    student = current_user['student']
     if request.method == "GET":
-        global current_user
         # Gets Student Info, Trips
-        student = current_user['student']
         student_trips = TripStudent.get_trips_by_student(student['id'], return_dict=True)
         trip_studs = [TripStudent.get_students_in_trip(trip['id']) for trip in student_trips]
 
@@ -260,6 +257,11 @@ def student():
         user = current_user['db_user']
         info = {"user_name": user.name, "date_created": user.date_created, "date_verified": user.date_last_verify}
         return render_template("student/student.html", student=student, student_trips=student_trips, trip_studs=trip_studs, info=info)
+    else:
+        data = request.get_json()
+        if data['cmd'] == "updateStudent":
+            student = Student.get_student_by_id(student['id'], return_dict=False).update(data)
+        return redirect("/student")
 
 # Student Preferences Form
 @app.route("/student/<trip_code>", methods=["GET", "POST"])
@@ -302,14 +304,16 @@ def student_preferences(trip_code):
         if 'pref_5' in request.form:
             pref_5 = request.form['pref_5']
         preferences = [pref_1, pref_2, pref_3, pref_4, pref_5]
-        
         # Update preferences if student is editing preferences
         if StudentPreference.check_student_preferences(trip.id, self_id):
-            p = StudentPreference.get_preferences(trip.id, self_id)
-            p.update(preferences)
+            if StudentPreference.check_different_preferences(trip.id, self_id, preferences):
+                p = StudentPreference.get_preferences(trip.id, self_id)
+                p.update(preferences)
+                current_user['db_user'].send_preferences_email(trip.id, updated=True)
         # Create new StudentPreference object if student is submitting for the first time
-        else:    
+        else:
             StudentPreference(trip_id=trip.id, student_id=self_id, preferences=preferences)
+            current_user['db_user'].send_preferences_email(trip.id)
         return render_template("student/prefs-submitted.html", trip_code=trip_code)
     
 # All Trips Page
@@ -344,21 +348,25 @@ def trip(trip_code):
             return render_template("error/invalid-trip.html")
 
 # Groups Page for Trip
-# TODO: Move /generate_trips POST route here
 @app.route("/trips/<trip_code>/groups", methods=["GET", "POST"])
 @teacher_only
 def groups(trip_code):
+    sel_trip = Trip.get_trip_by_code(trip_code)
     if request.method == "GET":
-        sel_trip = Trip.get_trip_by_code(trip_code)
         if Trip.get_trip_by_code(trip_code) != None:
             student_prefs = {}
             for s in TripStudent.get_students_in_trip(sel_trip.id):
                 student_prefs[s['id']] = StudentPreference.check_student_preferences(sel_trip.id, s['id'])
-                groups = sel_trip.get_groups()
-            generated = len(groups['groupless']) == 0
+            groups = sel_trip.get_groups()
+            generated = len(groups['groups'][0]) > 0
             return render_template("teacher/groups.html", trip_code=trip_code, sel_trip=sel_trip, student_prefs=student_prefs, groups=groups, generated=generated)
         else:
             return render_template("error/invalid-trip.html")
+    else:
+        data = request.get_json()
+        if data['cmd'] == "generateGroups":
+            sel_trip.generate_groups()
+        return redirect(f"/trips/{trip_code}/groups")
 
 # Admin Dashboard
 # TODO: User/Student Management:
@@ -370,32 +378,32 @@ def groups(trip_code):
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():
-    # Get all users
-    users = User.get_all_users(return_dict=True)
-    # Set student for each user
-    for u in users:
-        if u['student_id'] is not None:
-            u['student'] = Student.get_student_by_id(u['student_id'])
-        else:
-            u['student'] = None
-    # Get all students
-    students = Student.get_all_students()
-    return render_template("admin/admin.html", users=users, students=students)
+    if request.method == "GET":
+        # Get all users
+        users = User.get_all_users(return_dict=True)
+        # Set student for each user
+        for u in users:
+            if u['student_id'] is not None:
+                u['student'] = Student.get_student_by_id(u['student_id'])
+            else:
+                u['student'] = None
+        # Get all students
+        students = Student.get_all_students()
+        return render_template("admin/admin.html", users=users, students=students)
+    else:
+        data = request.get_json()
+        if data['cmd'] == "deleteUser":
+            user_id = data['id']
+            if User.check_exist_with_id(user_id):
+                User.get_user_by_id(user_id).delete()
+        return redirect("/admin")
 
 
 # |--------------------------------------------------------------------------{ POST-Only Routes }---------------------------------------------------------------------------|
-@app.route("/delete_user", methods=["POST"])
-@admin_only
-def delete_user():
-    id = request.get_json()[0]['id']
-    if User.check_exist_with_id(id):
-        User.get_user_by_id(id).delete()
-    return redirect("/admin")
-
 @app.route("/create_trip", methods=["POST"])
 @teacher_only
 def create_trip():
-    data = request.get_json()[0]
+    data = request.get_json()
     name = data['name']
     organizer = data['organizer']
     students = data['students']
@@ -408,7 +416,7 @@ def create_trip():
 @app.route("/delete_trip", methods=["POST"])
 @teacher_only
 def delete_trip():
-    data = request.get_json()[0]
+    data = request.get_json()
     code = data['code']
     Trip.get_trip_by_code(code).delete()
     return redirect("/trips")
@@ -416,42 +424,25 @@ def delete_trip():
 @app.route("/update_trip", methods=["POST"])
 @teacher_only
 def update_trip():
-    data = request.get_json()[0]
+    data = request.get_json()
     code = data['code']
     trip = Trip.get_trip_by_code(code)
     trip.update(data)
     return redirect(f"/trips/{code}")
 
-@app.route("/generate_groups", methods=["POST"])
-@teacher_only
-def generate_groups():
-    data = request.get_json()
-    code = data['code']
-    Trip.get_trip_by_code(code).generate_groups()
-    return redirect(f"/trips/{code}")
-
-@app.route("/update_student", methods=["POST"])
-@login_required()
-def update_student():
-    if request.method == "POST":
-        data = request.get_json()[0]
-        student = Student.get_student_by_id(current_user['student']['id'], return_dict=False)
-        student.update(data)
-        return redirect("/student")
-
 @app.route("/redo_verify", methods=["POST"])
 @login_required(disable_verify=True)
 def redo_verify():
     if request.method == "POST":
-        id = int(request.get_json()[0]['id'])
+        data = request.get_json()
+        id = data['id']
         if User.check_exist_with_id(id):
             u = User.get_user_by_id(id)
-            if  u.verify_time_expired():
+            if u.verify_time_expired():
                 u.regenerate_verify_code()
                 if not u.is_verified:
                     u.send_verify_email()
         return redirect("/verify")
-
 
 # |--------------------------------------------------------------------------{ Main Function :D }---------------------------------------------------------------------------|
 if __name__ == "__main__":

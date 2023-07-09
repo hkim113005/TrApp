@@ -6,16 +6,22 @@
 
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Student Information:</label>
+
 <label class="d-grid info-label mt-3 mx-auto">Date Created</label> 
 <text class="d-grid mx-auto">{{creation_date}}</text>
+
 <label class="d-grid info-label mt-3 mx-auto">Full Name</label> 
 <text class="d-grid mx-auto">{{student.name}}</text>
+
 <label class="d-grid info-label mt-3 mx-auto">Email</label> 
 <text class="d-grid mx-auto">{{student.email}}</text>
+
 <label class="d-grid info-label mt-3 mx-auto">Grade</label> 
 <text class="d-grid mx-auto">{{student.grade}}</text>
+
 <label class="d-grid info-label mt-3 mx-auto">Gender</label> 
 <text class="d-grid mx-auto">{{student.gender}}</text>
+
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#student_edit_information">
     <div class="icon-text-container center-div">
         <i class="fas fa-user-pen"></i>
@@ -127,17 +133,18 @@
 
 <script>
     let data = {
+        cmd: "updateStudent",
         id: parseInt(`{{student.id}}`)
     };
     function postUpdateData() {
         let updatePost = $.ajax({
                 type: "POST",
-                url: "/update_student",
-                data: JSON.stringify([data]),
+                url: "/student",
+                data: JSON.stringify(data),
                 contentType: "application/json",
                 dataType: "json",
-                complete: function(response) {
-                    window.location = window.location;
+                complete: (e) => {
+                    window.location.reload();
                 }
         });
     }

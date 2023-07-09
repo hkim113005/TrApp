@@ -31,7 +31,7 @@
     </tbody>
 </table>
 
-<button {{"disabled" if generated else ""}} type="button" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="generateGroups()">Generate Groups</button>
+<button type="button" id="generate_button" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="generateGroups()">Generate Groups</button>
 <a href="/trips/{{trip_code}}" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
     <div class="icon-text-container center-div">
         <i class="fas fa-arrow-left"></i>
@@ -69,10 +69,11 @@
 {%endif%}
 <script>
     function generateGroups() {
+        document.getElementById("generate_button").disabled = true;
         $.ajax({
             type: "POST",
-            url: "/generate_groups",
-            data: JSON.stringify({code: JSON.parse('{{ trip_code | tojson | safe }}')}),
+            url: window.location.href,
+            data: JSON.stringify({ cmd: "generateGroups" }),
             contentType: "application/json",
             dataType: "json",
             complete: function(response) {

@@ -148,12 +148,12 @@ Verify Email
 		let updatePost = $.ajax({
 			type: "POST",
 			url: "/redo_verify",
-			data: JSON.stringify([{id: parseInt(`{{user_id}}`)}]),
+			data: JSON.stringify({ id: parseInt(`{{user_id}}`) }),
 			contentType: "application/json",
 			dataType: "json",
-			complete: function(response) {
-				window.location = window.location;
-			}
+			complete: (e) => {
+                window.location.reload();
+            }
 		});
 	}
 </script>
