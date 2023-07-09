@@ -7,14 +7,10 @@
 {% block body %}
 	<p>Thank you for submitting your preferences for {{trip.name}}.</p>
 	<p>Please review your preferences below:</p>
-    <div style="display: flex; justify-content: center;"></div>
-        <div style="text-align: left; display: inline-block;">
-            <p>1 - Jeff (Grade 9)</p>
-            <p>2 - Billy Bobby Brown (Grade 12)</p>
-            <p>3 - Sandy Sim (Grade 10)</p>
-            <p>4 - Adam Johnson (Grade 10)</p>
-            <p>5 - Joseph Jones (Grade 11)</p>
-        </div>
+    <div style="text-align: left; display: inline-block;">
+        {%for i in range(preferences|length)%}
+            <p>{{(i + 1) | string}} - {{preferences[i].name}} (Grade {{preferences[i].grade}})</p>
+        {%endfor%}
     </div>
-	<p>To edit your preferences, click this trip on your student dashboard or <a href="http://127.0.0.1:5000/student/{{trip.code}}">click here</a>.</p>
+    <p>To edit your preferences, click this trip on your student dashboard or <a href="http://127.0.0.1:5000/student/{{trip.code}}">click here</a>.</p>
 {% endblock %}
