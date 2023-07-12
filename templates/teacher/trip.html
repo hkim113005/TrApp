@@ -5,17 +5,59 @@
 {% endblock %}
 
 {% block main %}
-<label class="d-grid form-label mt-3 mx-auto">Trip Name</label>
-<input name="trip_name" id="trip_name" type="text" oninput="syncTripName()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
+<label class="d-grid form-label mt-3 mx-auto">Trip Information:</label>
 
-<label class="d-grid form-label mt-3 mx-auto">Organizer</label>
-<input name="trip_organizer" id="trip_organizer" type="text" oninput="syncTripOrganizer()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
+<label class="d-grid info-label mt-3 mx-auto">Name</label> 
+<text class="d-grid mx-auto">{{sel_trip.name}}</text>
 
-<label class="d-grid form-label mt-3 mx-auto">Groups</label>
-<input name="num_groups" id="num_groups" type="number" min="0" onchange="syncGroupVals()" class="mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
+<label class="d-grid info-label mt-3 mx-auto">Organizer</label> 
+<text class="d-grid mx-auto">{{sel_trip.organizer}}</text>
 
-<label class="d-grid form-label mt-3 mx-auto">Group Size</label>
-<input name="group_size" id="group_size" type="number" min="0" oninput="this.value = updateGroupVal(this.value, false, false);" class="mx-auto form-control" value={{sel_trip.group_size}} placeholder="Max Group Size">
+<label class="d-grid info-label mt-3 mx-auto">Groups</label> 
+<text class="d-grid mx-auto">{{sel_trip.num_groups}}</text>
+
+<label class="d-grid info-label mt-3 mx-auto">Group Size</label> 
+<text class="d-grid mx-auto">{{sel_trip.group_size}}</text>
+
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#trip_edit">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-pen"></i>
+        <span>Edit Information</span>
+    </div>
+</button>
+
+<div class="modal fade" id="trip_edit" tabindex="-1" aria-labelledby="trip_edit_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <label class="d-grid form-label mx-auto">Edit Trip Information</label>
+
+                    <label id="name_label" class="d-grid info-label mt-3 mx-auto">Trip Name</label>
+                    <input name="trip_name" id="trip_name" type="text" oninput="checkTripInfo()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
+
+                    <label id="organizer_label" class="d-grid info-label mt-3 mx-auto">Organizer</label>
+                    <input name="trip_organizer" id="trip_organizer" type="text" oninput="checkTripInfo()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
+
+                    <label id="groups_label" class="d-grid info-label mt-3 mx-auto">Groups</label>
+                    <input name="num_groups" id="num_groups" type="number" min="0" oninput="checkTripInfo()" class="mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
+
+                    <label id="size_label" class="d-grid info-label mt-3 mx-auto">Group Size</label>
+                    <input name="group_size" id="group_size" type="number" min="0" oninput="this.value = updateGroupVal(this.value, false, false); checkTripInfo();" class="mx-auto form-control" value={{sel_trip.group_size}} placeholder="Max Group Size">
+
+                    <text class="d-grid mx-auto">* = Unsaved Changes!</text>
+                    <button onclick="saveTripInfo()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_trip_info">
+                        <div class="icon-text-container center-div">
+                            <i class="fas fa-floppy-disk"></i>
+                            <span>Save Changes</span>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <label class="d-grid form-label mt-4 mx-auto">Students ({{sel_students | length}})</label>
 <table class="table table-10-rows table-sm table-hover mt-3 mx-auto">
@@ -88,7 +130,7 @@
                     </tbody>
                 </table>
             </div>
-            <a id="save_trip" data-bs-dismiss="modal" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Save</a>
+            <a id="save_trip_students" data-bs-dismiss="modal" class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">Save</a>
         </div>
     </div>
 </div>
@@ -107,6 +149,74 @@
 </div>
 
 <script>
+    function postData(data) {
+        $.ajax({
+            type: "POST",
+            url: "/trips/{{sel_trip.code}}",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.reload();
+            }
+        });
+    }
+    
+    let data = {
+        cmd: "updateTripInfo",
+    };
+
+    function saveTripInfo() {
+        postData(data);
+    }
+
+    function checkTripInfo() {
+        let nameLabel = document.getElementById("name_label");
+        let organizerLabel = document.getElementById("organizer_label");
+        let groupsLabel = document.getElementById("groups_label");
+        let sizeLabel = document.getElementById("size_label");
+
+        let currentName = document.getElementById("trip_name").value;
+        let currentOrganizer = document.getElementById("trip_organizer").value;
+        let currentGroups = document.getElementById("num_groups").value;
+        let currentSize = document.getElementById("group_size").value;
+
+        let nameChanged = currentName != `{{sel_trip.name}}`;
+        let organizerChanged = currentOrganizer != `{{sel_trip.organizer}}`;
+        let groupsChanged = currentGroups != parseInt(`{{sel_trip.num_groups}}`);
+        let sizeChanged = currentSize != parseInt(`{{sel_trip.group_size}}`);
+
+        if (nameChanged) {
+            data.name = currentName;
+            nameLabel.innerHTML = "Trip Name*";
+        } else {
+            delete data.name;
+            nameLabel.innerHTML = "Trip Name";
+        }
+        if (organizerChanged) {
+            data.organizer = currentOrganizer;
+            organizerLabel.innerHTML = "Organizer*";
+        } else {
+            delete data.organizer;
+            organizerLabel.innerHTML = "Organizer";
+        }
+        if (groupsChanged) {
+            data.num_groups = currentGroups;
+            groupsLabel.innerHTML = "Groups*";
+        } else {
+            delete data.num_groups;
+            groupsLabel.innerHTML = "Groups";
+        }
+        if (sizeChanged) {
+            data.group_size = currentName;
+            sizeLabel.innerHTML = "Group Size*";
+        } else {
+            delete data.group_size;
+            sizeLabel.innerHTML = "Group Size";
+        }
+        document.getElementById('save_trip_info').disabled = !(nameChanged || organizerChanged || groupsChanged || sizeChanged);
+    }
+
     function search() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
@@ -170,61 +280,6 @@
         }
     }
 
-    function syncGroupVals() {
-        var groupElem = document.getElementById("num_groups");
-        var sizeElem = document.getElementById("group_size");
-        var data = {
-            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-            "groupSize": sizeElem.value,
-            "numGroups": groupElem.value,
-        };
-        console.log(groupElem.value)
-        console.log(sizeElem.value)
-        console.log(JSON.parse('{{ sel_trip.num_groups | safe }}'))
-        console.log(JSON.parse('{{ sel_trip.group_size | safe }}'))
-        if (groupElem.value != JSON.parse('{{ sel_trip.num_groups | safe }}') || sizeElem.value != JSON.parse('{{ sel_trip.group_size | safe }}')) {
-            $.ajax({
-                type: "POST",
-                url: "/update_trip",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: "json"
-            });
-        }
-    }
-
-    function syncTripName() {
-        var nameElem = document.getElementById("trip_name");
-        if (nameElem.value == `{{sel_trip.name}}`) return;
-        var data = {
-            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-            "name": nameElem.value,
-        }
-        $.ajax({
-            type: "POST",
-            url: "/update_trip",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            dataType: "json"
-        });
-    }
-
-    function syncTripOrganizer() {
-        var organizerElem = document.getElementById("trip_organizer");
-        if (organizerElem.value == `{{sel_trip.organizer}}`) return;
-        var data = {
-            "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-            "organizer": organizerElem.value,
-        };
-        $.ajax({
-            type: "POST",
-            url: "/update_trip",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            dataType: "json"
-        });
-    }
-
     function initRows() {
         var selected = JSON.parse('{{ sel_students | tojson | safe }}').map(x => x.id)
         var table = document.getElementById("students_table");
@@ -280,32 +335,13 @@
 
     window.addEventListener("load", () => {
         document.getElementById("delete_yes").addEventListener("click", () => {
-            var data = {
-                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-            };
-            $.ajax({
-                type: "POST",
-                url: "/delete_trip",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: "json"
-            });
-        })
+            postData({ cmd: "deleteTrip" });
+        });
 
-        document.getElementById("save_trip").addEventListener("click", () => {
-            var data = {
-                "code": JSON.parse('{{ trip_code | tojson | safe }}'),
-                "students": getSelectedStudents().map(x => parseInt(x))
-            };
-            let updatePost = $.ajax({
-                type: "POST",
-                url: "/update_trip",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: "json",
-                complete: (e) => {
-                    window.location.reload();
-                }
+        document.getElementById("save_trip_students").addEventListener("click", () => {
+            postData({
+                cmd: "updateTripStudents",
+                students: getSelectedStudents().map(x => parseInt(x))
             });
         });
 

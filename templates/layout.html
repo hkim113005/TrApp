@@ -6,7 +6,7 @@
 	<meta name="format-detection" content="telephone=no">
 	<title>{% block title %}{% endblock %} | TrApp</title>
 	{% block stylesheets %}{% endblock %}
-    <link rel="stylesheet" type="text/css" href="/static/css/stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
 	<style type="text/css">
 		.hidden {display:none;}
 	</style>
@@ -26,10 +26,28 @@
 </head>
 
 <body style="visibility: hidden">
+	{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			<div class="flash-overlay">
+				{% for category, message in messages %}
+					<p class="flash-card alert alert-{{ category }} fade-out">
+						{{ message | safe}}
+					</p>
+				{% endfor %}
+			</div>
+		{% endif %}
+	{% endwith %}
+
 	{% block main %}{% endblock %}
 
 	<script>
 		document.body.style.visibility = "visible";
+		
+		$(document).ready(function() {
+            $(".flash-card").delay(3000).fadeOut("slow", function() {
+                $(this).remove();
+            });
+        });
 	</script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>

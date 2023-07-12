@@ -1,5 +1,5 @@
 # |-------------------------------------------------------------------------{ Imports & Variables }-------------------------------------------------------------------------|
-from flask import Flask, render_template, redirect, request, session, abort
+from flask import Flask, render_template, redirect, request, session, abort, flash
 from functools import wraps
 
 # Stores current user and student
@@ -40,7 +40,7 @@ def admin_only(f):
     @login_required()
     def decorated_function(*args, **kwargs):
         if not current_user['db_user'].is_admin:
-            abort(401)
+            abort(403)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -50,7 +50,7 @@ def teacher_only(f):
     @login_required()
     def decorated_function(*args, **kwargs):
         if not current_user['db_user'].is_teacher:
-            abort(401)
+            abort(403)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -83,10 +83,10 @@ def home():
 def page_not_found(e):
   return render_template("error/404.html")
 
-# Handles Error 401: Unauthorized
-@app.errorhandler(401)
-def unauthorized(e):
-  return render_template("error/401.html")
+# Handles Error 403: Forbidden
+@app.errorhandler(403)
+def forbidden(e):
+  return render_template("error/403.html")
 
 # Handles Error 500: Server Error
 @app.errorhandler(500)
@@ -109,23 +109,23 @@ def signup():
         email_split = email.split("@")
 
         # Check if email has proper structure and acs.sch.ae domain
-        if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
-            error = "Invalid email! Please use an actual ACS (@acs.sch.ae) student email."
+        # Check if user account already exists
+        if User.check_exist_with_email(email):
+            flash('A user already exists with this email! Please <a href="/login">login</a> instead.', 'danger')
+        
+        elif len(email_split) != 2 or email_split[1] != "acs.sch.ae":
+            flash("Invalid email! Please use an actual ACS (@acs.sch.ae) student email.", 'danger')
 
         # Check if password length is at least 8
         elif len(password) < 8:
             e = email
-            error = "Your password must be at least 8 characters!"
+            flash("Your password must be at least 8 characters!", 'danger')
 
         # Check if password matches repeat password
         elif password != password_verify:
             e = email
             p1 = password
-            error = "Your passwords must match! Please repeat your password."
-
-        # Check if user account already exists
-        elif User.check_exist_with_email(email):
-            error = 'A user already exists with this email! Please <a href="/login">login</a> instead.' # TODO: Reset password option
+            flash("Your passwords must match! Please repeat your password.", 'danger')
 
         # If email exists in ACS student database
         elif Student.check_student_email(email):
@@ -145,8 +145,9 @@ def signup():
                 return redirect("/student")
         # Email doesn't exist in student databse
         else:
-            error = "This email doesn't exist! Please use an actual ACS student email. Email tsu@acs.sch.ae if you think this is a mistake."
-        return render_template("auth/signup.html", error=error, e=e, p1=p1)
+            flash("This email doesn't exist! Please use an actual ACS student email. Email tsu@acs.sch.ae if you think this is a mistake.", 'danger')
+            
+        return render_template("auth/signup.html", e=e, p1=p1)
 
 # Email Verification OTP
 @app.route("/verify", methods=["GET", "POST"])
@@ -159,7 +160,7 @@ def verify():
 
     # Verification time expired
     if user.verify_time_expired():
-        error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
+        error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one.", 'danger'
         time = 0
     else:
         time = user.get_remaining_time()
@@ -180,10 +181,12 @@ def verify():
         if user.check_verify_code(verify_code):
             if not error:
                 user.verify()
+                flash("Email Verified Successfully!", 'success')
                 return redirect("/")
         else:
             error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
-    return render_template("auth/verify.html", error=error, time=time, email=email, user_id=user_id, code=code)
+    flash(error, 'danger')
+    return render_template("auth/verify.html",time=time, email=email, user_id=user_id, code=code)
 
 # Existing User Login
 @app.route("/login", methods=["GET", "POST"])
@@ -200,7 +203,7 @@ def login():
 
         # Check if email has proper structure, acs.sch.ae domain, and exists in ACS student database
         if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
-            error = "Invalid email! Please use an actual ACS (@acs.sch.ae) student email."
+            flash("Invalid email! Please use an actual ACS (@acs.sch.ae) student email.", 'danger')
         
         # Check if user exists, continue login process
         elif User.check_exist_with_email(email):
@@ -211,6 +214,7 @@ def login():
 
                 # Login and redirect user based on permissions
                 login_user.login()
+                flash(f"Logged in as {current_user['db_user'].name}!", 'success')
                 if current_user['db_user'].is_admin:
                     return redirect("/admin")
                 if current_user['db_user'].is_teacher:
@@ -220,11 +224,11 @@ def login():
             # Wrong password
             # TODO: Reset password option
             else:
-                error = "Wrong password! Please try again."
+                flash("Wrong password! Please try again.", 'danger')
         # Unregistered Email
         else:
-            error = 'This email isn\'t linked to an account! Please <a href="/signup">sign up</a>.'
-        return render_template("auth/login.html", error=error)
+            flash('This email isn\'t linked to an account! Please <a href="/signup">sign up</a>.', 'danger')
+        return render_template("auth/login.html")
 
 # Logout
 @app.route("/logout", methods=["GET", "POST"])
@@ -239,6 +243,7 @@ def logout():
             current_user['db_user'] = None
         if current_user['student'] is not None:
             current_user['student'] = None
+        flash("Logged out successfully", 'success')
     return redirect("/")
     #return render_template("auth/logout.html")
 
@@ -326,6 +331,17 @@ def trips():
         trip_studs = [TripStudent.get_students_in_trip(t.id) for t in all_trips]
         all_students = Student.get_all_students()
         return render_template("teacher/trips.html", all_trips=all_trips, trip_studs=trip_studs, all_students=all_students)
+    else:
+        data = request.get_json()
+        if data['cmd'] == "createTrip":
+            name = data['name']
+            organizer = data['organizer']
+            students = data['students']
+            num_groups = data['num_groups']
+            group_size = data['group_size']
+            print(data)
+            Trip(name=name,organizer=organizer, num_groups=num_groups, group_size=group_size, students=students)
+            return redirect("/trips")
 
 # Speciic Trip Page
 @app.route("/trips/<trip_code>", methods=["GET", "POST"])
@@ -346,6 +362,14 @@ def trip(trip_code):
             return render_template("teacher/trip.html", trip_code=trip_code, sel_trip=sel_trip, sel_students=sel_students, student_prefs=student_prefs, all_students=all_students)
         else:
             return render_template("error/invalid-trip.html")
+    else:
+        data = request.get_json()
+        if data['cmd'] in ["updateTripInfo", "updateTripStudents"]:
+            Trip.get_trip_by_code(trip_code).update(data)
+        elif data['cmd'] == "deleteTrip":
+            Trip.get_trip_by_code(trip_code).delete()
+            return redirect("/trips")
+        return redirect(f"/trips/{trip_code}")
 
 # Groups Page for Trip
 @app.route("/trips/<trip_code>/groups", methods=["GET", "POST"])
@@ -396,40 +420,31 @@ def admin():
             user_id = data['id']
             if User.check_exist_with_id(user_id):
                 User.get_user_by_id(user_id).delete()
+        elif data['cmd'] == "addStudent":
+            email = data['email']
+            if not Student.check_student_email(email):
+                name = data['name']
+                grade = data['grade']
+                gender = data['gender']
+                Student(name=name, email=email, grade=grade, gender=gender)
+                flash("Student Added!", 'success')
+            else:
+                flash("Student Email Exists!", 'danger')
+        # TODO: Creating New User
+        elif data['cmd'] == "createUser":
+            student_id = data['student_id']
+            if Student.get_student_by_id(student_id) is not None and not User.check_exist_with_email(email):
+                name = data['name']
+                is_admin = data['admin']
+                is_teacher = data['teacher']
+                is_student = data['student']
+                password = data['password']
+                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, password=password,verified=True)
+                flash("User Created!", 'success')
         return redirect("/admin")
 
 
 # |--------------------------------------------------------------------------{ POST-Only Routes }---------------------------------------------------------------------------|
-@app.route("/create_trip", methods=["POST"])
-@teacher_only
-def create_trip():
-    data = request.get_json()
-    name = data['name']
-    organizer = data['organizer']
-    students = data['students']
-    num_groups = data['num_groups']
-    group_size = data['group_size']
-    print(data)
-    Trip(name=name,organizer=organizer, num_groups=num_groups, group_size=group_size, students=students)
-    return redirect("/trips")
-
-@app.route("/delete_trip", methods=["POST"])
-@teacher_only
-def delete_trip():
-    data = request.get_json()
-    code = data['code']
-    Trip.get_trip_by_code(code).delete()
-    return redirect("/trips")
-
-@app.route("/update_trip", methods=["POST"])
-@teacher_only
-def update_trip():
-    data = request.get_json()
-    code = data['code']
-    trip = Trip.get_trip_by_code(code)
-    trip.update(data)
-    return redirect(f"/trips/{code}")
-
 @app.route("/redo_verify", methods=["POST"])
 @login_required(disable_verify=True)
 def redo_verify():

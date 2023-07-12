@@ -9,11 +9,8 @@ Sign Up
 {% endblock %}
 
 {% block main %}
-{% if error %}
-    <p class="error-card red"><strong>Error:</strong> {{ error | safe}}</p>
-{% endif %}
 <form action="/signup" method="POST">
-    <label class="d-grid form-label {{"mt-3" if error else "mt-5"}} mx-auto">New User</label>
+    <label class="d-grid form-label mt-3 mx-auto">New User</label>
 
     <input type="text" oninput="inputChecker()" class="mt-3 mx-auto form-control" value="{{e if e}}" id="email" name="email" placeholder="ACS Email (@acs.sch.ae)">
 
@@ -23,7 +20,7 @@ Sign Up
     
     <button type="submit" disabled id="signup_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Sign Up</button>
 </form>
-<p style="text-align: center; font-size: small;" class="mt-2 mx-auto">Already have an account? Please <a href="/login">Login</a>.</p>
+<p style="text-align: center; font-size: small;" class="mt-3 mx-auto">Already have an account? Please <a href="/login">Login</a>.</p>
 
 <script>
     function checkEmail() {

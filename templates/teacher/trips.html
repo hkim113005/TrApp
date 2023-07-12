@@ -46,18 +46,18 @@ Trips
                     <label class="d-grid form-label mx-auto">Create New Trip - Details</label>
 
                     <label class="d-grid info-label mt-3 mx-auto">Trip Name</label>
-                    <input type="text" class="mt-2 mx-auto form-control" id="create_name" placeholder="Name" onKeyup="checkform()">
+                    <input type="text" class="mt-2 mx-auto form-control" id="create_name" placeholder="Name" onKeyup="checkForm()">
 
                     <label class="d-grid info-label mt-3 mx-auto">Organizer</label>
-                    <input type="text" class="mt-2 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkform()">
+                    <input type="text" class="mt-2 mx-auto form-control" id="create_organizer" placeholder="Organizer" onKeyup="checkForm()">
 
                     <label class="d-grid info-label mt-3 mx-auto"># of Groups</label>
                     <input type="number" min="0" class="mt-2 mx-auto form-control"
-                        onKeyup="checkform()" id="create_num_groups" placeholder="# of Groups">
+                        onKeyup="checkForm()" id="create_num_groups" placeholder="# of Groups">
 
                     <label class="d-grid info-label mt-3 mx-auto">Group Size</label>
                     <input type="number" min="0" oninput="this.value = updateGroupVal(this.value, false)" class="mt-2 mx-auto form-control"
-                        onKeyup="checkform()" id="create_group_size" placeholder="Max Group Size">
+                        onKeyup="checkForm()" id="create_group_size" placeholder="Max Group Size">
 
                     <label id = "create_students_label" class="d-grid info-label mt-3 mx-auto">Students</label>
                     <input type="text" class="mt-2 mx-auto form-control fontAwesome" id="search2" onkeyup="searchStudents()" placeholder="&#xF002; Search Trips">
@@ -133,21 +133,21 @@ Trips
 
     window.addEventListener("load", () => {
         document.getElementById("create_button").addEventListener("click", () => {
-            var data = {
-                    "name": document.getElementById("create_name").value,
-                    "organizer": document.getElementById("create_organizer").value,
-                    "students": getSelectedStudents().map(x => parseInt(x)),
-                    "num_groups": document.getElementById("create_num_groups").value,
-                    "group_size": document.getElementById("create_group_size").value
-            };
-            let updatePost = $.ajax({
+            $.ajax({
                 type: "POST",
-                url: "/create_trip",
-                data: JSON.stringify([data]),
+                url: "/trips",
+                data: JSON.stringify({
+                    cmd: "createTrip",
+                    name: document.getElementById("create_name").value,
+                    organizer: document.getElementById("create_organizer").value,
+                    students: getSelectedStudents().map(x => parseInt(x)),
+                    num_groups: document.getElementById("create_num_groups").value,
+                    group_size: document.getElementById("create_group_size").value
+                }),
                 contentType: "application/json",
                 dataType: "json",
-                complete: function(response) {
-                    window.location = window.location;
+                complete: (e) => {
+                    window.location.reload();
                 }
             });
         })
@@ -212,7 +212,7 @@ Trips
         });
     })
 
-    function checkform() {
+    function checkForm() {
         var f = document.forms["create_trip_form"].elements;
         var cansubmit = true;
 

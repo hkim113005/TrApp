@@ -109,8 +109,7 @@ class User (db.Model):
         super(User, self).__init__(**kwargs)
         self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.verify_code = User.get_new_code()
-        self.date_last_verify = self.date_created
+        self.verify_code = self.regenerate_verify_code()
         if verified:
             self.is_verified = verified;
         if not self.is_verified:
@@ -291,7 +290,7 @@ class Student(db.Model):
     @staticmethod
     def get_student_by_email(email):
         student = db.session.query(Student).filter_by(email=email).first()
-        return dict_converter(student)
+        return dict_converter(student) if student else None
 
     @staticmethod
     def check_student_email(email):

@@ -6,7 +6,7 @@
 
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">{{sel_trip["name"]}}</label>
-<label class="d-grid form-label mx-auto">Student Preferences:</label>
+<label class="d-grid form-label mx-auto">Student Preferences {{"(editing)" if autofill else ""}}:</label>
 <form id = "preferences_form" action=/student/{{trip_code}} method="POST">
     <label class="d-grid info-label mt-4 mx-auto">Student</label>
 
