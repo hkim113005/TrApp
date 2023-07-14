@@ -5,7 +5,7 @@ Trips
 {% endblock %}
 
 {% block main %}
-<input type="text" class="mt-5 mx-auto form-control fontAwesome id="search1" onkeyup="search1()" placeholder="&#xF002; Search Students">
+<input type="text" class="mt-5 mx-auto form-control fontAwesome" id="trip_search" oninput="searchTrips()" placeholder="&#xF002; Search Trips">
 <table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
     <thead>
         <tr>
@@ -60,7 +60,7 @@ Trips
                         onKeyup="checkForm()" id="create_group_size" placeholder="Max Group Size">
 
                     <label id = "create_students_label" class="d-grid info-label mt-3 mx-auto">Students</label>
-                    <input type="text" class="mt-2 mx-auto form-control fontAwesome" id="search2" onkeyup="searchStudents()" placeholder="&#xF002; Search Trips">
+                    <input type="text" class="mt-2 mx-auto form-control fontAwesome" id="student_search" oninput="searchStudents()" placeholder="&#xF002; Search Trips">
                     <table class="table table-10-rows table-sm table-hover mt-2 mx-auto" id="students_table">
                         <thead>
                             <tr>
@@ -87,19 +87,20 @@ Trips
 </div>
 
 <script>
-    function search1() {
+    function searchTrips() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search1");
+        input = document.getElementById("trip_search");
         filter = input.value.toUpperCase();
         table = document.getElementById("trips_table");
         tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
+            let tdName = tr[i].getElementsByTagName("td")[0];
+			let tdOrganizer = tr[i].getElementsByTagName("td")[1];
+            if (tdName && tdOrganizer) {
+                let txtValue = ` ${tdName.textContent || tdName.innerText} ${tdOrganizer.textContent || tdOrganizer.innerText} `;;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                 } else {
@@ -112,16 +113,17 @@ Trips
     function searchStudents() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search2");
+        input = document.getElementById("student_search");
         filter = input.value.toUpperCase();
         table = document.getElementById("students_table");
         tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
+            let tdID = tr[i].getElementsByTagName("td")[0];
+			let tdName = tr[i].getElementsByTagName("td")[1];
+            if (tdID && tdName) {
+                let txtValue = ` ${tdID.textContent || tdID.innerText} ${tdName.textContent || tdName.innerText} `;;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                 } else {
@@ -217,7 +219,7 @@ Trips
         var cansubmit = true;
 
         for (var i = 0; i < f.length; i++) {
-            if (f[i].id != "search2" && f[i].value.length == 0) cansubmit = false;
+            if (f[i].id != "student_search" && f[i].value.length == 0) cansubmit = false;
         }
 
         document.getElementById('create_button').disabled = !cansubmit;

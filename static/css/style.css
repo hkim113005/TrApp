@@ -5,10 +5,7 @@
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    margin: 0
+    opacity: 1;
 }
 
 .btn-primary {
@@ -177,14 +174,15 @@ td {
   }
 
 .flash-card {
-    margin: auto;
     width: 310px;
-    margin-top: 20px;
     font-size: small;
 }
 
 .flash-overlay {
-    display: flex;
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .fade-out {

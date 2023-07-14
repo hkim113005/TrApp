@@ -7,13 +7,16 @@
 {% block main %}
 <label class="d-grid form-label mt-3 mx-auto">Student Information:</label>
 
-<label class="d-grid info-label mt-3 mx-auto">Date Created</label> 
-<text class="d-grid mx-auto">{{creation_date}}</text>
-
 <label class="d-grid info-label mt-3 mx-auto">Full Name</label> 
 <text class="d-grid mx-auto">{{student.name}}</text>
 
-<label class="d-grid info-label mt-3 mx-auto">Email</label> 
+{% if info.login_email != student.email %}
+    <label class="d-grid info-label mt-3 mx-auto">Login Email</label> 
+    <text class="d-grid mx-auto">{{info.login_email}}</text>
+    <label class="d-grid info-label mt-3 mx-auto">ACS Email</label> 
+{% else %}
+    <label class="d-grid info-label mt-3 mx-auto">Email</label> 
+{% endif %}
 <text class="d-grid mx-auto">{{student.email}}</text>
 
 <label class="d-grid info-label mt-3 mx-auto">Grade</label> 
@@ -75,7 +78,7 @@
                     <input type="text" class="mt-3 mx-auto form-control" id="student_name" value="{{student.name}}" placeholder="Full Name" oninput="checkInfo()">
 
                     <label id="email_label" class="d-grid info-label mt-3 mx-auto">ACS Email</label>
-                    <input disabled type="text" class="mt-3 mx-auto form-control" id="student_email" value="{{student.email}}">
+                    <input disabled type="text" class="mt-3 mx-auto form-control" id="student_email" oninput="checkInfo()" value="{{student.email}}">
 
                     <label id="grade_label" class="d-grid info-label mt-3 mx-auto">Grade</label>
                     <select disabled id="student_grade" class="mt-3 mx-auto form-select" onchange="checkInfo()" aria-label=".form-select-sm">
@@ -154,39 +157,49 @@
         let genderElem = document.getElementById("student_gender");
         
         let nameLabel = document.getElementById("name_label");
+        let emailLabel = document.getElementById("email_label");
         let gradeLabel = document.getElementById("grade_label");
         let genderLabel = document.getElementById("gender_label");
         
         let currentName = document.getElementById("student_name").value;
+        let currentEmail = document.getElementById("student_email").value;
         let currentGrade = gradeElem.options[gradeElem.selectedIndex].value;
         let currentGender = genderElem.options[genderElem.selectedIndex].value;
 
         let nameChanged = currentName != `{{student.name}}`;
+        let emailChanged = currentEmail != `{{student.email}}`;
         let gradeChanged = currentGrade != parseInt(`{{student.grade}}`);
         let genderChanged = currentGender != `{{student.gender}}`;
         
         if (nameChanged) {
             data.name = currentName;
-            nameLabel.innerHTML = "Full Name*";
+            nameLabel.innerHTML = "*Full Name";
         } else {
             delete data.name;
             nameLabel.innerHTML = "Full Name";
         }
+        if (emailChanged) {
+            updateStudentData.email = currentEmail;
+            emailLabel.innerHTML = "*ACS Email";
+        } else {
+            delete updateStudentData.email;
+            emailLabel.innerHTML = "ACS Email";
+        }
         if (gradeChanged) {
             data.grade = currentGrade;
-            gradeLabel.innerHTML = "Grade*";
+            gradeLabel.innerHTML = "*Grade";
         } else {
             delete data.grade;
             gradeLabel.innerHTML = "Grade";
         }
         if (genderChanged) {
             data.gender = currentGender;
-            genderLabel.innerHTML = "Gender*";
+            genderLabel.innerHTML = "*Gender";
         } else {
             delete data.gender;
             genderLabel.innerHTML = "Gender";
         }
-        document.getElementById('save_student_info').disabled = !(nameChanged || gradeChanged || genderChanged);
+        document.getElementById('save_student_info').disabled = !(nameChanged || emailChanged || gradeChanged || genderChanged);
     }
 
     function autofillGradeAndGender() {

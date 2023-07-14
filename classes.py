@@ -126,6 +126,44 @@ class User (db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+    
+    def update_name(self, name):
+        self.name = name
+        self.sync()
+    
+    def update_email(self, email):
+        self.email = email
+        self.sync()
+    
+    def update_student_id(self, student_id):
+        self.student_id = student_id
+        self.sync()
+
+    def update_password(self, password):
+        self.hashed_password = generate_password_hash(password, method="scrypt")
+        self.sync()
+
+    def update_perms(self, data):
+        if 'is_verified' in data:
+            self.is_verified = data['is_verified']
+        if "is_admin" in data:
+            self.is_admin = data['is_admin']
+        if "is_teacher" in data:
+            self.is_teacher = data['is_teacher']
+        if "is_student" in data:
+            self.is_student = data['is_student']
+        self.sync()
+
+    def update(self, data):
+        if 'name' in data:
+            self.update_name(data['name'])
+        if 'email' in data:
+            self.update_email(data['email'])
+        if 'student_id' in data:
+            self.update_student_id(data['student_id'])
+        if 'password' in data:
+            self.update_password(data['password'])
+        self.update_perms(data)
 
     def get_remaining_time(self):
         return (timedelta(minutes=User.verify_minutes) - (datetime.now() - self.date_last_verify)).total_seconds() * 1000
@@ -282,10 +320,10 @@ class Student(db.Model):
     @staticmethod
     def get_student_by_id(id, return_dict=True):
         student = db.session.query(Student).filter_by(id=id).first()
-        if return_dict:
-            return dict_converter(student)
-        else:
+        if not return_dict or student is None:
             return student
+        else:
+            return dict_converter(student)
 
     @staticmethod
     def get_student_by_email(email):

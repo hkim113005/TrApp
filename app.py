@@ -1,5 +1,5 @@
 # |-------------------------------------------------------------------------{ Imports & Variables }-------------------------------------------------------------------------|
-from flask import Flask, render_template, redirect, request, session, abort, flash
+from flask import Flask, render_template, redirect, request, session, abort, flash, get_flashed_messages
 from functools import wraps
 
 # Stores current user and student
@@ -185,7 +185,8 @@ def verify():
                 return redirect("/")
         else:
             error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
-    flash(error, 'danger')
+    if error:
+        flash(error, 'danger')
     return render_template("auth/verify.html",time=time, email=email, user_id=user_id, code=code)
 
 # Existing User Login
@@ -200,13 +201,9 @@ def login():
         email = request.form['email'].lower().strip()
         password = request.form['password'].strip()
         email_split = email.split("@")
-
-        # Check if email has proper structure, acs.sch.ae domain, and exists in ACS student database
-        if len(email_split) != 2 or email_split[1] != "acs.sch.ae":
-            flash("Invalid email! Please use an actual ACS (@acs.sch.ae) student email.", 'danger')
         
         # Check if user exists, continue login process
-        elif User.check_exist_with_email(email):
+        if User.check_exist_with_email(email):
             login_user = User.get_user_by_email(email)
 
             # Check password with stores password hash
@@ -225,6 +222,10 @@ def login():
             # TODO: Reset password option
             else:
                 flash("Wrong password! Please try again.", 'danger')
+
+        # Check if email has proper structure, acs.sch.ae domain, and exists in ACS student database
+        elif len(email_split) != 2 or email_split[1] != "acs.sch.ae":
+            flash("Invalid email! Please use an actual ACS (@acs.sch.ae) student email.", 'danger')
         # Unregistered Email
         else:
             flash('This email isn\'t linked to an account! Please <a href="/signup">sign up</a>.', 'danger')
@@ -260,12 +261,21 @@ def student():
 
         # Gets User Info
         user = current_user['db_user']
-        info = {"user_name": user.name, "date_created": user.date_created, "date_verified": user.date_last_verify}
+        info = {
+            "user_name": user.name, 
+            "login_email": user.email, 
+            "is_student": user.is_student,
+            "is_teacher": user.is_teacher,
+            "is_admin": user.is_admin, 
+            "date_created": user.date_created, 
+            "date_verified": user.date_last_verify
+        }
         return render_template("student/student.html", student=student, student_trips=student_trips, trip_studs=trip_studs, info=info)
     else:
         data = request.get_json()
         if data['cmd'] == "updateStudent":
             student = Student.get_student_by_id(student['id'], return_dict=False).update(data)
+            flash("Student information Updated!", 'success')
         return redirect("/student")
 
 # Student Preferences Form
@@ -341,6 +351,7 @@ def trips():
             group_size = data['group_size']
             print(data)
             Trip(name=name,organizer=organizer, num_groups=num_groups, group_size=group_size, students=students)
+            flash("New Trip Created!", 'success')
             return redirect("/trips")
 
 # Speciic Trip Page
@@ -365,9 +376,12 @@ def trip(trip_code):
     else:
         data = request.get_json()
         if data['cmd'] in ["updateTripInfo", "updateTripStudents"]:
+            flash("Trip Updated!.", 'success')
             Trip.get_trip_by_code(trip_code).update(data)
+            
         elif data['cmd'] == "deleteTrip":
             Trip.get_trip_by_code(trip_code).delete()
+            flash("Trip Deleted!.", 'success')
             return redirect("/trips")
         return redirect(f"/trips/{trip_code}")
 
@@ -390,36 +404,42 @@ def groups(trip_code):
         data = request.get_json()
         if data['cmd'] == "generateGroups":
             sel_trip.generate_groups()
+            flash("Groups Generated!.", 'success')
         return redirect(f"/trips/{trip_code}/groups")
 
-# Admin Dashboard
-# TODO: User/Student Management:
-#   - Edit User Details
-#   - Add New User
-#   - Edit Student Details
-#   - Add New Student
-#   - Delete Student
+# TODO: Turn this into a page with subpages? (admin/users, admin/students, etc)
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():
+    get_flashed_messages()
+    # Get all users
+    users = User.get_all_users(return_dict=True)
+    # Set student for each user
+    for u in users:
+        if u['student_id'] is not None:
+            u['student'] = Student.get_student_by_id(u['student_id'])
+        else:
+            u['student'] = None
+    # Get all students
+    students = Student.get_all_students(return_dict=True)
     if request.method == "GET":
-        # Get all users
-        users = User.get_all_users(return_dict=True)
-        # Set student for each user
-        for u in users:
-            if u['student_id'] is not None:
-                u['student'] = Student.get_student_by_id(u['student_id'])
-            else:
-                u['student'] = None
-        # Get all students
-        students = Student.get_all_students()
         return render_template("admin/admin.html", users=users, students=students)
     else:
         data = request.get_json()
         if data['cmd'] == "deleteUser":
             user_id = data['id']
-            if User.check_exist_with_id(user_id):
+            if user_id == current_user['db_user'].id:
+                flash("You cannot delete yourself!", 'danger')
+            elif User.check_exist_with_id(user_id):
                 User.get_user_by_id(user_id).delete()
+                flash("User Deleted!", 'success')
+        
+        elif data['cmd'] == "deleteStudent":
+            student_id = data['id']
+            if Student.get_student_by_id(student_id) is not None:
+                Student.get_student_by_id(student_id, return_dict=False).delete()
+                flash("Student Deleted!", 'success')
+        
         elif data['cmd'] == "addStudent":
             email = data['email']
             if not Student.check_student_email(email):
@@ -429,19 +449,43 @@ def admin():
                 Student(name=name, email=email, grade=grade, gender=gender)
                 flash("Student Added!", 'success')
             else:
-                flash("Student Email Exists!", 'danger')
-        # TODO: Creating New User
+                flash("Student NOT Added: Email Already Exists!", 'danger')
+        
+        # TODO: Create User
         elif data['cmd'] == "createUser":
             student_id = data['student_id']
+            email = data['email']
             if Student.get_student_by_id(student_id) is not None and not User.check_exist_with_email(email):
                 name = data['name']
+                verified = data['verified']
                 is_admin = data['admin']
                 is_teacher = data['teacher']
                 is_student = data['student']
+                student_id = data['student_id']
                 password = data['password']
-                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, password=password,verified=True)
+                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, student_id=student_id, email=email, password=password, is_verified=verified)
                 flash("User Created!", 'success')
-        return redirect("/admin")
+            else:
+                flash("User NOT Created: Login Email Already Exists!", 'danger')
+        
+        elif data['cmd'] == "updateStudent":
+            student = Student.get_student_by_id(data['id'], return_dict=False)
+            email_check = Student.check_student_email(data['email']) if "email" in data else True
+            if student is not None and email_check:
+                student.update(data)
+                flash("Student Updated!", 'success')
+            else:
+                flash("Student NOT Updated: Invalid Email!", 'danger')
+        # TODO: Update User
+        elif data['cmd'] == "updateUser":
+            id = data['id']
+            user = User.get_user_by_id(id)
+            if id == current_user['db_user'].id:
+                flash("User NOT Updated: You cannot update yourself!", 'danger')
+            elif user is not None:
+                user.update(data)
+                flash("User Updated!", 'success')
+        return render_template("admin/admin.html", users=users, students=students)
 
 
 # |--------------------------------------------------------------------------{ POST-Only Routes }---------------------------------------------------------------------------|
