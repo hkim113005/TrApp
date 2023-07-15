@@ -1,5 +1,7 @@
 # |-------------------------------------------------------------------------{ Imports & Variables }-------------------------------------------------------------------------|
 from flask import Flask, render_template, redirect, request, session, abort, flash, get_flashed_messages
+from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 from functools import wraps
 
 # Stores current user and student
@@ -11,13 +13,16 @@ app = Flask(__name__)
 # Set configs from config.py
 app.config.from_pyfile('config.py')
 
+# SQLAlchemy and Mail
+db = SQLAlchemy(app)
+mail = Mail(app)
+
 # Imports Very Important Classes
-from classes import DB, User, Trip, Student, TripStudent, StudentPreference
+from classes import Setup, User, Trip, Student, TripStudent, StudentPreference
 
 # Initializes Databse Tables, Users, and Test Trips
 # (Find a better way to do this when hosting)
-if not DB.initialized:
-    DB.init_database()
+Setup.init_database()
 
 
 # |------------------------------------------------------------------------{ Permission Decorators }------------------------------------------------------------------------|
@@ -135,7 +140,6 @@ def signup():
             student_name = Student.get_student_by_email(email)['name']
             # Create User, login, and send signup/verification email
             new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=password)
-            new_user.create()
             new_user.login()
             new_user.send_signup_email()
             # Redirect to "/trips" or "/student"
@@ -160,7 +164,7 @@ def verify():
 
     # Verification time expired
     if user.verify_time_expired():
-        error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one.", 'danger'
+        error = "Your verification code has expired. Please click \"Redo Verification\" to generate a new one."
         time = 0
     else:
         time = user.get_remaining_time()
@@ -463,7 +467,7 @@ def admin():
                 is_student = data['student']
                 student_id = data['student_id']
                 password = data['password']
-                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, student_id=student_id, email=email, password=password, is_verified=verified)
+                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, student_id=student_id, email=email, is_verified=verified, password=password)
                 flash("User Created!", 'success')
             else:
                 flash("User NOT Created: Login Email Already Exists!", 'danger')

@@ -633,8 +633,8 @@
     }
 
 	function checkUserForm() {
-		var roleSelected = (document.getElementById("add_user_is_admin").checked || document.getElementById("add_user_is_teacher").checked)
 		var isStudent = document.getElementById("add_user_is_student").checked;
+		var roleSelected = document.getElementById("add_user_is_admin").checked || document.getElementById("add_user_is_teacher").checked || isStudent;
 		var validStudent = (isStudent) ? document.getElementById("add_user_student_id").value : true;
         var nameCheck = document.getElementById("add_user_name").value.length > 0;
 		var emailCheck = document.getElementById("add_user_email").value.length > 0;

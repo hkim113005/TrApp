@@ -140,15 +140,15 @@
         id: parseInt(`{{student.id}}`)
     };
     function saveStudentInfo() {
-        let updatePost = $.ajax({
-                type: "POST",
-                url: "/student",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: "json",
-                complete: (e) => {
-                    window.location.reload();
-                }
+        $.ajax({
+            type: "POST",
+            url: "/student",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.reload();
+            }
         });
     }
     
@@ -179,10 +179,10 @@
             nameLabel.innerHTML = "Full Name";
         }
         if (emailChanged) {
-            updateStudentData.email = currentEmail;
+            data.email = currentEmail;
             emailLabel.innerHTML = "*ACS Email";
         } else {
-            delete updateStudentData.email;
+            delete data.email;
             emailLabel.innerHTML = "ACS Email";
         }
         if (gradeChanged) {

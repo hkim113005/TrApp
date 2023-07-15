@@ -2,10 +2,9 @@ import random
 import csv
 from datetime import datetime, timedelta
 from flask import render_template, session
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_mail import Mail, Message
-from app import app, current_user
+from flask_mail import Message
+from app import db, mail, app, current_user
 
 # Admin Login Credentials
 ADMIN = {
@@ -19,71 +18,9 @@ TEACHER = {
     "password": "ACSTeachers2023"
 }
 
-# SQLAlchemy and Mail
-db = SQLAlchemy(app)
-mail = Mail(app)
-
 # Converts SQL databse row into a standard python dictionary
 def dict_converter(row):
     return {column.name: getattr(row, row.__mapper__.get_property_by_column(column).key) for column in row.__table__.columns}
-
-# Initializes databases and adds test trips
-class DB:
-    STUDENT_CSV = "data/students.csv"
-    initialized = False
-
-    @staticmethod
-    def init_database():
-        if DB.initialized:
-            return
-        print("Initialization Started")
-        with app.app_context():
-            table_names = [User.__tablename__, Student.__tablename__, Trip.__tablename__, StudentPreference.__tablename__, TripStudent.__tablename__]
-            tables = db.inspect(db.engine).get_table_names()
-            if (set(table_names) - set(tables)):
-                print("Creating All Databse Tables")
-                db.create_all()
-            if "students" not in tables:
-                file = open(DB.STUDENT_CSV, "r")
-                data = list(csv.DictReader(file, delimiter=","))
-                file.close()
-                Student(id=0, name="Test Student", email="tsu@acs.sch.ae", grade=12, gender="M")
-                for s in data:
-                    Student(name=s['name'], email=s['email'], grade=s['grade'], gender=s['gender'])
-                print("Added Students to Database")
-            if not User.check_exist_with_id(0):
-                admin = User(id=0, is_admin=True, is_teacher=True, is_student=True, name="TSU Admin", verified=True, student_id=0, email=ADMIN['email'], password=ADMIN['password'])
-                admin.create()
-                print("Added Admin to Database")
-            if not User.check_exist_with_id(1):
-                teacher = User(id=1, is_teacher=True, verified=True, name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
-                teacher.create()
-                print("Added Teacher to Database")
-            if not db.session.query(Trip).first():
-                DB.create_test_trips()
-        DB.initialized = True
-        print("Initialization Complete")
-    
-    def create_test_trips():
-        with app.app_context():
-            Trip(name="WWW 2023: Grade 6 (Greece)", organizer="MS", num_groups=4, group_size=2, details="blah blah blah", students=[1, 2, 3, 4])
-            Trip(name="Viper Venture 2023: Thailand", organizer="HS", num_groups=5, group_size=3, details="idk lol", students=[260, 261, 262])
-            Trip(code="TEST11", name="JV Boys Volleyball", organizer="MESAC", num_groups=7, group_size=2, details="eeeeeee", students=[0, 148, 100, 123, 90, 7,21, 150, 230, 190, 72, 110])
-            t = Trip(name="Varsity Boys Soccer", organizer="MESAC", num_groups=9, group_size=3, details="aaaaa", students=[21, 150, 230])
-            Trip(name="HS Track & Field", organizer="MESAC", num_groups=3, group_size=3, details="yyyyyy", students=[273, 220])
-            Trip(name="HS Tennis", organizer="MESAC", num_groups=5, group_size=2, details="xxxxxxx", students=[288, 270, 242, 276])
-            Trip(name="HS Wrestling", organizer="MESAC", num_groups=6, group_size=2, details="wwwwww", students=[204])
-            Trip(code="TEST22", name="Test Trip", organizer="Tester", num_groups=3, group_size=2, details="aaaaa", students=[0, 642, 631, 604, 573, 641])
-            t.update({
-                "name": "Varsity Boys Soccer", 
-                "organizer": "MESAC", 
-                "num_groups": 9, 
-                "group_size": 3, 
-                "details": "updated soccer", 
-                "students": [21, 150, 230, 190, 72, 110, 289, 280]
-            })
-            print("Created Test Trips")
-            print([dict_converter(t) for t in Trip.get_all_trips()])
 
 #  User Database Model - Handles user signup, verification, and login
 class User (db.Model):
@@ -97,30 +34,25 @@ class User (db.Model):
     is_student = db.Column(db.Boolean, nullable=False, default=False)
     name = db.Column(db.String, nullable=False)
     student_id = db.Column(db.Integer, nullable=True)
-    date_created = db.Column(db.DateTime, nullable=False)
-    email = db.Column(db.String, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.now().replace(microsecond=0))
+    email = db.Column(db.String, nullable=False, unique=True)
     is_verified = db.Column(db.Boolean, nullable=False, default=False)
-    verify_attempts = db.Column(db.Integer, nullable=True, default=0)
+    verify_attempts = db.Column(db.Integer, nullable=False, default=0)
     verify_code = db.Column(db.String(6), nullable=True)
-    date_last_verify = db.Column(db.DateTime, nullable=True)
+    date_last_verify = db.Column(db.DateTime, nullable=True, default=datetime.now().replace(microsecond=0))
     hashed_password = db.Column(db.String, nullable=False)
     
-    def __init__(self, password, verified=False,**kwargs):
+    def __init__(self, password, **kwargs):
         super(User, self).__init__(**kwargs)
-        self.date_created = datetime.now().replace(microsecond=0)
         self.hashed_password = generate_password_hash(password, method="scrypt")
-        self.verify_code = self.regenerate_verify_code()
-        if verified:
-            self.is_verified = verified;
-        if not self.is_verified:
-            self.verify_code = User.get_new_code()
-    
-    def sync(self):
-        db.session.merge(self)
-        db.session.commit()
-        
+        self.regenerate_verify_code()
+        self.create()
+
     def create(self):
         db.session.add(self)
+        db.session.commit()
+    
+    def sync(self):
         db.session.commit()
     
     def delete(self):
@@ -318,8 +250,8 @@ class Student(db.Model):
             self.update_gender(data['gender'])
 
     @staticmethod
-    def get_student_by_id(id, return_dict=True):
-        student = db.session.query(Student).filter_by(id=id).first()
+    def get_student_by_id(student_id, return_dict=True):
+        student = db.session.query(Student).filter_by(id=student_id).first()
         if not return_dict or student is None:
             return student
         else:
@@ -375,6 +307,9 @@ class Trip(db.Model):
     def delete(self):
         for student in TripStudent.get_students_in_trip(self.id):
             TripStudent.remove_student_from_trip(self.id, student['id'])
+            sp = StudentPreference.get_preferences(self.id, student['id'])
+            if sp:
+                sp.delete()
         db.session.delete(self)
         db.session.commit()
     
@@ -580,7 +515,8 @@ class TripStudent(db.Model):
     def get_students_in_trip(trip_id):
         ids = db.session.query(TripStudent.student_id).filter_by(trip_id=trip_id).all()
         ids = [id[0] for id in ids]
-        students = sorted([Student.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
+        students = [Student.get_student_by_id(id) for id in ids]
+        students = sorted(students, key=lambda x: (x['grade'], x['name']))
         return students
     
     @staticmethod
@@ -616,6 +552,78 @@ class TripStudent(db.Model):
         ids = [id[0] for id in ids]
         return sorted([Student.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
     
+# TrApp Setup - Initializes databases and adds test trips
+class Setup:
+    STUDENT_CSV = "data/students.csv"
+    TABLE_NAMES = [User.__tablename__, Student.__tablename__, Trip.__tablename__, StudentPreference.__tablename__, TripStudent.__tablename__]
+    initialized = False
+
+    @staticmethod
+    def init_database():
+        print("|-------------[TrApp Setup Start]-------------|")
+        tables_exist = students_exist = admin_exists = teacher_exists = trips_exist = True
+        with app.app_context():
+            while True:
+                tables = db.inspect(db.engine).get_table_names()
+                tables_exist = len(set(Setup.TABLE_NAMES) - set(tables)) == 0
+                
+                if not tables_exist:
+                    db.create_all()
+                    print("|-> Created All Databse Tables")
+                else:
+                    students_exist = len(Student.get_all_students()) > 0
+                    admin_exists = User.check_exist_with_email(ADMIN['email'])
+                    teacher_exists = User.check_exist_with_email(TEACHER['email'])
+                    trips_exist = len(db.session.query(Trip).all()) == 8
+                    if not students_exist:
+                        file = open(Setup.STUDENT_CSV, "r")
+                        data = list(csv.DictReader(file, delimiter=","))
+                        file.close()
+                        Student(id=0, name="Test Student", email="tsu@acs.sch.ae", grade=12, gender="M")
+                        for s in data:
+                            Student(name=s['name'], email=s['email'], grade=s['grade'], gender=s['gender'])
+                        print("|-> Added Students to Database")
+                    else:
+                        if not trips_exist:
+                            Setup.create_test_trips()
+                        if not admin_exists:
+                            User(is_admin=True, is_teacher=True, is_student=True, name="TSU Admin", is_verified=True, student_id=0, email=ADMIN['email'], password=ADMIN['password'])
+                            print("|-> Added Admin to Database")
+                        if not teacher_exists:
+                            User(is_teacher=True, is_verified=True, name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
+                            print("|-> Added Teacher to Database")
+                        if trips_exist and admin_exists and teacher_exists:
+                            break
+
+        print("|----------------[Setup Check]----------------|")
+        print(f"|---> {tables_exist} | Tables Exist")
+        print(f"|---> {students_exist} | Students Exist")
+        print(f"|---> {admin_exists} | Admin User Exists")
+        print(f"|---> {teacher_exists} | Teacher User Exists")
+        print(f"|---> {trips_exist} | Test Trips Exist")
+        print("|--------------[TrApp Setup End]--------------|")
+    
+    def create_test_trips():
+        with app.app_context():
+            Trip(name="WWW 2023: Grade 6 (Greece)", organizer="MS", num_groups=4, group_size=2, details="blah blah blah", students=[1, 2, 3, 4])
+            Trip(name="Viper Venture 2023: Thailand", organizer="HS", num_groups=5, group_size=3, details="idk lol", students=[260, 261, 262])
+            Trip(code="TEST11", name="JV Boys Volleyball", organizer="MESAC", num_groups=7, group_size=2, details="eeeeeee", students=[0, 148, 100, 123, 90, 7,21, 150, 230, 190, 72, 110])
+            t = Trip(name="Varsity Boys Soccer", organizer="MESAC", num_groups=9, group_size=3, details="aaaaa", students=[21, 150, 230])
+            Trip(name="HS Track & Field", organizer="MESAC", num_groups=3, group_size=3, details="yyyyyy", students=[273, 220])
+            Trip(name="HS Tennis", organizer="MESAC", num_groups=5, group_size=2, details="xxxxxxx", students=[288, 270, 242, 276])
+            Trip(name="HS Wrestling", organizer="MESAC", num_groups=6, group_size=2, details="wwwwww", students=[204])
+            Trip(code="TEST22", name="Test Trip", organizer="Tester", num_groups=3, group_size=2, details="aaaaa", students=[0, 642, 631, 604, 573, 641])
+            t.update({
+                "name": "Varsity Boys Soccer", 
+                "organizer": "MESAC", 
+                "num_groups": 9, 
+                "group_size": 3, 
+                "details": "updated soccer", 
+                "students": [21, 150, 230, 190, 72, 110, 289, 280]
+            })
+            print("|-> Created Test Trips")
+            #print([dict_converter(t) for t in Trip.get_all_trips()])
+
 # Group Class - Unused (idk why this is here), to be used in the future I guess
 class Group:
     members = []
