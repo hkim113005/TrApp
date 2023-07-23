@@ -1,24 +1,58 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Trips
+Teacher
 {% endblock %}
 
 {% block main %}
-<input type="text" class="mt-5 mx-auto form-control fontAwesome" id="trip_search" oninput="searchTrips()" placeholder="&#xF002; Search Trips">
-<table class="table table-sm table-hover mt-3 mx-auto" id="trips_table">
+<label class="d-grid form-label mt-3 mx-auto">Teacher Information:</label>
+
+<label class="d-grid info-label mt-3 mx-auto">Photo</label> 
+<div class="image-container mx-auto">
+    <img src="{{teacher.photoUrl}}" alt="Teacher Photo">
+</div>
+
+<label class="d-grid info-label mt-3 mx-auto">Full Name</label> 
+<text class="d-grid mx-auto">{{teacher.name}}</text>
+
+{% if info.login_email != teacher.email %}
+    <label class="d-grid info-label mt-3 mx-auto">Login Email</label> 
+    <text class="d-grid mx-auto">{{info.login_email}}</text>
+{% endif %}
+<label class="d-grid info-label mt-3 mx-auto">ACS Teacher Email</label> 
+<text class="d-grid mx-auto">{{teacher.email}}</text>
+
+<label class="d-grid info-label mt-3 mx-auto">Title</label> 
+<text class="d-grid mx-auto">{{teacher.title}}</text>
+
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacher_edit_information">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-pen"></i>
+        <span>Edit Information</span>
+    </div>
+</button>
+
+<label class="d-grid info-label mt-5 mx-auto">Your Trips</label>
+{% if main_teacher %} 
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="trip_search" oninput="searchTrips()" placeholder="&#xF002; Search Trips">
+{% endif %}
+<table class="table table-sm {{'table-users' if main_teacher else ''}} table-hover mt-2 mx-auto" id="trips_table">
     <thead>
         <tr>
-            <th style="width: 60%;" scope="col">Trip Name</th>
-            <th class="text-center" scope="col">By</th>
+            <th style="width: 100%;" scope="col">Trip Name</th>
+            {% if not main_teacher %}
+                <th class="text-center" tyle="width: 100%;" scope="col">By</th>
+            {% endif %}
             <th class="text-center" scope="col">Status</th>
         </tr>
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(all_trips|length)%}
-        <tr onclick="window.location = 'trips/{{all_trips[i].code}}'">
+        <tr onclick="window.location = 'teacher/{{all_trips[i].code}}'">
             <td>{{all_trips[i].name}}</td>
-            <td class="text-center">{{all_trips[i].organizer}}</td>
+            {% if not main_teacher %}
+                <td class="text-center">{{all_trips[i].organizer}}</td>
+            {% endif %}
             <td class="text-center">{{trip_studs[i]|length}}/{{all_trips[i].num_groups * all_trips[i].group_size}}</td>
         </tr>
         {%endfor%}
@@ -86,7 +120,117 @@ Trips
     </div>
 </div>
 
+<div class="modal fade" id="teacher_edit_information" tabindex="-1" aria-labelledby="teacher_edit_information_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <label class="d-grid form-label mx-auto">Edit Information</label>
+
+                    <label id="name_label" class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="teacher_name" value="{{teacher.name}}" placeholder="Full Name" oninput="checkInfo()">
+
+                    <label id="email_label" class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="teacher_email" oninput="checkInfo()" value="{{teacher.email}}">
+
+                    <label id="title_label" class="d-grid info-label mt-3 mx-auto">Job Title</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="teacher_title" oninput="checkInfo()" value="{{teacher.title}}">
+
+                    <text class="d-grid mx-auto">* = Unsaved Changes!</text>
+                    <button onclick="saveTeacherInfo()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_teacher_info">
+                        <div class="icon-text-container center-div">
+                            <i class="fas fa-floppy-disk"></i>
+                            <span>Save Changes</span>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="more_info" tabindex="-1" aria-labelledby="more_info_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+				<label id="user_info_title" class="d-grid form-label mx-auto">Additional Information</label>
+
+				<label class="d-grid info-label mt-3 mx-auto">Name (User)</label>
+				<text id="user_info_name" class="d-grid mx-auto">{{info.user_name}}</text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Created</label>
+				<text id="user_info_date_create" class="d-grid mx-auto">{{info.date_created}}</text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Verified</label>
+				<text id="user_info_verified" class="d-grid mx-auto">{{info.date_verified}}</text>
+
+                <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="">
+                    <div class="icon-text-container center-div">
+                        <i class="fas fa-lock"></i>
+                        <span>Change Password</span>
+                    </div>
+                </button>
+			</div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let data = {
+        cmd: "updateTeacher",
+        id: parseInt(`{{teacher.id}}`)
+    };
+    function saveTeacherInfo() {
+        $.ajax({
+            type: "POST",
+            url: window.location.href,
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.reload();
+            }
+        });
+    }
+    
+    function checkInfo() {
+        let nameLabel = document.getElementById("name_label");
+        let emailLabel = document.getElementById("email_label");
+        let titleLabel = document.getElementById("title_label");
+        
+        let currentName = document.getElementById("teacher_name").value;
+        let currentEmail = document.getElementById("teacher_email").value;
+        let currentTitle = document.getElementById("teacher_title").value;
+
+        let nameChanged = currentName != `{{teacher.name}}`;
+        let emailChanged = currentEmail != `{{teacher.email}}`;
+        let titleChanged = currentTitle != `{{teacher.title}}`;
+        
+        if (nameChanged) {
+            data.name = currentName;
+            nameLabel.innerHTML = "*Full Name";
+        } else {
+            delete data.name;
+            nameLabel.innerHTML = "Full Name";
+        }
+        if (emailChanged) {
+            data.email = currentEmail;
+            emailLabel.innerHTML = "*ACS Email";
+        } else {
+            delete data.email;
+            emailLabel.innerHTML = "ACS Email";
+        }
+        if (titleChanged) {
+            data.title = currentTitle;
+            titleLabel.innerHTML = "*Job Title";
+        } else {
+            delete data.title;
+            titleLabel.innerHTML = "Job Title";
+        }
+        document.getElementById('save_teacher_info').disabled = !(nameChanged || emailChanged || titleChanged);
+    }
+
     function searchTrips() {
         // Declare variables
         var input, filter, table, tr, td, i, txtValue;
@@ -137,7 +281,7 @@ Trips
         document.getElementById("create_button").addEventListener("click", () => {
             $.ajax({
                 type: "POST",
-                url: "/trips",
+                url: window.location.href,
                 data: JSON.stringify({
                     cmd: "createTrip",
                     name: document.getElementById("create_name").value,

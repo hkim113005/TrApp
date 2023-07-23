@@ -5,7 +5,7 @@ from flask_mail import Mail
 from functools import wraps
 
 # Stores current user and student
-current_user = { "db_user": None, "student": None }
+current_user = { "db_user": None, "teacher": None, "student": None }
 
 # Create Flask App
 app = Flask(__name__)
@@ -18,7 +18,7 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 
 # Imports Very Important Classes
-from classes import Setup, User, Trip, Student, TripStudent, StudentPreference
+from classes import Setup, User, Trip, Student, Teacher, TripStudent, StudentPreference
 
 # Initializes Databse Tables, Users, and Test Trips
 # (Find a better way to do this when hosting)
@@ -34,7 +34,8 @@ def login_required(disable_verify=False):
             if 'user_id' not in session or current_user['db_user'] is None:
                 return redirect("/login")
             elif not disable_verify and current_user['db_user'] is not None and not current_user['db_user'].is_verified:
-                return redirect("/verify")
+                if not current_user['db_user'].is_resetting:
+                    return redirect("/verify")
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -59,6 +60,15 @@ def teacher_only(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Decorator for teacher-only routes
+def student_only(f):
+    @wraps(f)
+    @login_required()
+    def decorated_function(*args, **kwargs):
+        if not current_user['db_user'].is_student:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 # |------------------------------------------------------------------------{ Main Flask App Routes }------------------------------------------------------------------------|
 # Triggered before every request, updates 'current_user' using session id
@@ -67,6 +77,8 @@ def before_request():
     if 'user_id' in session:
         if User.check_exist_with_id(session['user_id']):
             current_user['db_user'] = User.get_user_by_id(session['user_id'])
+            if current_user['db_user'].is_teacher:
+                current_user['teacher'] = Teacher.get_teacher_by_id(current_user['db_user'].teacher_id)
             if current_user['db_user'].is_student:
                 current_user['student'] = Student.get_student_by_id(current_user['db_user'].student_id)
 
@@ -133,18 +145,25 @@ def signup():
             flash("Your passwords must match! Please repeat your password.", 'danger')
 
         # If email exists in ACS student database
-        elif Student.check_student_email(email):
+        elif Student.check_student_email(email) or Teacher.check_teacher_email(email):
+            is_student = Student.check_student_email(email)
+            is_teacher = Teacher.check_teacher_email(email)
+            teacher_id = student_id = None
             # Get existing user info
-            user = Student.get_student_by_email(email)
-            student_id = user['id']
+            if is_student:
+                user = Student.get_student_by_email(email)
+                student_id = user['id']
+            if is_teacher:
+                user = Teacher.get_teacher_by_email(email)
+                teacher_id = user['id']
             student_name = Student.get_student_by_email(email)['name']
             # Create User, login, and send signup/verification email
-            new_user = User(is_student=True, student_id=student_id, name=student_name, email=email, password=password)
+            new_user = User(is_student=is_student, student_id=student_id, is_teacher=is_teacher, teacher_id=teacher_id, name=student_name, email=email, password=password)
             new_user.login()
             new_user.send_signup_email()
             # Redirect to "/trips" or "/student"
             if current_user['db_user'].is_teacher:
-                return redirect("/trips")
+                return redirect("/teacher")
             else:
                 return redirect("/student")
         # Email doesn't exist in student databse
@@ -184,7 +203,8 @@ def verify():
         # Check verification form, verify if correct
         if user.check_verify_code(verify_code):
             if not error:
-                user.verify()
+                initial = not user.is_resetting
+                user.verify(initial=initial)
                 flash("Email Verified Successfully!", 'success')
                 return redirect("/")
         else:
@@ -219,7 +239,7 @@ def login():
                 if current_user['db_user'].is_admin:
                     return redirect("/admin")
                 if current_user['db_user'].is_teacher:
-                    return redirect("/trips")
+                    return redirect("/teacher")
                 if current_user['db_user'].is_student:
                     return redirect("/student")
             # Wrong password
@@ -248,6 +268,8 @@ def logout():
             current_user['db_user'] = None
         if current_user['student'] is not None:
             current_user['student'] = None
+        if current_user['teacher'] is not None:
+            current_user['teacher'] = None
         flash("Logged out successfully", 'success')
     return redirect("/")
     #return render_template("auth/logout.html")
@@ -255,7 +277,7 @@ def logout():
 # Student Dashboard
 # TODO: Reset Password Feature
 @app.route("/student", methods=["GET", "POST"])
-@login_required()
+@student_only
 def student():
     student = current_user['student']
     if request.method == "GET":
@@ -272,19 +294,19 @@ def student():
             "is_teacher": user.is_teacher,
             "is_admin": user.is_admin, 
             "date_created": user.date_created, 
-            "date_verified": user.date_last_verify
+            "date_verified": user.date_verified
         }
         return render_template("student/student.html", student=student, student_trips=student_trips, trip_studs=trip_studs, info=info)
     else:
         data = request.get_json()
         if data['cmd'] == "updateStudent":
-            student = Student.get_student_by_id(student['id'], return_dict=False).update(data)
-            flash("Student information Updated!", 'success')
+            Student.get_student_by_id(student['id'], return_dict=False).update(data)
+            flash("Student Information Updated!", 'success')
         return redirect("/student")
 
 # Student Preferences Form
 @app.route("/student/<trip_code>", methods=["GET", "POST"])
-@login_required()
+@student_only
 def student_preferences(trip_code):
     global current_user
     student = current_user['student']
@@ -336,16 +358,31 @@ def student_preferences(trip_code):
         return render_template("student/prefs-submitted.html", trip_code=trip_code)
     
 # All Trips Page
-@app.route("/trips", methods=["GET", "POST"])
+@app.route("/teacher", methods=["GET", "POST"])
 @teacher_only
 def trips():
-    if request.method == "GET":
-        # Gets all trips and students
+    # Gets teacher and user info
+    teacher = current_user['teacher']
+    main_teacher = False
+    user = current_user['db_user']
+    info = {
+        "user_name": user.name, 
+        "login_email": user.email, 
+        "is_student": user.is_student,
+        "is_teacher": user.is_teacher,
+        "is_admin": user.is_admin, 
+        "date_created": user.date_created, 
+        "date_verified": user.date_verified
+    }
+
+    # Gets all trips and students
+    all_trips = Trip.get_trips_by_teacher_id(teacher['id'])
+    if Teacher.check_main(teacher['email']):
+        main_teacher = True
         all_trips = Trip.get_all_trips()
-        trip_studs = [TripStudent.get_students_in_trip(t.id) for t in all_trips]
-        all_students = Student.get_all_students()
-        return render_template("teacher/trips.html", all_trips=all_trips, trip_studs=trip_studs, all_students=all_students)
-    else:
+    trip_studs = [TripStudent.get_students_in_trip(t.id) for t in all_trips]
+    all_students = Student.get_all_students()
+    if request.method == "POST":
         data = request.get_json()
         if data['cmd'] == "createTrip":
             name = data['name']
@@ -353,15 +390,23 @@ def trips():
             students = data['students']
             num_groups = data['num_groups']
             group_size = data['group_size']
+            teacher_id = teacher['id']
             print(data)
-            Trip(name=name,organizer=organizer, num_groups=num_groups, group_size=group_size, students=students)
+            Trip(name=name, organizer=organizer, teacher_id=teacher_id, num_groups=num_groups, group_size=group_size, students=students)
             flash("New Trip Created!", 'success')
-            return redirect("/trips")
+        elif data['cmd'] == "updateTeacher":
+            if 'email' in data and not Teacher.check_teacher_email(data['email']):
+                flash("Teacher NOT Updated: Invalid Email!", 'danger')
+            else:
+                Teacher.get_teacher_by_id(teacher['id'], return_dict=False).update(data)
+                flash("Teacher Information Updated!", 'success')
+    return render_template("teacher/teacher.html", main_teacher=main_teacher, teacher=teacher, all_trips=all_trips, trip_studs=trip_studs, all_students=all_students, info=info)
 
 # Speciic Trip Page
-@app.route("/trips/<trip_code>", methods=["GET", "POST"])
+@app.route("/teacher/<trip_code>", methods=["GET", "POST"])
 @teacher_only
 def trip(trip_code):
+    main_teacher = Teacher.check_main(current_user['teacher']['email'])
     if request.method == "GET":
         sel_trip = Trip.get_trip_by_code(trip_code, return_dict=True)
 
@@ -374,7 +419,7 @@ def trip(trip_code):
             # Fill up student_prefs with whether the student has submitted their preferences
             for s in sel_students:
                 student_prefs[s['id']] = StudentPreference.check_student_preferences(sel_trip['id'], s['id'])
-            return render_template("teacher/trip.html", trip_code=trip_code, sel_trip=sel_trip, sel_students=sel_students, student_prefs=student_prefs, all_students=all_students)
+            return render_template("teacher/trip.html", main_teacher=main_teacher, trip_code=trip_code, sel_trip=sel_trip, sel_students=sel_students, student_prefs=student_prefs, all_students=all_students)
         else:
             return render_template("error/invalid-trip.html")
     else:
@@ -386,11 +431,11 @@ def trip(trip_code):
         elif data['cmd'] == "deleteTrip":
             Trip.get_trip_by_code(trip_code).delete()
             flash("Trip Deleted!.", 'success')
-            return redirect("/trips")
-        return redirect(f"/trips/{trip_code}")
+            return redirect("/teacher")
+        return redirect(f"/teacher/{trip_code}")
 
 # Groups Page for Trip
-@app.route("/trips/<trip_code>/groups", methods=["GET", "POST"])
+@app.route("/teacher/<trip_code>/groups", methods=["GET", "POST"])
 @teacher_only
 def groups(trip_code):
     sel_trip = Trip.get_trip_by_code(trip_code)
@@ -409,40 +454,92 @@ def groups(trip_code):
         if data['cmd'] == "generateGroups":
             sel_trip.generate_groups()
             flash("Groups Generated!.", 'success')
-        return redirect(f"/trips/{trip_code}/groups")
+        return redirect(f"/teacher/{trip_code}/groups")
 
-# TODO: Turn this into a page with subpages? (admin/users, admin/students, etc)
+
 @app.route("/admin", methods=["GET", "POST"])
 @admin_only
 def admin():
+    return render_template("/admin/admin.html")
+    
+@app.route("/admin/users", methods=["GET", "POST"])
+@admin_only
+def admin_users():
     get_flashed_messages()
     # Get all users
     users = User.get_all_users(return_dict=True)
     # Set student for each user
     for u in users:
+        u['student'] = u['teacher'] = None
         if u['student_id'] is not None:
             u['student'] = Student.get_student_by_id(u['student_id'])
-        else:
-            u['student'] = None
+        if u['teacher_id'] is not None:
+            u['teacher'] = Teacher.get_teacher_by_id(u['teacher_id'])
+
+    # Get all teachers
+    teachers = Teacher.get_all_teachers(return_dict=True)
+    
     # Get all students
     students = Student.get_all_students(return_dict=True)
-    if request.method == "GET":
-        return render_template("admin/admin.html", users=users, students=students)
-    else:
+    if request.method == "POST":
         data = request.get_json()
-        if data['cmd'] == "deleteUser":
+
+        if data['cmd'] == "updateUser":
+            id = data['id']
+            user = User.get_user_by_id(id)
+            if 'email' in data and User.check_exist_with_email(data['email']):
+                flash("User NOT Updated: Login Email Already Exists!", 'danger')
+            elif id == current_user['db_user'].id:
+                flash("User NOT Updated: You cannot update yourself!", 'danger')
+            elif user is not None:
+                user.update(data)
+                flash("User Updated!", 'success')
+       
+        elif data['cmd'] == "createUser":
+            email = data['email']
+            student_id = data['student_id'] if 'student_id' in data else None
+            teacher_id = data['teacher_id'] if 'teacher_id' in data else None
+            if User.check_exist_with_email(email):
+                flash("User NOT Created: Login Email Already Exists!", 'danger')
+            elif student_id is not None and Student.get_student_by_id(student_id) is None:
+                flash("User NOT Created: Invalid Student ID!", 'danger')
+            elif teacher_id is not None and Teacher.get_teacher_by_id(teacher_id) is None:
+                flash("User NOT Created: Invalid Teacher ID!", 'danger')
+            else:
+                name = data['name']
+                verified = data['verified']
+                is_admin = data['admin']
+                is_teacher = data['teacher']
+                is_student = data['student']
+                password = data['password']
+                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, student_id=student_id, teacher_id=teacher_id, email=email, is_verified=verified, password=password)
+                flash("User Created!", 'success')
+        
+        elif data['cmd'] == "deleteUser":
             user_id = data['id']
             if user_id == current_user['db_user'].id:
                 flash("You cannot delete yourself!", 'danger')
             elif User.check_exist_with_id(user_id):
                 User.get_user_by_id(user_id).delete()
                 flash("User Deleted!", 'success')
-        
-        elif data['cmd'] == "deleteStudent":
-            student_id = data['id']
-            if Student.get_student_by_id(student_id) is not None:
-                Student.get_student_by_id(student_id, return_dict=False).delete()
-                flash("Student Deleted!", 'success')
+
+    return render_template("admin/users.html", users=users, teachers=teachers, students=students)
+
+@app.route("/admin/students", methods=["GET", "POST"])
+@admin_only
+def admin_students():
+    # Get all students
+    students = Student.get_all_students(return_dict=True)
+    if request.method == "POST":
+        data = request.get_json()
+        if data['cmd'] == "updateStudent":
+            student = Student.get_student_by_id(data['id'], return_dict=False)
+            email_check = Student.check_student_email(data['email']) if "email" in data else True
+            if student is not None and email_check:
+                student.update(data)
+                flash("Student Updated!", 'success')
+            else:
+                flash("Student NOT Updated: Invalid Email!", 'danger')
         
         elif data['cmd'] == "addStudent":
             email = data['email']
@@ -453,44 +550,49 @@ def admin():
                 Student(name=name, email=email, grade=grade, gender=gender)
                 flash("Student Added!", 'success')
             else:
-                flash("Student NOT Added: Email Already Exists!", 'danger')
-        
-        # TODO: Create User
-        elif data['cmd'] == "createUser":
-            student_id = data['student_id']
-            email = data['email']
-            if Student.get_student_by_id(student_id) is not None and not User.check_exist_with_email(email):
-                name = data['name']
-                verified = data['verified']
-                is_admin = data['admin']
-                is_teacher = data['teacher']
-                is_student = data['student']
-                student_id = data['student_id']
-                password = data['password']
-                User(name=name, is_admin=is_admin, is_teacher=is_teacher, is_student=is_student, student_id=student_id, email=email, is_verified=verified, password=password)
-                flash("User Created!", 'success')
-            else:
-                flash("User NOT Created: Login Email Already Exists!", 'danger')
-        
-        elif data['cmd'] == "updateStudent":
-            student = Student.get_student_by_id(data['id'], return_dict=False)
-            email_check = Student.check_student_email(data['email']) if "email" in data else True
-            if student is not None and email_check:
-                student.update(data)
-                flash("Student Updated!", 'success')
-            else:
-                flash("Student NOT Updated: Invalid Email!", 'danger')
-        # TODO: Update User
-        elif data['cmd'] == "updateUser":
-            id = data['id']
-            user = User.get_user_by_id(id)
-            if id == current_user['db_user'].id:
-                flash("User NOT Updated: You cannot update yourself!", 'danger')
-            elif user is not None:
-                user.update(data)
-                flash("User Updated!", 'success')
-        return render_template("admin/admin.html", users=users, students=students)
+                flash("Student NOT Added: Email Already Exists!", 'danger') 
 
+        elif data['cmd'] == "deleteStudent":
+            student_id = data['id']
+            if Student.get_student_by_id(student_id) is not None:
+                Student.get_student_by_id(student_id, return_dict=False).delete()
+                flash("Student Deleted!", 'success')
+    return render_template("admin/students.html", students=students)
+
+@app.route("/admin/teachers", methods=["GET", "POST"])
+@admin_only
+def admin_teachers():
+    # Get all students
+    teachers = Teacher.get_all_teachers(return_dict=True)
+    if request.method == "POST":
+        data = request.get_json()
+        if data['cmd'] == "updateTeacher":
+            teacher = Teacher.get_teacher_by_id(data['id'], return_dict=False)
+            email_check = Teacher.check_teacher_email(data['email']) if "email" in data else True
+            if teacher is not None and email_check:
+                teacher.update(data)
+                flash("Teacher Updated!", 'success')
+            else:
+                flash("Teacher NOT Updated: Invalid Email!", 'danger')
+        
+        elif data['cmd'] == "addTeacher":
+            email = data['email']
+            if not Teacher.check_teacher_email(email):
+                name = data['name']
+                email = data['email']
+                title = data['title']
+                photoUrl = data['photoUrl'] if 'photoUrl' in data else None
+                Teacher(name=name, email=email, title=title, photoUrl=photoUrl)
+                flash("Teacher Added!", 'success')
+            else:
+                flash("Teacher NOT Added: Email Already Exists!", 'danger') 
+
+        elif data['cmd'] == "deleteTeacher":
+            teacher_id = data['id']
+            if Teacher.get_teacher_by_id(teacher_id) is not None:
+                Teacher.get_teacher_by_id(teacher_id, return_dict=False).delete()
+                flash("Teacher Deleted!", 'success')
+    return render_template("admin/teachers.html", teachers=teachers)
 
 # |--------------------------------------------------------------------------{ POST-Only Routes }---------------------------------------------------------------------------|
 @app.route("/redo_verify", methods=["POST"])

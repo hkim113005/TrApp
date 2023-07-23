@@ -10,8 +10,10 @@
 <label class="d-grid info-label mt-3 mx-auto">Name</label> 
 <text class="d-grid mx-auto">{{sel_trip.name}}</text>
 
+{% if not main_teacher %}
 <label class="d-grid info-label mt-3 mx-auto">Organizer</label> 
 <text class="d-grid mx-auto">{{sel_trip.organizer}}</text>
+{% endif %}
 
 <label class="d-grid info-label mt-3 mx-auto">Groups</label> 
 <text class="d-grid mx-auto">{{sel_trip.num_groups}}</text>
@@ -37,8 +39,10 @@
                     <label id="name_label" class="d-grid info-label mt-3 mx-auto">Trip Name</label>
                     <input name="trip_name" id="trip_name" type="text" oninput="checkTripInfo()" class="mx-auto form-control" value="{{sel_trip.name}}" placeholder="Trip Name">
 
+                    {% if not main_teacher %}
                     <label id="organizer_label" class="d-grid info-label mt-3 mx-auto">Organizer</label>
                     <input name="trip_organizer" id="trip_organizer" type="text" oninput="checkTripInfo()" class="mx-auto form-control" value="{{sel_trip.organizer}}" placeholder="Organizer">
+                    {% endif %}
 
                     <label id="groups_label" class="d-grid info-label mt-3 mx-auto">Groups</label>
                     <input name="num_groups" id="num_groups" type="number" min="0" oninput="checkTripInfo()" class="mx-auto form-control" value={{sel_trip.num_groups}} placeholder="# of Groups">
@@ -98,7 +102,7 @@
     </div>
 </button>
 
-<a href="/trips" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+<a href="/teacher" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
     <div class="icon-text-container center-div">
         <i class="fas fa-arrow-left"></i>
         <span>Back To All Trips</span>
@@ -149,6 +153,7 @@
 </div>
 
 <script>
+    let mainTeacher = `{{main_teacher}}` == 'True';
     function postData(data) {
         $.ajax({
             type: "POST",
@@ -172,17 +177,14 @@
 
     function checkTripInfo() {
         let nameLabel = document.getElementById("name_label");
-        let organizerLabel = document.getElementById("organizer_label");
         let groupsLabel = document.getElementById("groups_label");
         let sizeLabel = document.getElementById("size_label");
 
         let currentName = document.getElementById("trip_name").value;
-        let currentOrganizer = document.getElementById("trip_organizer").value;
         let currentGroups = document.getElementById("num_groups").value;
         let currentSize = document.getElementById("group_size").value;
 
         let nameChanged = currentName != `{{sel_trip.name}}`;
-        let organizerChanged = currentOrganizer != `{{sel_trip.organizer}}`;
         let groupsChanged = currentGroups != parseInt(`{{sel_trip.num_groups}}`);
         let sizeChanged = currentSize != parseInt(`{{sel_trip.group_size}}`);
 
@@ -193,12 +195,17 @@
             delete data.name;
             nameLabel.innerHTML = "Trip Name";
         }
-        if (organizerChanged) {
-            data.organizer = currentOrganizer;
-            organizerLabel.innerHTML = "Organizer*";
-        } else {
-            delete data.organizer;
-            organizerLabel.innerHTML = "Organizer";
+        if (!mainTeacher) {
+            let currentOrganizer = document.getElementById("trip_organizer").value;
+            let organizerLabel = document.getElementById("organizer_label");
+            let organizerChanged = currentOrganizer != `{{sel_trip.organizer}}`;
+            if (organizerChanged) {
+                data.organizer = currentOrganizer;
+                organizerLabel.innerHTML = "Organizer*";
+            } else {
+                delete data.organizer;
+                organizerLabel.innerHTML = "Organizer";
+            }
         }
         if (groupsChanged) {
             data.num_groups = currentGroups;
@@ -214,7 +221,7 @@
             delete data.group_size;
             sizeLabel.innerHTML = "Group Size";
         }
-        document.getElementById('save_trip_info').disabled = !(nameChanged || organizerChanged || groupsChanged || sizeChanged);
+        document.getElementById('save_trip_info').disabled = !(nameChanged || (!mainTeacher && organizerChanged) || groupsChanged || sizeChanged);
     }
 
     function search() {

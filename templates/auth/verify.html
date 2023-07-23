@@ -5,13 +5,10 @@ Verify Email
 {% endblock %}
 
 {% block main %}
-{% if error %}
-    <p class="error-card red"><strong>Error:</strong> {{ error | safe}}</p>
-{% endif %}
 <form id = "email_code_form" action="/verify" method="POST">
     <label for="email_code" class="d-grid form-label {{"mt-3" if error else "mt-5"}} mx-auto">User Verification Code</label>
     <text class="d-grid form-label mx-auto">Enter the verification code just sent to {{email}}.</text>
-    <p class="form-label mx-auto" id="countdown">Expires in: <span id="timer" class="danger"></span></p>
+    <p class="form-label mx-auto" id="countdown">Expires in: <span id="timer"></span></p>
 
     <div id="email_code" class="inputs d-flex flex-row justify-content-center mt-3">
         <input class="me-2 text-center form-control rounded" type="text" onKeyup="checkform()" oninput="this.value = (/^[A-Za-z0-9]*$/.test(this.value)) ? this.value.toUpperCase() : null" id=ch_1 name=ch_1 placeholder="-" maxlength="1" />
@@ -114,7 +111,7 @@ Verify Email
                 clearInterval(countdownInterval);
                 document.getElementById("countdown").firstChild.textContent = "";
                 document.getElementById('timer').innerHTML = 'VERIFICATION CODE EXPIRED';
-                document.getElementById('countdown').classList.add('danger');
+                document.getElementById('countdown').classList.add('text-danger');
                 document.getElementById("reverify_button").disabled = false;
                 return;
             }
@@ -128,10 +125,10 @@ Verify Email
 
             // Update the color based on the remaining time
             if (timeDifference <= 60000) { // Less than or equal to 1 minute (60,000 milliseconds)
-                document.getElementById('countdown').classList.add('danger');
-            } else if (timeDifference <= 150000) { // Less than or equal to 2.5 minutes (150,000 milliseconds)
-                document.getElementById('countdown').classList.remove('danger');
-                document.getElementById('countdown').classList.add('warning');
+                document.getElementById('countdown').classList.add('text-danger');
+            } else if (timeDifference <= 120000) { // Less than or equal to 2 minutes (120,000 milliseconds)
+                document.getElementById('countdown').classList.remove('text-danger');
+                document.getElementById('countdown').classList.add('text-warning');
             }
 
             // Update the countdown element

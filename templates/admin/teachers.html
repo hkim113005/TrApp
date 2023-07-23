@@ -1,0 +1,253 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Teachers
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Manage Teachers</label>
+<label class="d-grid info-label mt-3 mx-auto">TrApp Teachers</label> 
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="teacher_search" onkeyup="searchTeachers()" placeholder="&#xF002; Search Teachers">
+<table class="table table-10-rows table-sm table-hover mt-2 mx-auto" id="teachers_table">
+	<thead>
+		<tr>
+			<th class="text-center">ID</th>
+			<th>Teacher Name</th>
+			<th class="text-center">Photo</th>
+		</tr>
+	</thead>
+	<tbody class="table-group-divider">
+		{%for t in teachers%}
+		<tr onclick="updateTeacherInfoPanel(JSON.parse('{{t.id}}'))" data-toggle="modal" data-target="#teacher_edit_information">
+			<td class="text-center">{{t.id}}</td>
+			<td>{{t.name}}</td>
+			<td class="row-image text-center"><img src={{t.photoUrl}}></td>
+		</tr>
+		{%endfor%}
+	</tbody>
+</table>
+<text style="font-size: small;" class="d-grid mx-auto">Click on teacher for more options</text>
+
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_teacher_modal">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-plus"></i>
+        <span>Add New Teacher</span>
+    </div>
+</button>
+
+<a href="/admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back To Admin Dashboard</span>
+    </div>
+</a>
+
+
+<div class="modal fade" id="teacher_edit_information" tabindex="-1" aria-labelledby="teacher_edit_information_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <label class="d-grid form-label mx-auto">Edit Teacher Information</label>
+
+                    <label id="name_label" class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="teacher_name" placeholder="Full Name" oninput="checkTeacherInfo()">
+
+                    <label id="email_label" class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="teacher_email" oninput="checkTeacherInfo()">
+
+                    <label id="title_label" class="d-grid info-label mt-3 mx-auto">Job Title</label>
+                    <input type="text" class="mt-3 mx-auto form-control" id="teacher_title" oninput="checkTeacherInfo()"
+
+                    <text class="d-grid mx-auto">* = Unsaved Changes!</text>
+                    <button onclick="saveTeacherInfo()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_teacher_info">
+                        <div class="icon-text-container center-div">
+                            <i class="fas fa-floppy-disk"></i>
+                            <span>Save Changes</span>
+                        </div>
+                    </button>
+                </form>
+				<button onclick="deleteTeacher()" class="mb-2 d-grid mt-3 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" id="delete_button">
+					<div class="icon-text-container center-div">
+						<i class="fas fa-user-slash"></i>
+						<span>Delete Teacher</span>
+					</div>
+				</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add_teacher_modal" tabindex="-1" aria-labelledby="add_teacher_modal_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form name="add_teacher_form">
+                    <label class="d-grid form-label mx-auto">Add New Teacher</label>
+
+                    <label class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_teacher_name" placeholder="Teacher Name" oninput="checkTeacherForm()">
+
+                    <label class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_teacher_email" placeholder="Teacher Email" oninput="checkTeacherForm()">
+
+                    <label class="d-grid info-label mt-3 mx-auto">Job Title</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_teacher_title" placeholder="Teacher Job Title" oninput="checkTeacherForm()">
+                    
+                    <label class="d-grid info-label mt-3 mx-auto">Photo URL</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_teacher_photo" placeholder="Teacher Photo URL" oninput="checkTeacherForm()">
+                </form>
+            </div>
+            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled="disabled" id="add_teacher_button">Add Teacher</button>
+        </div>
+    </div>
+</div>
+
+<script>
+	const teachers = JSON.parse(`{{teachers | tojson | safe}}`);
+	let t = null;
+
+    let updateTeacherData = {
+		cmd: "updateTeacher",
+	};
+
+    function searchTeachers() {
+        let input = document.getElementById("teacher_search");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("teachers_table");
+        let tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            let tdID = tr[i].getElementsByTagName("td")[0];
+			let tdName = tr[i].getElementsByTagName("td")[1];
+            let tdTitle = tr[i].getElementsByTagName("td")[2];
+            if (tdID && tdName && tdTitle) {
+                let txtValue = ` ${tdID.textContent || tdID.innerText} ${tdName.textContent || tdName.innerText} ${tdTitle.textContent || tdTitle.innerText} `;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+	function updateTeacherInfoPanel(id) {
+		t = teachers[teachers.map(t => t.id).indexOf(id)];
+		document.getElementById("teacher_name").value = (t.name) ? t.name : "N/A";
+		document.getElementById("teacher_email").value = (t.email) ? t.email : "N/A";
+		document.getElementById("teacher_title").value = (t.title) ? t.title : "N/A";
+	}
+
+	function deleteTeacher() {
+		$.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify({ 
+				cmd: "deleteTeacher",
+				id: t.id
+			}),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+                window.location.reload();
+            }
+		});
+	}
+
+	function checkTeacherInfo() {
+        let nameLabel = document.getElementById("name_label");
+		let emailLabel = document.getElementById("email_label");
+        let titleLabel = document.getElementById("title_label");
+        
+        let currentName = document.getElementById("teacher_name").value;
+		let currentEmail = document.getElementById("teacher_email").value;
+        let currentTitle = document.getElementById("teacher_title").value;
+
+        let nameChanged = currentName != t.name;
+		let emailChanged = currentEmail != t.email;
+        let titleChanged = currentTitle != t.title;
+
+		if (!updateTeacherData.id) {
+			updateTeacherData.id = t.id;
+		}
+        
+        if (nameChanged) {
+            updateTeacherData.name = currentName;
+            nameLabel.innerHTML = "*Full Name";
+        } else {
+            delete updateTeacherData.name;
+            nameLabel.innerHTML = "Full Name";
+        }
+		if (emailChanged) {
+            updateTeacherData.email = currentEmail;
+            emailLabel.innerHTML = "*ACS Email";
+        } else {
+            delete updateTeacherData.email;
+            emailLabel.innerHTML = "ACS Email";
+        }
+        if (titleChanged) {
+            updateTeacherData.title = currentTitle;
+            titleLabel.innerHTML = "*Job Title";
+        } else {
+            delete updateTeacherData.title;
+            titleLabel.innerHTML = "Job Title";
+        }
+        document.getElementById('save_teacher_info').disabled = !(nameChanged || emailChanged || titleChanged);
+    }
+
+	function saveTeacherInfo() {
+        $.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify(updateTeacherData),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+				window.location.reload();
+			}
+        });
+    }
+
+	function checkTeacherForm() {
+        var f = document.forms["add_teacher_form"].elements;
+        var cansubmit = true;
+
+        for (var i = 0; i < f.length; i++) {
+            if (f[i].selectedIndex == 0 || f[i].value.length == 0) cansubmit = false;
+        }
+
+        document.getElementById('add_teacher_button').disabled = !cansubmit;
+    }
+
+    $(document).ready(function() {
+        $('tr[data-toggle="modal"]').on('click', function() {
+			var targetModal = $(this).data('target');
+			$(targetModal).modal('show');
+		});
+        document.getElementById("add_teacher_button").addEventListener("click", () => {
+			let gradeElem = document.getElementById("add_teacher_grade");
+        	let genderElem = document.getElementById("add_teacher_gender");
+            $.ajax({
+                type: "POST",
+                url: window.location.href,
+                data: JSON.stringify({
+                    cmd: "addTeacher",
+                    name: document.getElementById("add_teacher_name").value,
+					email: document.getElementById("add_teacher_email").value,
+                    title: document.getElementById("add_teacher_title").value,
+                    photoUrl: document.getElementById("add_teacher_photo").value,
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                complete: (e) => {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

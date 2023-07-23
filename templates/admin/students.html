@@ -1,0 +1,304 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Students
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Manage Students</label>
+<label class="d-grid info-label mt-3 mx-auto">TrApp Students</label> 
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="student_search" onkeyup="searchStudents()" placeholder="&#xF002; Search Students">
+<table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="students_table">
+	<thead>
+		<tr>
+			<th class="text-center">ID</th>
+			<th>Student Name</th>
+			<th data-type="number" class="text-center">Grade</th>
+			<th class="text-center">Gender</th>
+		</tr>
+	</thead>
+	<tbody class="table-group-divider">
+		{%for s in students%}
+		<tr onclick="updateStudentInfoPanel(JSON.parse('{{s.id}}'))" data-toggle="modal" data-target="#student_edit_information">
+			<td class="text-center">{{s.id}}</td>
+			<td>{{s.name}}</td>
+			<td class="text-center">{{s.grade}}</td>
+			<td class="text-center">{{s.gender}}</td>
+		</tr>
+		{%endfor%}
+	</tbody>
+</table>
+<text style="font-size: small;" class="d-grid mx-auto">Click on student for more options</text>
+
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_student_modal">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-plus"></i>
+        <span>Add New Student</span>
+    </div>
+</button>
+
+<a href="/admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back To Admin Dashboard</span>
+    </div>
+</a>
+
+
+<div class="modal fade" id="student_edit_information" tabindex="-1" aria-labelledby="student_edit_information_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form>
+                    <label class="d-grid form-label mx-auto">Edit Student Information</label>
+
+                    <label id="name_label" class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="student_name" placeholder="Full Name" oninput="checkStudentInfo()">
+
+                    <label id="email_label" class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="student_email" oninput="checkStudentInfo()">
+
+                    <label id="grade_label" class="d-grid info-label mt-3 mx-auto">Grade</label>
+                    <select id="student_grade" class="mt-2 mx-auto form-select" onchange="checkStudentInfo()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Grade</option>
+                        {%for grade in range(1, 13)%}
+                            <option value={{grade}}>{{grade}}</option>
+                        {%endfor%}
+                    </select>
+
+                    <label id="gender_label" class="d-grid info-label mt-3 mx-auto">Gender</label>
+                    <select id="student_gender" class="mt-2 mx-auto form-select" onchange="checkStudentInfo()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Gender</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="-">-</option>
+                    </select>
+
+                    <text class="d-grid mx-auto">* = Unsaved Changes!</text>
+                    <button onclick="saveStudentInfo()" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_student_info">
+                        <div class="icon-text-container center-div">
+                            <i class="fas fa-floppy-disk"></i>
+                            <span>Save Changes</span>
+                        </div>
+                    </button>
+                </form>
+				<button onclick="deleteStudent()" class="mb-2 d-grid mt-3 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" id="delete_button">
+					<div class="icon-text-container center-div">
+						<i class="fas fa-user-slash"></i>
+						<span>Delete Student</span>
+					</div>
+				</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add_student_modal" tabindex="-1" aria-labelledby="add_student_modal_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form name="add_student_form">
+                    <label class="d-grid form-label mx-auto">Add New Student</label>
+
+                    <label class="d-grid info-label mt-3 mx-auto">Full Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_student_name" placeholder="Student Name" oninput="checkStudentForm()">
+
+                    <label class="d-grid info-label mt-3 mx-auto">ACS Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_student_email" placeholder="Student Email" oninput="checkStudentForm()">
+
+                    <label class="d-grid info-label mt-3 mx-auto">Grade</label>
+                    <select id="add_student_grade" class="mt-3 mx-auto form-select" onchange="checkStudentForm()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Grade</option>
+                        {%for grade in range(1, 13)%}
+                            <option value={{grade}}>{{grade}}</option>
+                        {%endfor%}
+                    </select>
+
+                    <label class="d-grid info-label mt-3 mx-auto">Gender</label>
+                    <select id="add_student_gender" class="mt-3 mx-auto form-select" onchange="checkStudentForm()" aria-label=".form-select-sm">
+                        <option disabled selected="selected" selected>Gender</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="-">-</option>
+                    </select>
+
+                </form>
+            </div>
+            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled="disabled" id="add_student_button">Add Student</button>
+        </div>
+    </div>
+</div>
+
+<script>
+	const students = JSON.parse(`{{students | tojson | safe}}`);
+	let s = null;
+
+    let updateStudentData = {
+		cmd: "updateStudent",
+	};
+
+    function searchStudents() {
+        let input = document.getElementById("student_search");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("students_table");
+        let tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            let tdID = tr[i].getElementsByTagName("td")[0];
+			let tdName = tr[i].getElementsByTagName("td")[1];
+            if (tdID && tdName) {
+                let txtValue = ` ${tdID.textContent || tdID.innerText} ${tdName.textContent || tdName.innerText} `;;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+	function updateStudentInfoPanel(id) {
+		s = students[students.map(s => s.id).indexOf(id)];
+		document.getElementById("student_name").value = (s.name) ? s.name : "N/A";
+		document.getElementById("student_email").value = (s.email) ? s.email : "N/A";
+		
+		let gradeOptions = document.querySelectorAll(`#student_grade option`);
+        gradeOptions.forEach(o => {
+            if (s.grade == o.value) {
+                o.selected = true;
+            }
+        });
+
+        let genderOptions = document.querySelectorAll(`#student_gender option`);
+        genderOptions.forEach(o => {
+            if (s.gender == o.value) {
+                o.selected = true;
+            }
+        });
+	}
+
+	function deleteStudent() {
+		$.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify({ 
+				cmd: "deleteStudent",
+				id: s.id
+			}),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+                window.location.reload();
+            }
+		});
+	}
+
+	function checkStudentInfo() {
+        let gradeElem = document.getElementById("student_grade");
+        let genderElem = document.getElementById("student_gender");
+        
+        let nameLabel = document.getElementById("name_label");
+		let emailLabel = document.getElementById("email_label");
+        let gradeLabel = document.getElementById("grade_label");
+        let genderLabel = document.getElementById("gender_label");
+        
+        let currentName = document.getElementById("student_name").value;
+		let currentEmail = document.getElementById("student_email").value;
+        let currentGrade = gradeElem.options[gradeElem.selectedIndex].value;
+        let currentGender = genderElem.options[genderElem.selectedIndex].value;
+
+        let nameChanged = currentName != s.name;
+		let emailChanged = currentEmail != s.email;
+        let gradeChanged = currentGrade != parseInt(s.grade);
+        let genderChanged = currentGender != s.gender;
+
+		if (!updateStudentData.id) {
+			updateStudentData.id = s.id;
+		}
+        
+        if (nameChanged) {
+            updateStudentData.name = currentName;
+            nameLabel.innerHTML = "*Full Name";
+        } else {
+            delete updateStudentData.name;
+            nameLabel.innerHTML = "Full Name";
+        }
+		if (emailChanged) {
+            updateStudentData.email = currentEmail;
+            emailLabel.innerHTML = "*ACS Email";
+        } else {
+            delete updateStudentData.email;
+            emailLabel.innerHTML = "ACS Email";
+        }
+        if (gradeChanged) {
+            updateStudentData.grade = currentGrade;
+            gradeLabel.innerHTML = "*Grade";
+        } else {
+            delete updateStudentData.grade;
+            gradeLabel.innerHTML = "Grade";
+        }
+        if (genderChanged) {
+            updateStudentData.gender = currentGender;
+            genderLabel.innerHTML = "*Gender";
+        } else {
+            delete updateStudentData.gender;
+            genderLabel.innerHTML = "Gender";
+        }
+        document.getElementById('save_student_info').disabled = !(nameChanged || emailChanged || gradeChanged || genderChanged);
+    }
+
+	function saveStudentInfo() {
+        $.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify(updateStudentData),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+				window.location.reload();
+			}
+        });
+    }
+
+	function checkStudentForm() {
+        var f = document.forms["add_student_form"].elements;
+        var cansubmit = true;
+
+        for (var i = 0; i < f.length; i++) {
+            if (f[i].selectedIndex == 0 || f[i].value.length == 0) cansubmit = false;
+        }
+
+        document.getElementById('add_student_button').disabled = !cansubmit;
+    }
+
+    $(document).ready(function() {
+        $('tr[data-toggle="modal"]').on('click', function() {
+			var targetModal = $(this).data('target');
+			$(targetModal).modal('show');
+		});
+        document.getElementById("add_student_button").addEventListener("click", () => {
+			let gradeElem = document.getElementById("add_student_grade");
+        	let genderElem = document.getElementById("add_student_gender");
+            $.ajax({
+                type: "POST",
+                url: window.location.href,
+                data: JSON.stringify({
+                    cmd: "addStudent",
+                    name: document.getElementById("add_student_name").value,
+					email: document.getElementById("add_student_email").value,
+                    grade: gradeElem.options[gradeElem.selectedIndex].value,
+                    gender: genderElem.options[genderElem.selectedIndex].value,
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                complete: (e) => {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

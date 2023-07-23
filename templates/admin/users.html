@@ -1,0 +1,525 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Users
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Manage Users</label>
+<label class="d-grid info-label mt-3 mx-auto">TrApp Users</label> 
+<input type="text" class="mt-3 mx-auto form-control fontAwesome" id="user_search" onkeyup="searchUsers()" placeholder="&#xF002; Search Users">
+<table class="table table-5-rows table-users table-sm table-hover mt-3 mx-auto" id="user_table">
+    <thead>
+        <tr>
+			<th class="text-center" scope="col">UID</th>
+			<th class="text-center" scope="col">SID</th>
+			<th class="text-center" scope="col">
+				<i class="fas fa-screwdriver-wrench"></i>
+			</th>
+			<th class="text-center" scope="col">
+				<i class="fas fa-person-chalkboard"></i>
+			</th>
+			<th class="text-center" scope="col">
+				<i class="fas fa-graduation-cap"></i>
+			</th>
+			<th class="text-center" scope="col">
+				<i class="fas fa-envelope"></i>
+			</th>
+            <th style="width: 60%;" scope="col">User Name</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        {%for i in range(users|length)%}
+        <tr onclick="updateUserInfoPanel(JSON.parse('{{users[i].id}}'))" data-toggle="modal" data-target="#user_info_modal">
+			<td class="text-center">{{users[i].id}}</td>
+			<td class="text-center">{{"-" if users[i].student_id == None else users[i].student_id}}</td>
+			<td class="text-center">
+				<i class="fa-solid {{'text-success fa-check' if users[i].is_admin else 'text-danger fa-x'}}"></i>
+			</td>
+			<td class="text-center">
+				<i class="fa-solid fas {{'text-success fa-check' if users[i].is_teacher else 'text-danger fa-x'}}"></i>
+			</td>
+			<td class="text-center">
+				<i class="fa-solid fas {{'text-success fa-check' if users[i].is_student else 'text-danger fa-x'}}"></i>
+			</td>
+			<td class="text-center">
+				<i class="fa-solid fas {{'text-success fa-check' if users[i].is_verified else 'text-danger fa-x'}}"></i>
+			</td>
+			<td>{{users[i].name}}</td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+<text style="font-size: small;" class="d-grid mx-auto">Click on user for more options</text>
+
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_user_modal">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-user-plus"></i>
+        <span>Add New User</span>
+    </div>
+</button>
+
+<a href="/admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back To Admin Dashboard</span>
+    </div>
+</a>
+
+
+<div class="modal fade" id="user_info_modal" tabindex="-1" aria-labelledby="user_info_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+				<label id="user_info_title" class="d-grid form-label mx-auto">Additional User Details</label>
+
+				<label class="d-grid info-label mt-3 mx-auto">Student Name</label>
+				<text id="user_info_name" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Login Email</label>
+				<text id="user_info_email_1" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Student Email</label>
+				<text id="user_info_email_2" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Created</label>
+				<text id="user_info_date_create" class="d-grid mx-auto"></text>
+				
+				<label class="d-grid info-label mt-3 mx-auto">Verify Attempts</label>
+				<text id="user_info_verify_att" class="d-grid mx-auto"></text>
+
+				<label class="d-grid info-label mt-3 mx-auto">Date Verified</label>
+				<text id="user_info_date_verify" class="d-grid mx-auto"></text>
+
+				<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#edit_user_modal">
+					<div class="icon-text-container center-div">
+						<i class="fas fa-user-pen"></i>
+						<span>Edit User</span>
+					</div>
+				</button>
+
+				<button onclick="deleteUser()" class="mb-2 d-grid mt-4 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" id="delete_button">
+					<div class="icon-text-container center-div">
+						<i class="fas fa-user-slash"></i>
+						<span>Delete User</span>
+					</div>
+				</button>
+			</div>
+        </div>
+	</div>
+</div>
+
+<div class="modal fade" id="add_user_modal" tabindex="-1" aria-labelledby="add_user_modal_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form name="add_user_form">
+                    <label class="d-grid form-label mx-auto">Add New User</label>
+
+                    <label class="d-grid info-label mt-3 mx-auto">User Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_user_name" placeholder="User Name" oninput="checkUserForm()">
+
+
+                    <div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="add_user_is_admin" onchange="checkUserForm()">
+						<label class="label-medium form-check-label" for="add_user_is_admin">Admin</label>
+					</div>
+					
+					<div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="add_user_is_teacher" onchange="enableTeacher(this.checked); checkUserForm()">
+						<label class="label-medium form-check-label" for="add_user_is_teacher">Teacher</label>
+					</div>
+					
+					<div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="add_user_is_student" onchange="enableStudent(this.checked); checkUserForm()">
+						<label class="label-medium form-check-label" for="add_user_is_student">Student</label>
+					</div>
+
+                    <label id="add_user_teacher_id_label" class="d-grid info-label mt-3 mx-auto">Teacher ID</label>
+                    <input disabled type="number" class="mt-2 mx-auto form-control" id="add_user_teacher_id" placeholder="Teacher ID" oninput="updateUserTeacher(this); checkUserForm();">
+
+					<label id="add_user_teacher_info_label" class="d-grid info-label mt-3 mx-auto">Teacher Info</label>
+                    <input type="text" class="mt-2 mx-auto form-control" disabled id="add_user_teacher_info" placeholder="Teacher">
+
+					<label id="add_user_student_id_label" class="d-grid info-label mt-3 mx-auto">Student ID</label>
+                    <input disabled type="number" class="mt-2 mx-auto form-control" id="add_user_student_id" placeholder="Student ID" oninput="updateUserStudent(this); checkUserForm();">
+
+					<label id="add_user_student_info_label" class="d-grid info-label mt-3 mx-auto">Student Info</label>
+                    <input type="text" class="mt-2 mx-auto form-control" disabled id="add_user_student_info" placeholder="Student">
+
+					<div class="mt-3 form-check form-check">
+						<input checked type="checkbox" class="form-check-input" id="add_user_is_verified" onchange="checkUserForm()">
+						<label class="label-medium form-check-label" for="add_user_is_verified">Email Verified (Default Selected)</label>
+					</div>
+
+					<label class="d-grid info-label mt-3 mx-auto">Login Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_user_email" placeholder="Login Email" oninput="checkUserForm()">
+
+	
+					<label class="d-grid info-label mt-3 mx-auto">Password</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="add_user_password" placeholder="Password" oninput="checkUserForm()">
+                </form>
+            </div>
+            <button class="mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled="disabled" id="add_user_button">Add User</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="edit_user_modal" tabindex="-1" aria-labelledby="edit_user_modal_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form name="add_user_form">
+                    <label class="d-grid form-label mx-auto">Edit User</label>
+
+                    <label id="user_name_label" class="d-grid info-label mt-3 mx-auto">User Name</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="user_name" placeholder="User Name" oninput="checkUserInfo()">
+
+                    <div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="user_is_admin" onchange="checkUserInfo()">
+						<label id="user_is_admin_label" class="label-medium form-check-label" for="user_is_admin">Admin</label>
+					</div>
+					
+					<div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="user_is_teacher" onchange="checkUserInfo()">
+						<label id="user_is_teacher_label" class="label-medium form-check-label" for="user_is_teacher">Teacher</label>
+					</div>
+					
+					<div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="user_is_student" onchange="enableStudent(this.checked); checkUserInfo()">
+						<label id="user_is_student_label" class="label-medium form-check-label" for="user_is_student">Student</label>
+					</div>
+
+                    <label id="user_teacher_id_label" class="d-grid info-label mt-3 mx-auto">Teacher ID</label>
+                    <input type="number" class="mt-2 mx-auto form-control" id="user_teacher_id" placeholder="Teacher ID" oninput="updateUserTeacher(this); checkUserInfo();">
+
+					<label id="user_teacher_info_label" class="d-grid info-label mt-3 mx-auto">Teacher Info</label>
+                    <input type="text" class="mt-2 mx-auto form-control" disabled id="user_teacher_info" placeholder="Teacher">
+
+					<label id="user_student_id_label" class="d-grid info-label mt-3 mx-auto">Student ID</label>
+                    <input type="number" class="mt-2 mx-auto form-control" id="user_student_id" placeholder="Student ID" oninput="updateUserStudent(this); checkUserInfo();">
+
+					<label id="user_student_info_label" class="d-grid info-label mt-3 mx-auto">Student Info</label>
+                    <input type="text" class="mt-2 mx-auto form-control" disabled id="user_student_info" placeholder="Student">
+
+					<div class="mt-3 form-check form-check">
+						<input checked type="checkbox" class="form-check-input" id="user_is_verified" onchange="checkUserInfo()">
+						<label id="user_is_verified_label" class="label-medium form-check-label" for="user_is_verified">Email Verified (Default Selected)</label>
+					</div>
+
+					<label id="user_email_label" class="d-grid info-label mt-3 mx-auto">Login Email</label>
+                    <input type="text" class="mt-2 mx-auto form-control" id="user_email" placeholder="Login Email" oninput="checkUserInfo()">
+
+
+					<div class="mt-3 form-check form-check-inline">
+						<input type="checkbox" class="form-check-input" id="update_password" onchange='enablePassword(this.checked)'>
+						<label id="user_password_label" class="label-medium form-check-label" for="update_password">Update Password</label>
+					</div>
+                    <input disabled type="text" class="mt-2 mx-auto form-control" id="user_password" oninput="checkUserInfo()" placeholder="Password">
+                </form>
+            </div>
+			<text class="d-grid mx-auto">* = Unsaved Changes!</text>
+            <button onclick="saveUserInfo()" class="mb-4 mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_user_info">
+				<div class="icon-text-container center-div">
+					<i class="fas fa-floppy-disk"></i>
+					<span>Save Changes</span>
+				</div>
+			</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const users = JSON.parse(`{{users | tojson | safe}}`);
+    const teachers = JSON.parse(`{{teachers | tojson | safe}}`);
+	const students = JSON.parse(`{{students | tojson | safe}}`);
+	let u = null;
+    let t = null;
+	let s = null;
+
+    let updateUserData = {
+		cmd: "updateUser",
+	};
+
+    function searchUsers() {
+		let input = document.getElementById("user_search");
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById("user_table");
+        let tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            let tdUID = tr[i].getElementsByTagName("td")[0];
+			let tdSID = tr[i].getElementsByTagName("td")[1];
+			let tdName = tr[i].getElementsByTagName("td")[5];
+            if (tdUID && tdSID && tdName) {
+                let txtValue = ` ${tdUID.textContent || tdUID.innerText} ${tdSID.textContent || tdSID.innerText} ${tdName.textContent || tdName.innerText} `;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+	}
+
+    function updateUserInfoPanel(id) {
+		u = users[users.map(u => u.id).indexOf(id)];
+        t = teachers[teachers.map(t => t.id).indexOf(u.teacher_id)];
+		s = students[students.map(s => s.id).indexOf(u.student_id)];
+
+		document.getElementById("user_info_name").innerHTML = (u.student) ? u.student.name : "N/A";
+		document.getElementById("user_info_email_1").innerHTML = u.email;
+		document.getElementById("user_info_email_2").innerHTML = (u.student) ? u.student.email : "N/A";
+		document.getElementById("user_info_date_create").innerHTML = u.date_created;
+		document.getElementById("user_info_verify_att").innerHTML = u.verify_attempts;
+		document.getElementById("user_info_date_verify").innerHTML = u.date_last_verify;
+
+		document.getElementById("user_name").value = u.name;
+		document.getElementById("user_is_verified").checked = u.is_verified;
+		document.getElementById("user_is_admin").checked = u.is_admin;
+		document.getElementById("user_is_teacher").checked = u.is_teacher;
+		document.getElementById("user_is_student").checked = u.is_student;
+		document.getElementById("user_email").value = u.email;
+		
+		document.getElementById("user_student_id").disabled = !u.is_student;
+		document.getElementById("user_student_id").value = u.student_id;
+		document.getElementById("user_student_info").value = (u.is_student) ? `${s.name} - Grade ${s.grade}, ${s.gender}` : "Student";
+
+        document.getElementById("user_teacher_id").disabled = !u.is_teacher;
+		document.getElementById("user_teacher_id").value = u.teacher_id;
+		document.getElementById("user_teacher_info").value = (u.is_teacher) ? `${t.name} - ${t.title}` : "Teacher";
+		checkUserInfo();
+	}
+
+    function updateUserStudent(e) {
+		let studentIds = students.map(s => s.id);
+		if(!studentIds.includes(parseInt(e.value))) {
+			e.value = null;
+			return;
+		}
+		s = students[students.map(s => s.id).indexOf(parseInt(e.value))];
+		document.getElementById("user_student_info").value = `${s.name} - Grade ${s.grade} | ${s.gender}`;
+		document.getElementById("add_user_student_info").value = `${s.name} - Grade ${s.grade} | ${s.gender}`;
+	}
+
+    function updateUserTeacher(e) {
+		let teacherIds = teachers.map(t => t.id);
+		if(!teacherIds.includes(parseInt(e.value))) {
+			e.value = null;
+			return;
+		}
+		t = teachers[teachers.map(t => t.id).indexOf(parseInt(e.value))];
+		document.getElementById("user_teacher_info").value = `${t.name} - ${t.title}`;
+		document.getElementById("add_user_teacher_info").value = `${t.name} - ${t.title}`;
+	}
+
+    function checkUserInfo() {
+        let nameLabel = document.getElementById("user_name_label");
+		let verifiedLabel = document.getElementById("user_is_verified_label");
+        let adminLabel = document.getElementById("user_is_admin_label");
+        let teacherLabel = document.getElementById("user_is_teacher_label");
+		let studentLabel = document.getElementById("user_is_student_label");
+		let emailLabel = document.getElementById("user_email_label");
+		let passwordLabel = document.getElementById("user_password_label");
+        let teacherIdLabel = document.getElementById("user_teacher_id_label");
+		let teacherInfoLabel = document.getElementById("user_teacher_info_label");
+		let studentIdLabel = document.getElementById("user_student_id_label");
+		let studentInfoLabel = document.getElementById("user_student_info_label");
+        
+        let currentName = document.getElementById("user_name").value;
+		let isVerified = document.getElementById("user_is_verified").checked;
+		let isAdmin = document.getElementById("user_is_admin").checked;
+        let isTeacher = document.getElementById("user_is_teacher").checked;
+		let isStudent = document.getElementById("user_is_student").checked;
+		let email = document.getElementById("user_email").value;
+		let password = document.getElementById("user_password").value;
+		let studentId = parseInt(document.getElementById("user_student_id").value);
+        let teacherId = parseInt(document.getElementById("user_teacher_id").value);
+
+        let nameChanged = currentName != u.name;
+		let verifiedChanged = isVerified != u.is_verified;
+        let adminChanged = isAdmin != u.is_admin;
+		let teacherChanged = isTeacher != u.is_teacher;
+		let studentChanged = isStudent != u.is_student;
+		let emailChanged = email != u.email;
+		let studentIdChanged = studentId != u.student_id;
+        let teacherIdChanged = teacherId != u.teacher_id;
+		let passwordChanged = document.getElementById("update_password").checked && password.length > 0;
+
+		if (!updateUserData.id) {
+			updateUserData.id = u.id;
+		}
+        
+        if (nameChanged) {
+            updateUserData.name = currentName;
+            nameLabel.innerHTML = "*User Name";
+        } else {
+            delete updateUserData.name;
+            nameLabel.innerHTML = "User Name";
+        }
+		
+		if (verifiedChanged) {
+            updateUserData.is_verified = isVerified;
+            verifiedLabel.innerHTML = "*Email Verified (Default Selected)";
+        } else {
+            delete updateUserData.is_verified;
+            verifiedLabel.innerHTML = "Email Verified (Default Selected)";
+        }
+		if (adminChanged) {
+            updateUserData.is_admin = isAdmin;
+            adminLabel.innerHTML = "*Admin";
+        } else {
+            delete updateUserData.is_admin;
+            adminLabel.innerHTML = "Admin";
+        }
+        if (teacherChanged) {
+            updateUserData.is_teacher = isTeacher;
+            teacherLabel.innerHTML = "*Teacher";
+        } else {
+            delete updateUserData.is_teacher;
+            teacherLabel.innerHTML = "Teacher";
+        }
+        if (studentChanged) {
+            updateUserData.is_student = isStudent;
+            studentLabel.innerHTML = "*Student";
+        } else {
+            delete updateUserData.is_student;
+            studentLabel.innerHTML = "Student";
+        }
+		if (studentIdChanged) {
+            updateUserData.student_id = studentId;
+            studentIdLabel.innerHTML = "*Student ID";
+			studentInfoLabel.innerHTML = "*Student Info";
+        } else {
+            delete updateUserData.student_id;
+            studentIdLabel.innerHTML = "Student ID";
+			studentInfoLabel.innerHTML = "Student Info";
+        }
+        if (teacherIdChanged) {
+            updateUserData.teacher_id = studentId;
+            teacherIdLabel.innerHTML = "*Teacher ID";
+			teacherInfoLabel.innerHTML = "*Teacher Info";
+        } else {
+            delete updateUserData.teacher_id;
+            teacherIdLabel.innerHTML = "Teacher ID";
+			teacherInfoLabel.innerHTML = "Teacher Info";
+        }
+		if (emailChanged) {
+            updateUserData.email = email;
+            emailLabel.innerHTML = "*Login Email";
+        } else {
+            delete updateUserData.email;
+            emailLabel.innerHTML = "Login Email";
+        }
+		if (passwordChanged) {
+            updateUserData.password = password;
+            passwordLabel.innerHTML = "*Update Password";
+        } else {
+            delete updateUserData.password;
+            passwordLabel.innerHTML = "Update Password";
+        }
+        document.getElementById('save_user_info').disabled = !(nameChanged || verifiedChanged || adminChanged || ((isTeacher ? teacherId : true) && teacherChanged) || (isTeacher && teacherId && teacherIdChanged) || ((isStudent ? studentId : true) && studentChanged) || (isStudent && studentId && studentIdChanged) || emailChanged || passwordChanged);
+	}
+
+    function saveUserInfo() {
+		$.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify(updateUserData),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+				window.location.reload();
+			}
+        });
+	}
+
+    function deleteUser() {
+		$.ajax({
+			type: "POST",
+			url: window.location.href,
+			data: JSON.stringify({ 
+				cmd: "deleteUser",
+				id: u.id 
+			}),
+			contentType: "application/json",
+			dataType: "json",
+			complete: (e) => {
+                window.location.reload();
+            }
+		});
+	}
+
+    function checkUserForm() {
+		var isStudent = document.getElementById("add_user_is_student").checked;
+		var roleSelected = document.getElementById("add_user_is_admin").checked || document.getElementById("add_user_is_teacher").checked || isStudent;
+		var validStudent = (isStudent) ? document.getElementById("add_user_student_id").value : true;
+        var nameCheck = document.getElementById("add_user_name").value.length > 0;
+		var emailCheck = document.getElementById("add_user_email").value.length > 0;
+		var passwordCheck = document.getElementById("add_user_password").value.length > 0;
+		var cansubmit = roleSelected && nameCheck && emailCheck && passwordCheck && validStudent;
+
+        document.getElementById('add_user_button').disabled = !cansubmit;
+    }
+
+    function enablePassword(checked) {
+		let passwordElem = document.getElementById("user_password");
+		passwordElem.disabled= !checked;
+	}
+
+	function enableStudent(checked) {
+		let idElem1 = document.getElementById("user_student_id");
+		idElem1.disabled= !checked;
+		let idElem2 = document.getElementById("add_user_student_id");
+		idElem2.disabled= !checked;
+	}
+
+    function enableTeacher(checked) {
+		let idElem1 = document.getElementById("user_teacher_id");
+		idElem1.disabled= !checked;
+		let idElem2 = document.getElementById("add_user_teacher_id");
+		idElem2.disabled= !checked;
+	}
+
+    $(document).ready(function() {
+		$('tr[data-toggle="modal"]').on('click', function() {
+			var targetModal = $(this).data('target');
+			$(targetModal).modal('show');
+		});
+		document.getElementById("add_user_button").addEventListener("click", () => {
+			let data = {
+				cmd: "createUser",
+				name: document.getElementById("add_user_name").value,
+				email: document.getElementById("add_user_email").value,
+				verified: document.getElementById("add_user_is_verified").checked,
+				admin: document.getElementById("add_user_is_admin").checked,
+				teacher: document.getElementById("add_user_is_teacher").checked,
+				teacher_id: document.getElementById("add_user_teacher_id").value,
+				student: document.getElementById("add_user_is_student").checked,
+				student_id: document.getElementById("add_user_student_id").value,
+				password: document.getElementById("add_user_password").value,
+            };
+			if (!data.teacher) {
+				delete data.teacher_id;
+			}
+			if (!data.student) {
+				delete data.student_id;
+			}
+            $.ajax({
+                type: "POST",
+                url: window.location.href,
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "json",
+                complete: (e) => {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

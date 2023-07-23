@@ -1,7 +1,7 @@
 import random
 import csv
 from datetime import datetime, timedelta
-from flask import render_template, session
+from flask import render_template, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_mail import Message
 from app import db, mail, app, current_user
@@ -15,7 +15,8 @@ ADMIN = {
 # Teacher Login Credentials
 TEACHER = {
     "email": "//--@acs.sch.ae",
-    "password": "ACSTeachers2023"
+    "password": "ACSTeachers2023",
+    "photoUrl": "https://web.archive.org/web/20201030114656if_/https://www.acs.sch.ae/uploaded/Home_Page/ACS_Star.png?1576060292569"
 }
 
 # Converts SQL databse row into a standard python dictionary
@@ -32,15 +33,21 @@ class User (db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     is_teacher = db.Column(db.Boolean, nullable=False, default=False)
     is_student = db.Column(db.Boolean, nullable=False, default=False)
-    name = db.Column(db.String, nullable=False)
-    student_id = db.Column(db.Integer, nullable=True)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.now().replace(microsecond=0))
-    email = db.Column(db.String, nullable=False, unique=True)
     is_verified = db.Column(db.Boolean, nullable=False, default=False)
-    verify_attempts = db.Column(db.Integer, nullable=False, default=0)
-    verify_code = db.Column(db.String(6), nullable=True)
-    date_last_verify = db.Column(db.DateTime, nullable=True, default=datetime.now().replace(microsecond=0))
+    is_resetting = db.Column(db.Boolean, nullable=False, default=False)
+
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
     hashed_password = db.Column(db.String, nullable=False)
+    verify_code = db.Column(db.String(6), nullable=True)
+    
+    student_id = db.Column(db.Integer, nullable=True)
+    teacher_id = db.Column(db.Integer, nullable=True)
+    verify_attempts = db.Column(db.Integer, nullable=False, default=0)
+
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.now().replace(microsecond=0))
+    date_verified = db.Column(db.DateTime, nullable=True)
+    date_last_verify = db.Column(db.DateTime, nullable=True, default=datetime.now().replace(microsecond=0))
     
     def __init__(self, password, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -70,6 +77,10 @@ class User (db.Model):
     def update_student_id(self, student_id):
         self.student_id = student_id
         self.sync()
+    
+    def update_teacher_id(self, teacher_id):
+        self.teacher_id = teacher_id
+        self.sync()
 
     def update_password(self, password):
         self.hashed_password = generate_password_hash(password, method="scrypt")
@@ -93,6 +104,8 @@ class User (db.Model):
             self.update_email(data['email'])
         if 'student_id' in data:
             self.update_student_id(data['student_id'])
+        if 'teacher_id' in data:
+            self.update_teacher_id(data['teacher_id'])
         if 'password' in data:
             self.update_password(data['password'])
         self.update_perms(data)
@@ -111,8 +124,10 @@ class User (db.Model):
             return True
         return False
     
-    def verify(self):
+    def verify(self, initial=False):
         self.is_verified = True
+        if initial:
+            self.date_verified = datetime.now().replace(microsecond=0)
         self.sync()
     
     def regenerate_verify_code(self):
@@ -156,6 +171,8 @@ class User (db.Model):
         current_user['db_user'] = self
         if current_user['db_user'].is_student:
             current_user['student'] = Student.get_student_by_id(self.student_id)
+        if current_user['db_user'].is_teacher:
+            current_user['teacher'] = Teacher.get_teacher_by_id(self.teacher_id)
         self.sync()
         print(f"Succesfully Logged in as {self.name}")
     
@@ -182,6 +199,8 @@ class User (db.Model):
                     u['date_created'] = str(u['date_created'])
                 if u['date_last_verify'] is not None:
                     u['date_last_verify'] = str(u['date_last_verify'])
+                if u['date_verified'] is not None:
+                    u['date_verified'] = str(u['date_verified'])
         return users
     
     @staticmethod
@@ -275,12 +294,85 @@ class Student(db.Model):
         else:
             return students
 
+# Teacher Databse Model - Stores and handles teacher info 
+class Teacher(db.Model):
+    __tablename__ = 'teachers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=True)
+    title = db.Column(db.String, nullable=True, default="Unknown")
+    photoUrl = db.Column(db.String, nullable=False, default="/static/img/logo.png")
+
+    def __init__(self, **kwargs):
+        super(Teacher, self).__init__(**kwargs)
+        db.session.add(self)
+        db.session.commit()
+
+    def sync(self):
+        db.session.merge(self)
+        db.session.commit()
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update_name(self, name):
+        self.name = name
+        self.sync()
+    
+    def update_email(self, email):
+        self.email = email
+        self.sync()
+    
+    def update_title(self, title):
+        self.title = title
+        self.sync()
+    
+    def update(self, data):
+        if 'name' in data:
+            self.update_name(data['name'])
+        if 'email' in data:
+            self.update_email(data['email'])
+        if 'title' in data:
+            self.update_title(data['title'])
+
+    @staticmethod
+    def get_teacher_by_id(teacher_id, return_dict=True):
+        teacher = db.session.query(Teacher).filter_by(id=teacher_id).first()
+        if not return_dict or teacher is None:
+            return teacher
+        else:
+            return dict_converter(teacher)
+
+    @staticmethod
+    def get_teacher_by_email(email):
+        teacher = db.session.query(Teacher).filter_by(email=email).first()
+        return dict_converter(teacher) if teacher else None
+
+    @staticmethod
+    def check_teacher_email(email):
+        teacher = Teacher.get_teacher_by_email(email)
+        return teacher is not None
+    
+    def check_main(email):
+        return email == TEACHER['email']
+
+    @staticmethod
+    def get_all_teachers(return_dict=False):
+        teachers = db.session.query(Teacher).all()
+        if return_dict:
+            return [dict_converter(t) for t in teachers] 
+        else:
+            return teachers
+
 # Trip Databse Model - Stores and handles trip info 
 class Trip(db.Model):
     __tablename__ = 'trips'
     trip_ids = []
 
     id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, nullable=False, default=0)
     code = db.Column(db.String(6), nullable=False)
     name = db.Column(db.String, nullable=False)
     organizer = db.Column(db.String, nullable=False)
@@ -425,6 +517,14 @@ class Trip(db.Model):
             return [dict_converter(t) for t in trips] 
         else:
             return trips
+    
+    @staticmethod
+    def get_trips_by_teacher_id(teacher_id, return_dict=False):
+        trips = db.session.query(Trip).filter_by(teacher_id=teacher_id).all()
+        if return_dict:
+            return [dict_converter(t) for t in trips] 
+        else:
+            return trips
 
 # Student Preference Databse Model - Stores and handles student trip preferences
 class StudentPreference(db.Model):
@@ -555,7 +655,8 @@ class TripStudent(db.Model):
 # TrApp Setup - Initializes databases and adds test trips
 class Setup:
     STUDENT_CSV = "data/students.csv"
-    TABLE_NAMES = [User.__tablename__, Student.__tablename__, Trip.__tablename__, StudentPreference.__tablename__, TripStudent.__tablename__]
+    TEACHER_CSV = "data/teachers.csv"
+    TABLE_NAMES = [User.__tablename__, Student.__tablename__, Teacher.__tablename__, Trip.__tablename__, StudentPreference.__tablename__, TripStudent.__tablename__]
     initialized = False
 
     @staticmethod
@@ -572,6 +673,7 @@ class Setup:
                     print("|-> Created All Databse Tables")
                 else:
                     students_exist = len(Student.get_all_students()) > 0
+                    teachers_exist = len(Teacher.get_all_teachers()) > 0
                     admin_exists = User.check_exist_with_email(ADMIN['email'])
                     teacher_exists = User.check_exist_with_email(TEACHER['email'])
                     trips_exist = len(db.session.query(Trip).all()) == 8
@@ -583,14 +685,23 @@ class Setup:
                         for s in data:
                             Student(name=s['name'], email=s['email'], grade=s['grade'], gender=s['gender'])
                         print("|-> Added Students to Database")
+                    elif not teachers_exist:
+                        file = open(Setup.TEACHER_CSV, "r")
+                        data = list(csv.DictReader(file, delimiter=","))
+                        file.close()
+                        Teacher(id=0, name="TSU Admin", email="tsu@acs.sch.ae", title="TSU Admin")
+                        Teacher(id=1, name="ACS Teacher", email=TEACHER['email'], title="ACS Teacher", photoUrl=TEACHER['photoUrl'])
+                        for t in data:
+                            Teacher(name=t['name'], email=t['email'], title=t['title'], photoUrl=t['photoUrl'])
+                        print("|-> Added Teachers to Database")
                     else:
                         if not trips_exist:
                             Setup.create_test_trips()
                         if not admin_exists:
-                            User(is_admin=True, is_teacher=True, is_student=True, name="TSU Admin", is_verified=True, student_id=0, email=ADMIN['email'], password=ADMIN['password'])
+                            User(is_admin=True, is_teacher=True, is_student=True, name="TSU Admin", is_verified=True, student_id=0, teacher_id=0, email=ADMIN['email'], password=ADMIN['password'])
                             print("|-> Added Admin to Database")
                         if not teacher_exists:
-                            User(is_teacher=True, is_verified=True, name="ACS Teacher", email=TEACHER['email'], password=TEACHER['password'])
+                            User(is_teacher=True, is_verified=True, name="ACS Teacher",teacher_id=1, email=TEACHER['email'], password=TEACHER['password'])
                             print("|-> Added Teacher to Database")
                         if trips_exist and admin_exists and teacher_exists:
                             break
@@ -598,6 +709,7 @@ class Setup:
         print("|----------------[Setup Check]----------------|")
         print(f"|---> {tables_exist} | Tables Exist")
         print(f"|---> {students_exist} | Students Exist")
+        print(f"|---> {teachers_exist} | Teachers Exist")
         print(f"|---> {admin_exists} | Admin User Exists")
         print(f"|---> {teacher_exists} | Teacher User Exists")
         print(f"|---> {trips_exist} | Test Trips Exist")

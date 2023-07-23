@@ -1,3 +1,10 @@
+:root {
+    --default-width: 320px;
+    --modal-width: 360px;
+    --acs-green: #014C43;
+    --acs-green-transparent: #014c4350;
+}
+
 .inputs input {
     width: 40px !important;
     height: 40px !important;
@@ -9,31 +16,31 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .btn-primary {
-    width: 320px !important;
-    border-color: #014C43 !important;
-    background-color: #014C43 !important;
+    width: var(--default-width) !important;
+    border-color: var(--acs-green) !important;
+    background-color: var(--acs-green) !important;
 }
 
 .form-label {
-    width: 320px !important;
+    width: var(--default-width) !important;
 }
 
 .form-select {
-    width: 320px !important;
+    width: var(--default-width) !important;
 }
 
 .form-control {
-    width: 320px !important;
+    width: var(--default-width) !important;
 }
 
 label {
-    color: #014C43;
+    color: var(--acs-green);
     font-weight: bold;
     font-size: large;
 }
 
 .info-label {
-    width: 320px !important;
+    width: var(--default-width) !important;
     margin-left: auto;
     font-size: medium;
 }
@@ -47,15 +54,11 @@ label {
 }
 
 text {
-    width: 320px !important;
-}
-
-.error {
-    color: red !important;
+    width: var(--default-width) !important;
 }
 
 .modal-dialog {
-    width: 360px !important;
+    width: var(--modal-width) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -65,8 +68,8 @@ text {
 }
 
 .selected {
-    background-color: #014c4350 !important;
-    border-color: #014c4350;
+    background-color: var(--acs-green-transparent) !important;
+    border-color: var(--acs-green-transparent);
 }
 
 .complete {
@@ -79,27 +82,22 @@ text {
     border-color: rgba(255, 0, 0, 0.350);
 }
 
-.completed {
-    color: #014C43 !important;
-    font-weight: bolder;
-}
-
 .table {
-    width: 320px !important;
+    width: var(--default-width) !important;
     display: block !important;
     max-height: 500px !important;
     overflow: auto !important;
 }
 
 .table-10-rows {
-    width: 320px !important;
+    width: var(--default-width) !important;
     display: block !important;
     max-height: 350px !important;
     overflow: auto !important;
 }
 
 .table-5-rows {
-    width: 320px !important;
+    width: var(--default-width) !important;
     display: block !important;
     max-height: 200px !important;
     overflow: auto !important;
@@ -107,9 +105,10 @@ text {
 
 thead {
     top: 0;
-    color: #014C43;
+    color: var(--acs-green);
     position: sticky;
     background-color: white;
+    font-size: 90%;
 }
 
 .home-logo {
@@ -120,20 +119,21 @@ thead {
 
 td {
     white-space: nowrap;
+    font-size: 80%;
+}
+
+.table-users thead {
+    font-size: 100%;
+}
+
+.table-users td {
+    font-size: 90%;
 }
 
 .table-border thead th,
 .table-border tbody td {
   border: 1px solid black;
   border-collapse: collapse;
-}
-
-.red {
-    color: red;
-}
-
-.green {
-    color: green;
 }
 
 .icon-text-container {
@@ -149,32 +149,11 @@ td {
     margin: auto;
 }
 
-.error-card {
-    margin: auto;
-    width: 300px;
-    background-color: #f8d7da;
-    border: 1px solid #f88f9a;
-    color: red;
-    padding: 10px;
-    margin-top: 50px;
-    border-radius: 10px;
-    font-size: small;
-}
-
-.success-card {
-    margin: auto;
-    width: 300px;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    padding: 10px;
-    margin-top: 50px;
-    border-radius: 10px;
-    font-size: small;
-  }
-
 .flash-card {
-    width: 310px;
+    min-width: fit-content;
+    min-width: -webkit-fit-content;
+    min-width: -moz-fit-content;
+    max-width: var(--default-width);
     font-size: small;
 }
 
@@ -199,22 +178,23 @@ td {
 }
 
 #countdown {
-    color: black; /* Default color */
-}
-
-#countdown.warning {
-    color: orange; /* Color when nearing expiration */
-}
-
-#countdown.danger {
-    color: red; /* Color when expired */
+    color: var(--acs-green); /* Default countdown color */
 }
 
 .fontAwesome {
     font-family: 'Helvetica', FontAwesome, sans-serif;
 }
 
-.inline {
-    display: inline-block;
-    vertical-align: middle;
+.row-image img {
+    max-height: 50%;
+    max-width: 50%;
+}
+
+.image-container {
+    width: var(--default-width);
+    align-items: left;
+}
+
+.image-container img {
+    max-width: 25%;
 }
