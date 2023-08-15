@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Update Teachers
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Update Teachers</label>
+<form action="/admin/teachers/update" method="POST" enctype="multipart/form-data">
+    <input class="mt-3 d-grid col-6 mx-auto form-control" type="file" name="file" accept=".csv" id="fileInput" onchange="document.getElementById('fileSubmit').disabled = this.files.length == 0;"/>
+    <input class="mt-2 d-grid col-6 mx-auto btn btn-primary" type="submit" id="fileSubmit" disabled/>
+</form>  
+{% endblock %}

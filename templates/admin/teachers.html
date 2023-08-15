@@ -12,15 +12,15 @@
 	<thead>
 		<tr>
 			<th class="text-center">ID</th>
-			<th>Teacher Name</th>
-			<th class="text-center">Photo</th>
+			<th style="width:50%;">Teacher Name</th>
+			<th style="width:50%;" class="text-center">Photo</th>
 		</tr>
 	</thead>
 	<tbody class="table-group-divider">
 		{%for t in teachers%}
 		<tr onclick="updateTeacherInfoPanel(JSON.parse('{{t.id}}'))" data-toggle="modal" data-target="#teacher_edit_information">
 			<td class="text-center">{{t.id}}</td>
-			<td>{{t.name}}</td>
+			<td id="{{t.title}}">{{t.name}}</td>
 			<td class="row-image text-center"><img src={{t.photoUrl}}></td>
 		</tr>
 		{%endfor%}
@@ -120,12 +120,12 @@
         let tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those who don't match the search query
-        for (i = 0; i < tr.length; i++) {
+        for (i = 1; i < tr.length; i++) {
             let tdID = tr[i].getElementsByTagName("td")[0];
 			let tdName = tr[i].getElementsByTagName("td")[1];
-            let tdTitle = tr[i].getElementsByTagName("td")[2];
+            let tdTitle = tdName.id || "unknown";
             if (tdID && tdName && tdTitle) {
-                let txtValue = ` ${tdID.textContent || tdID.innerText} ${tdName.textContent || tdName.innerText} ${tdTitle.textContent || tdTitle.innerText} `;
+                let txtValue = ` ${tdID.textContent || tdID.innerText} ${tdName.textContent || tdName.innerText} ${tdTitle} `;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                 } else {

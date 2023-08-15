@@ -1,0 +1,297 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Update Students
+{% endblock %}
+
+{% block main %}
+<label class="d-grid form-label mt-3 mx-auto">Update Students</label>
+<form action="/admin/students/update" method="POST" enctype="multipart/form-data">
+    <label class="d-grid form-label label-medium mt-3 mx-auto">Action</label>
+    <select name="student_action" id="student_action" class="mt-2 mx-auto form-select" aria-label=".form-select-sm">
+        <option disabled>Action</option>
+        <option selected value="add">Add Students in CSV File</option>
+        <option value="remove">Remove Students in CSV File</option>
+    </select>
+    <label class="d-grid form-label label-medium mt-3 mx-auto">Upload New CSV File</label>
+    <input class="mt-2 d-grid col-6 mx-auto form-control" type="file" name="file" accept=".csv" id="fileInput" onchange="document.getElementById('fileSubmit').disabled = this.files.length == 0;"{% if filename %}value={{filename}}{% endif %}/>
+    <input class="mt-2 d-grid col-6 mx-auto btn btn-primary" type="submit" value="Upload" id="fileSubmit" disabled/>
+    
+    <label class="d-grid form-label label-medium mt-3 mx-auto">Select Uploaded File</label>
+    <select name="file_select" id="file_select" class="mt-2 mx-auto form-select" aria-label=".form-select-sm" onchange="document.getElementById('fileSubmit2').disabled = (this.value == 'Select File');">
+        <option disabled selected>Select File</option>
+        {%for u in uploads%}
+            <option value="{{u.id}}">{{u.filename}}</option>
+        {%endfor%}
+    </select>
+    <input class="mt-2 d-grid col-6 mx-auto btn btn-primary" type="submit" value="Select File" id="fileSubmit2" disabled/>
+</form>  
+
+<button class="mt-5 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#manage_uploads">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-file"></i>
+        <span>Manage Uploads</span>
+    </div>
+</button>
+
+{% if results.added|length > 0 %}
+    <div class="mt-3 form-label mx-auto">
+        <input type="checkbox" checked class="form-check-input" id="added_checkbox" onchange='enableTable(this)'>
+        <label class="mx-1 label-medium">Add Students ({{results.added | length}})</label>
+    </div>
+    <table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="added">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th style="width:100%;">Email</th>
+                <th data-type="number" class="text-center">Grade</th>
+                <th class="text-center">Gender</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for s in results.added%}
+            <tr onclick="selectRow(this)" class="selected">
+                <td>{{s.name}}</td>
+                <td>{{s.email}}</td>
+                <td class="text-center">{{s.grade}}</td>
+                <td class="text-center">{{s.gender}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if results.removed.unused|length > 0 %}
+    <div class="mt-3 form-label mx-auto">
+        <input type="checkbox" class="form-check-input" id="remove_unused_checkbox" onchange='enableTable(this)'>
+        <label class="mx-1 label-medium">Remove Students w/o User(s) ({{results.removed.unused | length}})</label>
+    </div>
+    <table class="table table-5-rows table-sm table-hover mt-2 mx-auto table-secondary" id="remove_unused">
+        <thead>
+            <tr>
+                <th class="text-center">ID</th>
+                <th style="width:100%;">Student Name</th>
+                <th data-type="number" class="text-center">Grade</th>
+                <th class="text-center">Gender</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {%for s in results.removed.unused%}
+            <tr onclick="selectRow(this)" class="selected">
+                <td class="text-center">{{s.id}}</td>
+                <td>{{s.name}}</td>
+                <td class="text-center">{{s.grade}}</td>
+                <td class="text-center">{{s.gender}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if results.removed.used|length > 0 %}
+    <div class="mt-3 form-label mx-auto">
+        <input type="checkbox" class="form-check-input" id="remove_used_checkbox" onchange='enableTable(this)'>
+        <label class="mx-1 label-medium">Remove Students w/ User(s) ({{results.removed.used | length}})</label>
+    </div>
+    <table class="table table-5-rows table-sm table-hover mt-2 mx-auto table-secondary" id="remove_used">
+        <thead>
+            <tr>
+                <th class="text-center">ID</th>
+                <th style="width:100%;">Student Name</th>
+                <th data-type="number" class="text-center">Grade</th>
+                <th class="text-center">Gender</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {%for s in results.removed.used%}
+            <tr onclick="selectRow(this)" class="selected">
+                <td class="text-center">{{s.id}}</td>
+                <td>{{s.name}}</td>
+                <td class="text-center">{{s.grade}}</td>
+                <td class="text-center">{{s.gender}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if results.invalid|length > 0 %}
+    <label class="d-grid form-label label-medium mt-3 mx-auto">Invalid Student Data ({{results.invalid | length}})</label>
+    <table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="students_error">
+        <thead>
+            <tr>
+                <th style="width:100%;">Student Name</th>
+                <th data-type="number" class="text-center">Grade</th>
+                <th class="text-center">Gender</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {%for s in results.invalid%}
+            <tr>
+                {{s}}
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if results.added|length + results.removed.used|length + results.removed.unused|length > 0 %}
+    <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" id="button_update_students" onclick="updateStudents()">
+        <div class="icon-text-container center-div">
+            <i class="fas fa-check"></i>
+            <span>Update Students</span>
+        </div>
+    </button>
+{% endif %}
+
+<a href="/admin/students" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back To Manage Students</span>
+    </div>
+</a>
+
+<div class="modal fade" id="manage_uploads" tabindex="-1" aria-labelledby="manage_uploads_label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                    <label class="d-grid form-label mx-auto">Manage Files</label>
+                    <table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="file_table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center" scope="col">
+                                <i class="fas fa-trash"></i>
+                            </th>
+                            <th>Filename</th>
+                            <th style="width:100%;" class="text-center">Upload Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for u in uploads%}
+                        <tr id="f{{u.id}}">
+                            <td> <input onclick="update(`f{{u.id}}`, this.checked)" type="checkbox"> </td>
+                            <td><a href="{{ url_for('download', path=u.dir, filename=u.filename) }}">{{u.filename}}</a></td>
+                            <td class="text-center">{{u.upload_date}}</td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+                <text style="font-size: small;" class="d-grid mx-auto">Click filename to download</text>
+            </div>
+            <button onclick="deleteFiles()" disabled class="mb-4 d-grid mt-1 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" id="delete_button">
+                <div class="icon-text-container center-div">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete Files</span>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getSelectedFiles() {
+        var table = document.getElementById("file_table");
+        var tr = table.getElementsByTagName("tr");
+        let selected = [];
+        for (i = 1; i < tr.length; i++) {
+            var inp = tr[i].getElementsByTagName("td")[0].getElementsByTagName("input")[0];
+            if (inp.checked) {
+                selected.push(parseInt(tr[i].id.split("f")[1]));
+            }
+        }
+        return selected;
+    }
+
+    function update(id, checked) {
+        document.getElementById(id).className = (checked) ? "selected" : "";
+        document.getElementById("delete_button").disabled = getSelectedFiles().length == 0;
+    }
+
+    function selectRow(elem) {
+        elem.className = (elem.className == "selected") ? "" : "selected";
+    }
+
+    function deleteFiles() {
+        $.ajax({
+            type: "POST",
+            url: "/admin/students/update",
+            data: JSON.stringify({
+                cmd: "deleteFiles",
+                ids: getSelectedFiles()
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.reload();
+            }
+        });
+    }
+
+    function enableTable(elem) {
+        var table = document.getElementById(elem.id.substring(0, elem.id.lastIndexOf("_")));
+        if (elem.checked) {
+            table.classList.remove("table-secondary");
+        } else {
+            table.classList.add("table-secondary");
+        }
+        let add_checkbox = document.getElementById("added_checkbox");
+        let rem_a_checkbox = document.getElementById("remove_used_checkbox");
+        let rem_b_checkbox = document.getElementById("remove_unused_checkbox");
+        document.getElementById("button_update_students").disabled = !((add_checkbox && add_checkbox.checked) || (rem_a_checkbox && rem_a_checkbox.checked) || (rem_b_checkbox && rem_b_checkbox.checked));
+    }
+
+    function getSelectedStudents(id) {
+        var table = document.getElementById(id);
+        var tr = table.getElementsByTagName("tr");
+        let selected = [];
+        for (i = 1; i < tr.length; i++) {
+            let tds = tr[i].getElementsByTagName("td");
+            if (id == "added") {
+                selected.push({
+                    name: tds[0].textContent || tds[0].innerText, 
+                    email: tds[1].textContent || tds[1].innerText,
+                    grade: tds[2].textContent || tds[2].innerText,
+                    gender: tds[3].textContent || tds[3].innerText
+                });
+            } else {
+                selected.push(tds[0].textContent || tds[0].innerText);
+            }
+        }
+        return selected;
+    }
+
+    function updateStudents() {
+        let data = {
+            cmd: "updateStudents"
+        };
+
+        let add_checkbox = document.getElementById("added_checkbox");
+        let rem_a_checkbox = document.getElementById("remove_used_checkbox");
+        let rem_b_checkbox = document.getElementById("remove_unused_checkbox");
+
+        if (add_checkbox && add_checkbox.checked) {
+            data.add = getSelectedStudents("added");
+        }
+
+        if (rem_a_checkbox && rem_a_checkbox.checked) {
+            data.remove_used = getSelectedStudents("remove_used");
+        }
+
+        if (rem_b_checkbox && rem_b_checkbox.checked) {
+            data.remove_unused = getSelectedStudents("remove_unused");
+        }
+        
+        $.ajax({
+            type: "POST",
+            url: "/admin/students/update",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.reload();
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,5 +1,5 @@
 # |-------------------------------------------------------------------------{ Imports & Variables }-------------------------------------------------------------------------|
-from flask import Flask, render_template, redirect, request, session, abort, flash, get_flashed_messages
+from flask import Flask, render_template, redirect, request, session, abort, flash, get_flashed_messages, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from functools import wraps
@@ -18,7 +18,7 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 
 # Imports Very Important Classes
-from classes import Setup, User, Trip, Student, Teacher, TripStudent, StudentPreference
+from classes import Setup, User, Trip, Student, Teacher, TripStudent, StudentPreference, FileUpload
 
 # Initializes Databse Tables, Users, and Test Trips
 # (Find a better way to do this when hosting)
@@ -39,6 +39,15 @@ def login_required(disable_verify=False):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+# Decorator for logout-only routes
+def logout_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' in session or current_user['db_user'] is not None:
+            return redirect("/")
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Decorator for admin-only routes
 def admin_only(f):
@@ -111,7 +120,8 @@ def server_error(e):
   return render_template("error/500.html")
 
 # Sign Up (New User)
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup/", methods=["GET", "POST"])
+@logout_required
 def signup():
     if request.method == "GET":
         return render_template("auth/signup.html")
@@ -173,7 +183,7 @@ def signup():
         return render_template("auth/signup.html", e=e, p1=p1)
 
 # Email Verification OTP
-@app.route("/verify", methods=["GET", "POST"])
+@app.route("/verify/", methods=["GET", "POST"])
 @login_required(disable_verify=True)
 def verify():
     error = code = None
@@ -206,7 +216,10 @@ def verify():
                 initial = not user.is_resetting
                 user.verify(initial=initial)
                 flash("Email Verified Successfully!", 'success')
-                return redirect("/")
+                if initial:
+                    return redirect("/")
+                else:
+                    return redirect("/reset")
         else:
             error = "Incorrect verification code. Please check if the code you entered matches the one in your email inbox."
     if error:
@@ -214,7 +227,8 @@ def verify():
     return render_template("auth/verify.html",time=time, email=email, user_id=user_id, code=code)
 
 # Existing User Login
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login/", methods=["GET", "POST"])
+@logout_required
 def login():
     if request.method == "GET":
         return render_template("auth/login.html")
@@ -256,7 +270,7 @@ def login():
         return render_template("auth/login.html")
 
 # Logout
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/logout/", methods=["GET", "POST"])
 @login_required(disable_verify=True)
 def logout():
     # Log Out User - Clear session and reset `current_user`
@@ -274,9 +288,47 @@ def logout():
     return redirect("/")
     #return render_template("auth/logout.html")
 
+# TODO: Reset Password
+@app.route("/reset/", methods=["GET", "POST"])
+@login_required()
+def reset():
+    global current_user
+    
+    if request.method == "GET":
+        if not current_user['db_user'].is_verified or not current_user['db_user'].is_resetting:
+            return redirect("/verify")
+        return render_template("auth/reset.html")
+    else:
+        p1 = None
+        
+        # Get Sign Up info from form
+        password = request.form['password'].strip()
+        password_verify = request.form['password_confirm'].strip()
+
+        # Check if email has proper structure and acs.sch.ae domain
+        # Check if user account already exists
+        if len(password) < 8:
+            flash("Your password must be at least 8 characters!", 'danger')
+
+        # Check if password matches repeat password
+        elif password != password_verify:
+            p1 = password
+            flash("Your passwords must match! Please repeat your password.", 'danger')
+
+        # If passwords match
+        else:
+            current_user['db_user'].update_password(password)
+            flash('Password reset successfully!', 'success')
+            if current_user['db_user'].is_teacher:
+                return redirect("/teacher")
+            else:
+                return redirect("/student")
+            
+        return render_template("auth/reset.html", p1=p1)
+
 # Student Dashboard
 # TODO: Reset Password Feature
-@app.route("/student", methods=["GET", "POST"])
+@app.route("/student/", methods=["GET", "POST"])
 @student_only
 def student():
     student = current_user['student']
@@ -302,10 +354,14 @@ def student():
         if data['cmd'] == "updateStudent":
             Student.get_student_by_id(student['id'], return_dict=False).update(data)
             flash("Student Information Updated!", 'success')
+        elif data['cmd'] == "changePass":
+            if not current_user['db_user'].is_resetting:
+                current_user['db_user'].initiate_pass_reset()
+            return redirect("/verify")
         return redirect("/student")
 
 # Student Preferences Form
-@app.route("/student/<trip_code>", methods=["GET", "POST"])
+@app.route("/student/<trip_code>/", methods=["GET", "POST"])
 @student_only
 def student_preferences(trip_code):
     global current_user
@@ -357,8 +413,9 @@ def student_preferences(trip_code):
             current_user['db_user'].send_preferences_email(trip.id)
         return render_template("student/prefs-submitted.html", trip_code=trip_code)
     
-# All Trips Page
-@app.route("/teacher", methods=["GET", "POST"])
+
+# Teacher Dashboard
+@app.route("/teacher/", methods=["GET", "POST"])
 @teacher_only
 def trips():
     # Gets teacher and user info
@@ -400,10 +457,14 @@ def trips():
             else:
                 Teacher.get_teacher_by_id(teacher['id'], return_dict=False).update(data)
                 flash("Teacher Information Updated!", 'success')
+        elif data['cmd'] == "changePass":
+            if not current_user['db_user'].is_resetting:
+                current_user['db_user'].initiate_pass_reset()
+            return redirect("/verify")
     return render_template("teacher/teacher.html", main_teacher=main_teacher, teacher=teacher, all_trips=all_trips, trip_studs=trip_studs, all_students=all_students, info=info)
 
 # Speciic Trip Page
-@app.route("/teacher/<trip_code>", methods=["GET", "POST"])
+@app.route("/teacher/<trip_code>/", methods=["GET", "POST"])
 @teacher_only
 def trip(trip_code):
     main_teacher = Teacher.check_main(current_user['teacher']['email'])
@@ -435,7 +496,7 @@ def trip(trip_code):
         return redirect(f"/teacher/{trip_code}")
 
 # Groups Page for Trip
-@app.route("/teacher/<trip_code>/groups", methods=["GET", "POST"])
+@app.route("/teacher/<trip_code>/groups/", methods=["GET", "POST"])
 @teacher_only
 def groups(trip_code):
     sel_trip = Trip.get_trip_by_code(trip_code)
@@ -457,12 +518,14 @@ def groups(trip_code):
         return redirect(f"/teacher/{trip_code}/groups")
 
 
-@app.route("/admin", methods=["GET", "POST"])
+# Admin Dasboard
+@app.route("/admin/", methods=["GET", "POST"])
 @admin_only
 def admin():
     return render_template("/admin/admin.html")
-    
-@app.route("/admin/users", methods=["GET", "POST"])
+
+# Manage Users
+@app.route("/admin/users/", methods=["GET", "POST"])
 @admin_only
 def admin_users():
     get_flashed_messages()
@@ -525,13 +588,15 @@ def admin_users():
 
     return render_template("admin/users.html", users=users, teachers=teachers, students=students)
 
-@app.route("/admin/students", methods=["GET", "POST"])
+# Manage Students
+@app.route("/admin/students/", methods=["GET", "POST"])
 @admin_only
 def admin_students():
     # Get all students
     students = Student.get_all_students(return_dict=True)
     if request.method == "POST":
         data = request.get_json()
+        print(data)
         if data['cmd'] == "updateStudent":
             student = Student.get_student_by_id(data['id'], return_dict=False)
             email_check = Student.check_student_email(data['email']) if "email" in data else True
@@ -559,7 +624,68 @@ def admin_students():
                 flash("Student Deleted!", 'success')
     return render_template("admin/students.html", students=students)
 
-@app.route("/admin/teachers", methods=["GET", "POST"])
+# Update Students with CSV
+@app.route("/admin/students/update/", methods=["GET", "POST"])
+@admin_only
+def admin_students_update():
+    results = {
+            "added": [],
+            "removed": {
+                "used": [],
+                "unused": []
+            },
+            "invalid": []
+    }
+    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True)
+    if request.method == "POST":
+        if 'file' not in request.files:
+            data = request.get_json()
+            if data['cmd'] == "deleteFiles":
+                for id in data['ids']:
+                    file = FileUpload.get_upload_by_id(id)
+                    if file is not None:
+                        file.delete()
+                flash('Files Deleted!', 'success')
+            elif data['cmd'] == "updateStudents":
+                if 'add' in data:
+                    for student in data['add']:
+                        Student(name=student['name'], email=student['email'], grade=int(student['grade']), gender=student['gender'])
+                if 'remove_used' in data:
+                    Student.delete_students_with_ids(data['remove_used'], delete_users=True)
+                if 'remove_unused' in data:
+                    Student.delete_students_with_ids(data['remove_unused'])
+                flash('Students Updated!', 'success')
+        else:
+            file = request.files['file']
+            action = request.form['student_action']
+            if len(uploads) > 10:
+                flash('You have over 10 files already uploaded! Please delete some and try again.', 'danger')
+            elif file.filename == '':
+                flash('File NOT Uploaded: Name Error!', 'danger')
+            elif file:
+                adding = action == 'add'
+                if FileUpload.check_student_csv_columns(file, adding=adding):
+                    file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
+                    file_upload.save_file(file)
+                    results = FileUpload.get_students_results(file_upload, adding=adding)
+                    if not adding and (len(results['removed']['used']) + len(results['removed']['unused'])) == 0:
+                        flash('No Valid Students to Remove!', 'warning')
+                    elif adding and len(results['added']) == 0:
+                        flash('No Valid Students to Add!', 'warning')
+                    else:
+                        flash('File Uploaded!', 'success')
+                    return render_template("admin/update-students.html", uploads=uploads, results=results)
+                else:
+                    flash('File NOT Uploaded: Colunm Error!', 'danger')   
+            elif request.form.get("file") is not None:
+                #TODO
+                return redirect(request.url)
+            return redirect(request.url)
+            
+    return render_template("admin/update-students.html", uploads=uploads, results=results)
+
+# Manage Teachers
+@app.route("/admin/teachers/", methods=["GET", "POST"])
 @admin_only
 def admin_teachers():
     # Get all students
@@ -594,8 +720,27 @@ def admin_teachers():
                 flash("Teacher Deleted!", 'success')
     return render_template("admin/teachers.html", teachers=teachers)
 
+# Update Teachers with CSV
+@app.route("/admin/teachers/update/", methods=["GET", "POST"])
+@admin_only
+def admin_teachers_update():
+    return render_template("admin/update-teachers.html")
+
+# Download Uploaded File
+@app.route('/uploads/<path>/<filename>/', methods=['GET', 'POST'])
+def download(path, filename):
+    print(path, filename)
+    user_id = path.split("-")[-1]
+    if not user_id.isnumeric() or filename not in [u.filename for u in FileUpload.get_uploads_by_user(int(user_id))]:
+        if int(user_id) == current_user['db_user'].id:
+            abort(403)
+        else:
+            abort(404)
+    full_path = FileUpload.get_full_path(path)
+    return send_from_directory(full_path, filename)
+
 # |--------------------------------------------------------------------------{ POST-Only Routes }---------------------------------------------------------------------------|
-@app.route("/redo_verify", methods=["POST"])
+@app.route("/redo_verify/", methods=["POST"])
 @login_required(disable_verify=True)
 def redo_verify():
     if request.method == "POST":
@@ -608,6 +753,7 @@ def redo_verify():
                 if not u.is_verified:
                     u.send_verify_email()
         return redirect("/verify")
+
 
 # |--------------------------------------------------------------------------{ Main Function :D }---------------------------------------------------------------------------|
 if __name__ == "__main__":

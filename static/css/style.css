@@ -92,14 +92,14 @@ text {
 .table-10-rows {
     width: var(--default-width) !important;
     display: block !important;
-    max-height: 350px !important;
+    max-height: 313px !important;
     overflow: auto !important;
 }
 
 .table-5-rows {
     width: var(--default-width) !important;
     display: block !important;
-    max-height: 200px !important;
+    max-height: 175px !important;
     overflow: auto !important;
 }
 

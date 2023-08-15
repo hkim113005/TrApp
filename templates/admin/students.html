@@ -12,7 +12,7 @@
 	<thead>
 		<tr>
 			<th class="text-center">ID</th>
-			<th>Student Name</th>
+			<th style="width:100%;" >Student Name</th>
 			<th data-type="number" class="text-center">Grade</th>
 			<th class="text-center">Gender</th>
 		</tr>
@@ -37,13 +37,19 @@
     </div>
 </button>
 
+<a href="/admin/students/update" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-rotate"></i>
+        <span>Bulk Add/Remove Students</span>
+    </div>
+</a>
+
 <a href="/admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
     <div class="icon-text-container center-div">
         <i class="fas fa-arrow-left"></i>
         <span>Back To Admin Dashboard</span>
     </div>
 </a>
-
 
 <div class="modal fade" id="student_edit_information" tabindex="-1" aria-labelledby="student_edit_information_label"
     aria-hidden="true">

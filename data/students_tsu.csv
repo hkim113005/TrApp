@@ -1,9 +1,9 @@
-id,name,email,grade,gender
-,Ryan Ayoub,ryanramiayoub@acs.sch.ae,10,M
-,Lionel De Visscher,lioneldevisscher@acs.sch.ae,10,M
-,Andrew Lee,jehyeoklee@acs.sch.ae,10,M
-,Jeremiah Mathew,jeremiahmathew@acs.sch.ae,10,M
-,Rohit Sundararaman,rohitsundararaman@acs.sch.ae,10,M
-,GT Heming,gordonheming@acs.sch.ae,11,M
-,Hyungjae Kim,hyungjaekim@acs.sch.ae,11,M
-,Batu Sinanoglu,batusinanoglu@acs.sch.ae,11,M
+name,email,grade,gender
+Ryan Ayoub,ryanramiayoub@acs.sch.ae,10,M
+Lionel De Visscher,lioneldevisscher@acs.sch.ae,10,M
+Andrew Lee,jehyeoklee@acs.sch.ae,10,M
+Jeremiah Mathew,jeremiahmathew@acs.sch.ae,10,M
+Rohit Sundararaman,rohitsundararaman@acs.sch.ae,10,M
+GT Heming,gordonheming@acs.sch.ae,11,M
+Hyungjae Kim,hyungjaekim@acs.sch.ae,11,M
+Batu Sinanoglu,batusinanoglu@acs.sch.ae,11,M

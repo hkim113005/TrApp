@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Change Password
+{% endblock %}
+
+{% block stylesheets %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block main %}
+<form action="/reset" method="POST">
+    <label class="d-grid form-label mt-3 mx-auto">Change Password</label>
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" value="{{p1 if p1}}" id="password" name="password" placeholder="Password">
+
+    <input type="password" oninput="inputChecker()" class="mt-3 mx-auto form-control" id="password_confirm" name="password_confirm" placeholder="Repeat Password">
+    
+    <button type="submit" disabled id="password_submit" class="d-grid gap-2 col-6 mt-5 mx-auto btn btn-primary">Submit</button>
+</form>
+
+<script>
+
+    function checkPasswords() {
+        let password = document.getElementById("password").value;
+        let passwordConfirm = document.getElementById("password_confirm").value;
+        if (!(password && passwordConfirm)) return false;
+        //if (password.length < 8) return false;
+        //if (password != passwordConfirm) return false;
+        
+        return true;
+    }
+
+    function inputChecker() {
+        document.getElementById("password").value = document.getElementById("password").value.replace(" ", "");
+        document.getElementById("password_confirm").value =  document.getElementById("password_confirm").value.replace(" ", "");
+        let cansubmit = checkPasswords();
+        document.getElementById('password_submit').disabled = !cansubmit;
+    }
+</script>
+
+{% endblock %}

@@ -303,6 +303,7 @@
 		s = students[students.map(s => s.id).indexOf(parseInt(e.value))];
 		document.getElementById("user_student_info").value = `${s.name} - Grade ${s.grade} | ${s.gender}`;
 		document.getElementById("add_user_student_info").value = `${s.name} - Grade ${s.grade} | ${s.gender}`;
+		updateUserLoginEmail(s.email);
 	}
 
     function updateUserTeacher(e) {
@@ -314,6 +315,11 @@
 		t = teachers[teachers.map(t => t.id).indexOf(parseInt(e.value))];
 		document.getElementById("user_teacher_info").value = `${t.name} - ${t.title}`;
 		document.getElementById("add_user_teacher_info").value = `${t.name} - ${t.title}`;
+		updateUserLoginEmail(t.email);
+	}
+
+	function updateUserLoginEmail(email) {
+		emailElem = document.getElementById("add_user_email").value = email;
 	}
 
     function checkUserInfo() {

@@ -19,18 +19,27 @@ Teacher
     <label class="d-grid info-label mt-3 mx-auto">Login Email</label> 
     <text class="d-grid mx-auto">{{info.login_email}}</text>
 {% endif %}
+
 <label class="d-grid info-label mt-3 mx-auto">ACS Teacher Email</label> 
 <text class="d-grid mx-auto">{{teacher.email}}</text>
 
 <label class="d-grid info-label mt-3 mx-auto">Title</label> 
 <text class="d-grid mx-auto">{{teacher.title}}</text>
 
+{% if not main_teacher %} 
 <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacher_edit_information">
     <div class="icon-text-container center-div">
         <i class="fas fa-user-pen"></i>
         <span>Edit Information</span>
     </div>
 </button>
+<button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-toggle="modal" data-bs-target="#more_info">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-circle-info"></i>
+        <span>Additional Information</span>
+    </div>
+</button>
+{% endif %} 
 
 <label class="d-grid info-label mt-5 mx-auto">Your Trips</label>
 {% if main_teacher %} 
@@ -138,12 +147,20 @@ Teacher
                     <input type="text" class="mt-2 mx-auto form-control" id="teacher_title" oninput="checkInfo()" value="{{teacher.title}}">
 
                     <text class="d-grid mx-auto">* = Unsaved Changes!</text>
-                    <button onclick="saveTeacherInfo()" class="mt-3 mb-4 d-grid gap-2 col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_teacher_info">
+                    <button onclick="saveTeacherInfo()" class="mt-3 d-grid {{'mb-4' if not main_teacher else ''}} col-6 mx-auto btn btn-primary" data-bs-dismiss="modal" disabled id="save_teacher_info">
                         <div class="icon-text-container center-div">
                             <i class="fas fa-floppy-disk"></i>
                             <span>Save Changes</span>
                         </div>
                     </button>
+                    {% if not main_teacher %}
+                        <button id="pass_reset" class="mt-2 d-grid mb-2 col-6 mx-auto btn btn-primary" onclick="sendPassReset()">
+                            <div class="icon-text-container center-div">
+                                <i class="fas fa-lock"></i>
+                                <span>Change Password</span>
+                            </div>
+                        </button>
+                    {% endif %}
                 </form>
             </div>
         </div>
@@ -164,17 +181,11 @@ Teacher
 
 				<label class="d-grid info-label mt-3 mx-auto">Date Verified</label>
 				<text id="user_info_verified" class="d-grid mx-auto">{{info.date_verified}}</text>
-
-                <button class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" onclick="">
-                    <div class="icon-text-container center-div">
-                        <i class="fas fa-lock"></i>
-                        <span>Change Password</span>
-                    </div>
-                </button>
 			</div>
         </div>
     </div>
 </div>
+
 
 <script>
     let data = {
@@ -190,6 +201,23 @@ Teacher
             dataType: "json",
             complete: (e) => {
                 window.location.reload();
+            }
+        });
+    }
+
+    function sendPassReset() {
+        document.getElementById("pass_reset").disabled = true;
+        $.ajax({
+            type: "POST",
+            url: "/teacher",
+            data: JSON.stringify({
+                cmd: "changePass",
+                id: parseInt(`{{teacher.id}}`)
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            complete: (e) => {
+                window.location.href = "/verify";
             }
         });
     }

@@ -47,6 +47,9 @@
             $(".flash-card").delay(3000).fadeOut("slow", function() {
                 $(this).remove();
             });
+			if ( window.history.replaceState ) {
+				window.history.replaceState( null, null, window.location.href );
+			}
         });
 	</script>
 

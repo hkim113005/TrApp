@@ -1,8 +1,10 @@
 import random
 import csv
+import os
 from datetime import datetime, timedelta
-from flask import render_template, session, url_for
+from flask import render_template, session
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from flask_mail import Message
 from app import db, mail, app, current_user
 
@@ -49,9 +51,11 @@ class User (db.Model):
     date_verified = db.Column(db.DateTime, nullable=True)
     date_last_verify = db.Column(db.DateTime, nullable=True, default=datetime.now().replace(microsecond=0))
     
-    def __init__(self, password, **kwargs):
+    def __init__(self, password, is_verified=False, **kwargs):
         super(User, self).__init__(**kwargs)
         self.hashed_password = generate_password_hash(password, method="scrypt")
+        if is_verified:
+            self.verify(initial=True)
         self.regenerate_verify_code()
         self.create()
 
@@ -63,6 +67,8 @@ class User (db.Model):
         db.session.commit()
     
     def delete(self):
+        for file in FileUpload.get_uploads_by_user(self.id):
+            file.delete()
         db.session.delete(self)
         db.session.commit()
     
@@ -84,6 +90,7 @@ class User (db.Model):
 
     def update_password(self, password):
         self.hashed_password = generate_password_hash(password, method="scrypt")
+        self.is_resetting = False
         self.sync()
 
     def update_perms(self, data):
@@ -179,6 +186,13 @@ class User (db.Model):
     def check_password(self, plain_password):
         return check_password_hash(self.hashed_password, plain_password)
 
+    def initiate_pass_reset(self):
+        self.regenerate_verify_code()
+        self.is_verified = False
+        self.is_resetting = True
+        self.sync()
+        self.send_verify_email()
+
     def reset_password(self, new_password):
         self.hashed_password = generate_password_hash(new_password)
         self.sync()
@@ -212,12 +226,25 @@ class User (db.Model):
         return db.session.query(User).filter_by(id=id).first()
 
     @staticmethod
+    def get_user_by_student_id(student_id):
+        return db.session.query(User).filter_by(student_id=student_id).first()
+
+    @staticmethod
+    def get_user_by_teacher_id(teacher_id):
+        return db.session.query(User).filter_by(teacher_id=teacher_id).first()
+
+    @staticmethod
     def check_exist_with_email(email):
         return User.get_user_by_email(email) is not None
 
     @staticmethod
     def check_exist_with_id(id):
         return User.get_user_by_id(id) is not None
+
+    @staticmethod
+    def check_exist_with_student_email(email):
+        s = Student.get_student_by_email(email)
+        return User.get_user_by_student_id(s['id']) is not None
 
 # Student Databse Model - Stores and handles student info 
 class Student(db.Model):
@@ -227,7 +254,7 @@ class Student(db.Model):
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     grade = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(1), nullable=False, default="-")
+    gender = db.Column(db.String(1), nullable=True, default="-")
 
     def __init__(self, **kwargs):
         super(Student, self).__init__(**kwargs)
@@ -277,9 +304,12 @@ class Student(db.Model):
             return dict_converter(student)
 
     @staticmethod
-    def get_student_by_email(email):
+    def get_student_by_email(email, return_dict=True):
         student = db.session.query(Student).filter_by(email=email).first()
-        return dict_converter(student) if student else None
+        if not return_dict or student is None:
+            return student
+        else:
+            return dict_converter(student)
 
     @staticmethod
     def check_student_email(email):
@@ -293,6 +323,21 @@ class Student(db.Model):
             return [dict_converter(s) for s in students] 
         else:
             return students
+    
+    @staticmethod
+    def check_new_student(student):
+        no_name = student['name'] == '' or student['name'] is None
+        no_email = student['email'] == '' or student['email'] is None
+        if not no_email:
+            s = Student.get_student_by_email(student['email'])
+        return no_name or no_email or s is None
+
+    @staticmethod
+    def delete_students_with_ids(student_ids, delete_users=False):
+        for id in student_ids:
+            Student.get_student_by_id(id, return_dict=False).delete()
+            if delete_users:
+                User.get_user_by_student_id(id).delete()
 
 # Teacher Databse Model - Stores and handles teacher info 
 class Teacher(db.Model):
@@ -652,11 +697,157 @@ class TripStudent(db.Model):
         ids = [id[0] for id in ids]
         return sorted([Student.get_student_by_id(id) for id in ids], key=lambda x: (x['grade'], x['name']))
     
+# File Upload Database model - Stores and handles file upload info
+class FileUpload(db.Model):
+    __tablename__ = "file_uploads"
+
+    STUDENT_COLUMN_INFO = None
+    TEACHER_COLUMN_INFO = None
+
+    ALLOWED_FORMATS = {
+        "csv": "csv",
+    }
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    full_path = db.Column(db.String, nullable=False, default=app.config['UPLOAD_FOLDER'])
+    dir = db.Column(db.String, nullable=False, default="")
+    filename = db.Column(db.String, nullable=False)
+    type = db.Column(db.String, nullable=False, default="unknown")
+    upload_date = db.Column(db.DateTime, nullable=False, default=datetime.now().replace(microsecond=0))
+
+    def __init__(self, filename, **kwargs):
+        super(FileUpload, self).__init__(**kwargs)
+        self.dir = f"user-{kwargs.get('user_id')}"
+        self.full_path = f"{app.config['UPLOAD_FOLDER']}/{self.dir}"
+        if not os.path.exists(self.full_path):
+            os.makedirs(self.full_path)
+        self.filename = FileUpload.fix_filename(self.full_path, filename)
+        ext = filename.split(".")[-1]
+        if ext in list(FileUpload.ALLOWED_FORMATS.keys()):
+            self.type = FileUpload.ALLOWED_FORMATS[ext]
+
+    def delete(self):
+        os.remove(os.path.join(self.full_path, self.filename))
+        db.session.delete(self)
+        db.session.commit()
+
+    def save_file(self, file):
+        file.seek(0)
+        file.save(os.path.join(self.full_path, self.filename))
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def check_student_csv_columns(file, adding=False):
+        f = file.stream.read().decode("utf-8").splitlines()
+        data = list(csv.DictReader(f))
+        columns = list(dict(data[0]).keys())
+        if not adding:
+            return 'email' in columns
+        return columns == FileUpload.STUDENT_COLUMN_INFO['columns']
+    
+    @staticmethod
+    def check_valid_student(row):
+        for key, val in row.items():
+            data = FileUpload.STUDENT_COLUMN_INFO[key]
+            is_null = val == '' or val is None
+            if is_null and is_null != data['nullable']:
+                return False         
+            if key != "gender" and 'max_length' in data:
+                if len(val) != data['max_length']:
+                    return False
+            if key == "grade":
+                if int(val) < 1 or int(val) > 12:
+                    return False
+            if key == "gender" and val not in ['M', 'F', '-', '']:
+                return False
+        return True
+    
+    @staticmethod
+    def check_teacher_csv_columns(file):
+        f = file.stream.read().decode("utf-8").splitlines()
+        data = list(csv.DictReader(f))
+        return list(dict(data[0]).keys()) == FileUpload.TEACHER_COLUMN_INFO['columns']
+
+    @staticmethod
+    def get_uploads_by_user(user_id, return_dict=False):
+        uploads = db.session.query(FileUpload).filter_by(user_id=user_id).all()
+        if return_dict:
+            return [dict_converter(u) for u in uploads] 
+        else:
+            return uploads
+    
+    @staticmethod
+    def get_students_results(file_upload, adding=False):
+        students = {
+            "added": [],
+            "removed": {
+                "used": [],
+                "unused": []
+            },
+            "invalid": []
+        }
+        f_path = os.path.join(file_upload.full_path, file_upload.filename)
+        f = open(f_path, "r")
+        data = list(csv.DictReader(f))
+        emails = [s['email'] for s in data]
+        if adding:
+            for st in Student.get_all_students(return_dict=True):
+                if st['email'] not in emails:
+                    if User.check_exist_with_student_email(st['email']):
+                        students['removed']['used'].append(st)
+                    else:
+                        students['removed']['unused'].append(st)
+        for s in data:
+            if len(s['gender']) == 0:
+                s['gender'] = "-"
+            if not FileUpload.check_valid_student(s):
+                students['invalid'].append(s)
+            elif adding and Student.check_new_student(s):
+                students['added'].append(s)
+            elif Student.check_student_email(s['email']):
+                student = Student.get_student_by_email(s['email'])
+                if User.check_exist_with_student_email(student['email']):
+                    students['removed']['used'].append(student)
+                else:
+                    students['removed']['unused'].append(student)
+        return students
+    
+    @staticmethod
+    def get_upload_by_id(file_id, return_dict=False):
+        upload = db.session.query(FileUpload).filter_by(id=file_id).first()
+        if return_dict:
+            dict_converter(upload)
+        else:
+            return upload
+    
+    @staticmethod
+    def fix_filename(path, filename):
+        fn = secure_filename(filename)
+        filename_list = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        if not fn:
+            fn = "file"
+        if fn in filename_list:
+            i = 1
+            new_path = os.path.join(path, filename)
+            while os.path.exists(new_path):
+                name, ext = os.path.splitext(filename)
+                fn = f"{name}_{i}{ext}"
+                new_path = os.path.join(path, fn)
+                i += 1
+        return fn
+
+    @staticmethod
+    def get_full_path(path):
+        return os.path.join(app.config['UPLOAD_FOLDER'], path)
+
 # TrApp Setup - Initializes databases and adds test trips
 class Setup:
     STUDENT_CSV = "data/students.csv"
     TEACHER_CSV = "data/teachers.csv"
     TABLE_NAMES = [User.__tablename__, Student.__tablename__, Teacher.__tablename__, Trip.__tablename__, StudentPreference.__tablename__, TripStudent.__tablename__]
+    
     initialized = False
 
     @staticmethod
@@ -677,23 +868,12 @@ class Setup:
                     admin_exists = User.check_exist_with_email(ADMIN['email'])
                     teacher_exists = User.check_exist_with_email(TEACHER['email'])
                     trips_exist = len(db.session.query(Trip).all()) == 8
+                    s_column_info_exists = FileUpload.STUDENT_COLUMN_INFO is not None
+                    t_column_info_exists = FileUpload.TEACHER_COLUMN_INFO is not None
                     if not students_exist:
-                        file = open(Setup.STUDENT_CSV, "r")
-                        data = list(csv.DictReader(file, delimiter=","))
-                        file.close()
-                        Student(id=0, name="Test Student", email="tsu@acs.sch.ae", grade=12, gender="M")
-                        for s in data:
-                            Student(name=s['name'], email=s['email'], grade=s['grade'], gender=s['gender'])
-                        print("|-> Added Students to Database")
+                        Setup.add_students()
                     elif not teachers_exist:
-                        file = open(Setup.TEACHER_CSV, "r")
-                        data = list(csv.DictReader(file, delimiter=","))
-                        file.close()
-                        Teacher(id=0, name="TSU Admin", email="tsu@acs.sch.ae", title="TSU Admin")
-                        Teacher(id=1, name="ACS Teacher", email=TEACHER['email'], title="ACS Teacher", photoUrl=TEACHER['photoUrl'])
-                        for t in data:
-                            Teacher(name=t['name'], email=t['email'], title=t['title'], photoUrl=t['photoUrl'])
-                        print("|-> Added Teachers to Database")
+                        Setup.add_teachers()
                     else:
                         if not trips_exist:
                             Setup.create_test_trips()
@@ -703,7 +883,11 @@ class Setup:
                         if not teacher_exists:
                             User(is_teacher=True, is_verified=True, name="ACS Teacher",teacher_id=1, email=TEACHER['email'], password=TEACHER['password'])
                             print("|-> Added Teacher to Database")
-                        if trips_exist and admin_exists and teacher_exists:
+                        if not s_column_info_exists:
+                            Setup.add_column_info(Student)
+                        if not t_column_info_exists:
+                            Setup.add_column_info(Teacher)
+                        if trips_exist and admin_exists and teacher_exists and s_column_info_exists and t_column_info_exists:
                             break
 
         print("|----------------[Setup Check]----------------|")
@@ -713,8 +897,33 @@ class Setup:
         print(f"|---> {admin_exists} | Admin User Exists")
         print(f"|---> {teacher_exists} | Teacher User Exists")
         print(f"|---> {trips_exist} | Test Trips Exist")
+        print(f"|---> {s_column_info_exists} | Student Column Info Exists")
+        print(f"|---> {t_column_info_exists} | Teacher Column Info Exists")
         print("|--------------[TrApp Setup End]--------------|")
     
+    @staticmethod
+    def add_students():
+        file = open(Setup.STUDENT_CSV, "r")
+        data = list(csv.DictReader(file))
+        file.close()
+        Student(id=0, name="Test Student", email="tsu@acs.sch.ae", grade=12, gender="M")
+        for s in data:
+            Student(name=s['name'], email=s['email'], grade=s['grade'], gender=s['gender'])
+        print("|-> Added Students to Database")
+    
+    @staticmethod
+    def add_teachers():
+        file = open(Setup.TEACHER_CSV, "r")
+        data = list(csv.DictReader(file))
+        file.close()
+        Teacher(id=0, name="TSU Admin", email="tsu@acs.sch.ae", title="TSU Admin")
+        Teacher(id=1, name="ACS Teacher", email=TEACHER['email'], title="ACS Teacher", photoUrl=TEACHER['photoUrl'])
+        for t in data:
+            Teacher(name=t['name'], email=t['email'], title=t['title'], photoUrl=t['photoUrl'])
+        print("|-> Added Teachers to Database")
+    
+    # Get rid of this for production
+    @staticmethod
     def create_test_trips():
         with app.app_context():
             Trip(name="WWW 2023: Grade 6 (Greece)", organizer="MS", num_groups=4, group_size=2, details="blah blah blah", students=[1, 2, 3, 4])
@@ -735,6 +944,55 @@ class Setup:
             })
             print("|-> Created Test Trips")
             #print([dict_converter(t) for t in Trip.get_all_trips()])
+
+    @staticmethod
+    def add_column_info(t):
+        def get_python_type(sqlalchemy_type):
+            type_mapping = {
+                "INTEGER": int,
+                "STRING": str,
+                "VARCHAR": str,
+                "BOOLEAN": bool,
+                "DATETIME": str,
+                # (add more later)...
+            }
+            type_name = str(sqlalchemy_type).split("(")[0].upper()
+            return type_mapping.get(type_name)
+
+        # Get the SQLAlchemy table object for the provided model class
+        table = t.__table__
+
+        # Get the column names and types as Python types
+        columns = table.columns
+        column_names = []
+        column_types = []
+        nullable_flags = []
+        max_lengths = []
+
+        for column in columns:
+            if column.name != "id": # Ignore ID column
+                column_names.append(column.name)
+                column_types.append(get_python_type(column.type))
+                nullable_flags.append(column.nullable)
+                max_lengths.append(column.type.length if isinstance(column.type, db.String) else None)
+                
+        # Create the database_info dictionary
+        database_info = {
+            "columns": column_names
+        }
+        
+        for column, column_type, nullable, max_length in zip(column_names, column_types, nullable_flags, max_lengths):
+            column_info = {
+                "type": column_type,
+                "nullable": nullable
+            }
+            if max_length is not None:
+                column_info["max_length"] = max_length
+            database_info[column] = column_info
+        if t.__tablename__ == Student.__tablename__:
+            FileUpload.STUDENT_COLUMN_INFO = database_info
+        elif t.__tablename__ == Teacher.__tablename__:
+            FileUpload.TEACHER_COLUMN_INFO = database_info
 
 # Group Class - Unused (idk why this is here), to be used in the future I guess
 class Group:
