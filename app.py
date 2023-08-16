@@ -554,6 +554,8 @@ def admin_users():
                 flash("User NOT Updated: Login Email Already Exists!", 'danger')
             elif id == current_user['db_user'].id:
                 flash("User NOT Updated: You cannot update yourself!", 'danger')
+            elif id == 0:
+                flash("User NOT Updated: You cannot update the main admin!", 'danger')
             elif user is not None:
                 user.update(data)
                 flash("User Updated!", 'success')
@@ -580,11 +582,17 @@ def admin_users():
         
         elif data['cmd'] == "deleteUser":
             user_id = data['id']
-            if user_id == current_user['db_user'].id:
+            if user_id == 0:
+                flash("You cannot delete the main admin!", 'danger')
+            elif user_id == current_user['db_user'].id:
                 flash("You cannot delete yourself!", 'danger')
             elif User.check_exist_with_id(user_id):
-                User.get_user_by_id(user_id).delete()
-                flash("User Deleted!", 'success')
+                user = User.get_user_by_id(user_id)
+                if user.is_admin and current_user['db_user'].id != 0:
+                    flash("Stop trying to delete other admins!")
+                else:
+                    user.delete()
+                    flash("User Deleted!", 'success')
 
     return render_template("admin/users.html", users=users, teachers=teachers, students=students)
 
@@ -600,7 +608,7 @@ def admin_students():
         if data['cmd'] == "updateStudent":
             student = Student.get_student_by_id(data['id'], return_dict=False)
             email_check = Student.check_student_email(data['email']) if "email" in data else True
-            if student is not None and email_check:
+            if data['id'] != 0 and student is not None and email_check:
                 student.update(data)
                 flash("Student Updated!", 'success')
             else:
@@ -619,7 +627,7 @@ def admin_students():
 
         elif data['cmd'] == "deleteStudent":
             student_id = data['id']
-            if Student.get_student_by_id(student_id) is not None:
+            if student_id != 0 and Student.get_student_by_id(student_id) is not None:
                 Student.get_student_by_id(student_id, return_dict=False).delete()
                 flash("Student Deleted!", 'success')
     return render_template("admin/students.html", students=students)
@@ -629,19 +637,20 @@ def admin_students():
 @admin_only
 def admin_students_update():
     results = {
-            "added": [],
-            "removed": {
-                "used": [],
-                "unused": []
-            },
-            "invalid": []
+        "added": [],
+        "removed": {
+            "used": [],
+            "unused": []
+        },
+        "invalid": []
     }
     uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True)
     if request.method == "POST":
-        if 'file' not in request.files:
+        action = request.form['student_action'] if 'student_action' in request.form else None
+        if 'file' not in request.files and 'student_action' not in request.form:
             data = request.get_json()
             if data['cmd'] == "deleteFiles":
-                for id in data['ids']:
+                for id in data['fileIds']:
                     file = FileUpload.get_upload_by_id(id)
                     if file is not None:
                         file.delete()
@@ -656,32 +665,36 @@ def admin_students_update():
                     Student.delete_students_with_ids(data['remove_unused'])
                 flash('Students Updated!', 'success')
         else:
-            file = request.files['file']
-            action = request.form['student_action']
-            if len(uploads) > 10:
-                flash('You have over 10 files already uploaded! Please delete some and try again.', 'danger')
-            elif file.filename == '':
-                flash('File NOT Uploaded: Name Error!', 'danger')
-            elif file:
-                adding = action == 'add'
-                if FileUpload.check_student_csv_columns(file, adding=adding):
-                    file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
-                    file_upload.save_file(file)
+            adding = action == 'add'
+            file = None
+            results_generated = False
+            print(request)
+            if 'file_select' in request.form:
+                file_upload = FileUpload.get_upload_by_id(request.form['file_select'])
+                if file_upload:
                     results = FileUpload.get_students_results(file_upload, adding=adding)
-                    if not adding and (len(results['removed']['used']) + len(results['removed']['unused'])) == 0:
-                        flash('No Valid Students to Remove!', 'warning')
-                    elif adding and len(results['added']) == 0:
-                        flash('No Valid Students to Add!', 'warning')
+                    results_generated = True
+            else:
+                file = request.files['file'] if 'file' in request.files else None
+                if len(uploads) > 10:
+                    flash('You have over 10 files already uploaded! Please delete some and try again.', 'danger')
+                elif file.filename == '':
+                    flash('File NOT Uploaded: Name Error!', 'danger')
+                elif file:
+                    if FileUpload.check_student_csv_columns(file, adding=adding):
+                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
+                        file_upload.save_file(file)
+                        results = FileUpload.get_students_results(file_upload, adding=adding)
+                        results_generated = True
                     else:
-                        flash('File Uploaded!', 'success')
-                    return render_template("admin/update-students.html", uploads=uploads, results=results)
-                else:
-                    flash('File NOT Uploaded: Colunm Error!', 'danger')   
-            elif request.form.get("file") is not None:
-                #TODO
-                return redirect(request.url)
-            return redirect(request.url)
-            
+                        flash('File NOT Uploaded: Colunm Error!', 'danger')   
+            if results_generated:
+                if not adding and (len(results['removed']['used']) + len(results['removed']['unused'])) == 0:
+                    flash('No Valid Students to Remove!', 'warning')
+                elif adding and len(results['added']) == 0:
+                    flash('No Valid Students to Add!', 'warning')
+                elif file:
+                    flash('File Uploaded!', 'success')
     return render_template("admin/update-students.html", uploads=uploads, results=results)
 
 # Manage Teachers
@@ -695,7 +708,7 @@ def admin_teachers():
         if data['cmd'] == "updateTeacher":
             teacher = Teacher.get_teacher_by_id(data['id'], return_dict=False)
             email_check = Teacher.check_teacher_email(data['email']) if "email" in data else True
-            if teacher is not None and email_check:
+            if data['id'] != 0 and teacher is not None and email_check:
                 teacher.update(data)
                 flash("Teacher Updated!", 'success')
             else:
@@ -714,8 +727,8 @@ def admin_teachers():
                 flash("Teacher NOT Added: Email Already Exists!", 'danger') 
 
         elif data['cmd'] == "deleteTeacher":
-            teacher_id = data['id']
-            if Teacher.get_teacher_by_id(teacher_id) is not None:
+            teacher_id = data['id']       
+            if teacher_id != 0 and Teacher.get_teacher_by_id(teacher_id) is not None:
                 Teacher.get_teacher_by_id(teacher_id, return_dict=False).delete()
                 flash("Teacher Deleted!", 'success')
     return render_template("admin/teachers.html", teachers=teachers)
@@ -758,3 +771,4 @@ def redo_verify():
 # |--------------------------------------------------------------------------{ Main Function :D }---------------------------------------------------------------------------|
 if __name__ == "__main__":
     app.run(debug=True)
+    # --app app.py run --debug --port 3000

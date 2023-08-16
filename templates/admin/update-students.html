@@ -215,10 +215,10 @@
     function deleteFiles() {
         $.ajax({
             type: "POST",
-            url: "/admin/students/update",
-            data: JSON.stringify({
-                cmd: "deleteFiles",
-                ids: getSelectedFiles()
+            url: "/admin/students/update/",
+            data: JSON.stringify({ 
+                cmd: "deleteFiles", 
+                fileIds: getSelectedFiles()
             }),
             contentType: "application/json",
             dataType: "json",
