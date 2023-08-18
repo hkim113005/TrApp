@@ -48,7 +48,7 @@
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(student_trips|length)%}
-        <tr onclick="window.location = 'student/{{student_trips[i].code}}'">
+        <tr onclick="window.location = '/student/{{student_trips[i].code}}'">
             <td style="width: 100%;">{{student_trips[i].name}}</td>
             <td class="text-center">{{student_trips[i].organizer}}</td>
             <td class="text-center">{{trip_studs[i]|length}}/{{student_trips[i].num_groups * student_trips[i].group_size}}</td>

@@ -448,7 +448,6 @@ def trips():
             num_groups = data['num_groups']
             group_size = data['group_size']
             teacher_id = teacher['id']
-            print(data)
             Trip(name=name, organizer=organizer, teacher_id=teacher_id, num_groups=num_groups, group_size=group_size, students=students)
             flash("New Trip Created!", 'success')
         elif data['cmd'] == "updateTeacher":
@@ -604,7 +603,6 @@ def admin_students():
     students = Student.get_all_students(return_dict=True)
     if request.method == "POST":
         data = request.get_json()
-        print(data)
         if data['cmd'] == "updateStudent":
             student = Student.get_student_by_id(data['id'], return_dict=False)
             email_check = Student.check_student_email(data['email']) if "email" in data else True
@@ -668,7 +666,6 @@ def admin_students_update():
             adding = action == 'add'
             file = None
             results_generated = False
-            print(request)
             if 'file_select' in request.form:
                 file_upload = FileUpload.get_upload_by_id(request.form['file_select'])
                 if file_upload:
@@ -737,12 +734,69 @@ def admin_teachers():
 @app.route("/admin/teachers/update/", methods=["GET", "POST"])
 @admin_only
 def admin_teachers_update():
-    return render_template("admin/update-teachers.html")
+    results = {
+        "added": [],
+        "removed": {
+            "used": [],
+            "unused": []
+        },
+        "invalid": []
+    }
+    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True)
+    if request.method == "POST":
+        action = request.form['teacher_action'] if 'teacher_action' in request.form else None
+        if 'file' not in request.files and 'teacher_action' not in request.form:
+            data = request.get_json()
+            if data['cmd'] == "deleteFiles":
+                for id in data['fileIds']:
+                    file = FileUpload.get_upload_by_id(id)
+                    if file is not None:
+                        file.delete()
+                flash('Files Deleted!', 'success')
+            elif data['cmd'] == "updateTeachers":
+                if 'add' in data:
+                    for teacher in data['add']:
+                        Teacher(name=teacher['name'], email=teacher['email'], title=teacher['title'], photoUrl=teacher['photoUrl'])
+                if 'remove_used' in data:
+                    Teacher.delete_teachers_with_ids(data['remove_used'], delete_users=True)
+                if 'remove_unused' in data:
+                    Teacher.delete_teachers_with_ids(data['remove_unused'])
+                flash('Teachers Updated!', 'success')
+        else:
+            adding = action == 'add'
+            file = None
+            results_generated = False
+            if 'file_select' in request.form:
+                file_upload = FileUpload.get_upload_by_id(request.form['file_select'])
+                if file_upload:
+                    results = FileUpload.get_teachers_results(file_upload, adding=adding)
+                    results_generated = True
+            else:
+                file = request.files['file'] if 'file' in request.files else None
+                if len(uploads) > 10:
+                    flash('You have over 10 files already uploaded! Please delete some and try again.', 'danger')
+                elif file.filename == '':
+                    flash('File NOT Uploaded: Name Error!', 'danger')
+                elif file:
+                    if FileUpload.check_teacher_csv_columns(file, adding=adding):
+                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
+                        file_upload.save_file(file)
+                        results = FileUpload.get_teachers_results(file_upload, adding=adding)
+                        results_generated = True
+                    else:
+                        flash('File NOT Uploaded: Colunm Error!', 'danger')   
+            if results_generated:
+                if not adding and (len(results['removed']['used']) + len(results['removed']['unused'])) == 0:
+                    flash('No Valid Teachers to Remove!', 'warning')
+                elif adding and len(results['added']) == 0:
+                    flash('No Valid Teachers to Add!', 'warning')
+                elif file:
+                    flash('File Uploaded!', 'success')
+    return render_template("admin/update-teachers.html", uploads=uploads, results=results)
 
 # Download Uploaded File
 @app.route('/uploads/<path>/<filename>/', methods=['GET', 'POST'])
 def download(path, filename):
-    print(path, filename)
     user_id = path.split("-")[-1]
     if not user_id.isnumeric() or filename not in [u.filename for u in FileUpload.get_uploads_by_user(int(user_id))]:
         if int(user_id) == current_user['db_user'].id:
@@ -771,4 +825,4 @@ def redo_verify():
 # |--------------------------------------------------------------------------{ Main Function :D }---------------------------------------------------------------------------|
 if __name__ == "__main__":
     app.run(debug=True)
-    # --app app.py run --debug --port 3000
+    # flask --app app.py run --debug

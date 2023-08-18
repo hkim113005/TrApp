@@ -21,7 +21,7 @@
 		{%for s in students%}
 		<tr onclick="updateStudentInfoPanel(JSON.parse('{{s.id}}'))" data-toggle="modal" data-target="#student_edit_information">
 			<td class="text-center">{{s.id}}</td>
-			<td>{{s.name}}</td>
+			<td title="{{s.email}}">{{s.name}}</td>
 			<td class="text-center">{{s.grade}}</td>
 			<td class="text-center">{{s.gender}}</td>
 		</tr>

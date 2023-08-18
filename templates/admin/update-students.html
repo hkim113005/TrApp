@@ -51,7 +51,7 @@
         <tbody>
             {%for s in results.added%}
             <tr onclick="selectRow(this)" class="selected">
-                <td>{{s.name}}</td>
+                <td title="{{s.email}}">{{s.name}}</td>
                 <td>{{s.email}}</td>
                 <td class="text-center">{{s.grade}}</td>
                 <td class="text-center">{{s.gender}}</td>
@@ -79,7 +79,7 @@
             {%for s in results.removed.unused%}
             <tr onclick="selectRow(this)" class="selected">
                 <td class="text-center">{{s.id}}</td>
-                <td>{{s.name}}</td>
+                <td title="{{s.email}}">{{s.name}}</td>
                 <td class="text-center">{{s.grade}}</td>
                 <td class="text-center">{{s.gender}}</td>
             </tr>
@@ -106,7 +106,7 @@
             {%for s in results.removed.used%}
             <tr onclick="selectRow(this)" class="selected">
                 <td class="text-center">{{s.id}}</td>
-                <td>{{s.name}}</td>
+                <td title="{{s.email}}">{{s.name}}</td>
                 <td class="text-center">{{s.grade}}</td>
                 <td class="text-center">{{s.gender}}</td>
             </tr>
@@ -120,15 +120,13 @@
     <table class="table table-5-rows table-sm table-hover mt-2 mx-auto" id="students_error">
         <thead>
             <tr>
-                <th style="width:100%;">Student Name</th>
-                <th data-type="number" class="text-center">Grade</th>
-                <th class="text-center">Gender</th>
+                <th style="width:100%;">Data</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
-            {%for s in results.invalid%}
+            {%for data in results.invalid%}
             <tr>
-                {{s}}
+                {{data}}
             </tr>
             {%endfor%}
         </tbody>
@@ -250,9 +248,9 @@
             if (id == "added") {
                 selected.push({
                     name: tds[0].textContent || tds[0].innerText, 
-                    email: tds[1].textContent || tds[1].innerText,
-                    grade: tds[2].textContent || tds[2].innerText,
-                    gender: tds[3].textContent || tds[3].innerText
+                    email: tds[0].title,
+                    grade: tds[1].textContent || tds[2].innerText,
+                    gender: tds[2].textContent || tds[3].innerText
                 });
             } else {
                 selected.push(tds[0].textContent || tds[0].innerText);

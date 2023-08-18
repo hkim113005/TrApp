@@ -18,7 +18,7 @@
         {% if groups.groupless is not none %}
             {%for student in groups.groupless%}
             <tr class={{'complete' if student_prefs[student.id] else 'incomplete'}}>
-                <td>{{student.name}}</td>
+                <td title="{{student.email}}">{{student.name}}</td>
                 <td class="text-center">{{student.grade}}</td>
                 <td class="text-center">{{student.gender}}</td>
             </tr>
@@ -53,7 +53,7 @@
                 {% if group is not none %}
                     {%for student in group%}
                     <tr class={{'complete' if student_prefs[student.id] else 'incomplete'}}>
-                        <td>{{student.name}}</td>
+                        <td title="{{student.email}}">{{student.name}}</td>
                         <td class="text-center">{{student.grade}}</td>
                         <td class="text-center">{{student.gender}}</td>
                     </tr>

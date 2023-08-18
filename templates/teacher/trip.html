@@ -75,7 +75,7 @@
     <tbody class="table-group-divider">
         {%for student in sel_students%}
         <tr class={{'complete' if student_prefs[student.id] else 'incomplete'}}>
-            <td>{{student.name}}</td>
+            <td title="{{student.email}}">{{student.name}}</td>
             <td class="text-center">{{student.grade}}</td>
             <td class="text-center">{{student.gender}}</td>
         </tr>
@@ -126,7 +126,7 @@
                     <tbody id="all_students" class="table-group-divider table-body">
                         {%for s in all_students%}
                         <tr id={{s.id}}  onclick="updateRow(this.id)">
-                            <td>{{s.name}}</td>
+                            <td title="{{s.email}}">{{s.name}}</td>
                             <td class="text-center">{{s.grade}}</td>
                             <td class="text-center">{{s.gender}}</td>
                         </tr>

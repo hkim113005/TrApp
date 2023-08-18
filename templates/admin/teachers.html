@@ -20,8 +20,8 @@
 		{%for t in teachers%}
 		<tr onclick="updateTeacherInfoPanel(JSON.parse('{{t.id}}'))" data-toggle="modal" data-target="#teacher_edit_information">
 			<td class="text-center">{{t.id}}</td>
-			<td id="{{t.title}}">{{t.name}}</td>
-			<td class="row-image text-center"><img src={{t.photoUrl}}></td>
+			<td title="{{t.email}}">{{t.name}}</td>
+			<td title="{{t.title}}" class="row-image text-center"><img src={{t.photoUrl}}></td>
 		</tr>
 		{%endfor%}
 	</tbody>
@@ -34,6 +34,13 @@
         <span>Add New Teacher</span>
     </div>
 </button>
+
+<a href="/admin/teachers/update" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
+    <div class="icon-text-container center-div">
+        <i class="fas fa-rotate"></i>
+        <span>Bulk Add/Remove Teachers</span>
+    </div>
+</a>
 
 <a href="/admin" class="mt-3 d-grid gap-2 col-6 mx-auto btn btn-primary" role="button">
     <div class="icon-text-container center-div">

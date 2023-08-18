@@ -245,6 +245,11 @@ class User (db.Model):
     def check_exist_with_student_email(email):
         s = Student.get_student_by_email(email)
         return User.get_user_by_student_id(s['id']) is not None
+    
+    @staticmethod
+    def check_exist_with_teacher_email(email):
+        t = Teacher.get_teacher_by_email(email)
+        return User.get_user_by_teacher_id(t['id']) is not None
 
 # Student Databse Model - Stores and handles student info 
 class Student(db.Model):
@@ -410,6 +415,22 @@ class Teacher(db.Model):
             return [dict_converter(t) for t in teachers] 
         else:
             return teachers
+    
+    @staticmethod
+    def check_new_teacher(teacher):
+        no_name = teacher['name'] == '' or teacher['name'] is None
+        no_email = teacher['email'] == '' or teacher['email'] is None
+        if not no_email:
+            s = Teacher.get_teacher_by_email(teacher['email'])
+        return no_name or no_email or s is None
+    
+    @staticmethod
+    def delete_teachers_with_ids(teacher_ids, delete_users=False):
+        for id in teacher_ids:
+            Teacher.get_teacher_by_id(id, return_dict=False).delete()
+            if delete_users:
+                User.get_user_by_teacher_id(id).delete()
+    
 
 # Trip Databse Model - Stores and handles trip info 
 class Trip(db.Model):
@@ -750,25 +771,42 @@ class FileUpload(db.Model):
     @staticmethod
     def check_valid_student(row):
         for key, val in row.items():
-            data = FileUpload.STUDENT_COLUMN_INFO[key]
-            is_null = val == '' or val is None
-            if is_null and is_null != data['nullable']:
-                return False         
-            if key != "gender" and 'max_length' in data:
-                if len(val) != data['max_length']:
+            if key in FileUpload.STUDENT_COLUMN_INFO.keys():
+                data = FileUpload.STUDENT_COLUMN_INFO[key]
+                is_null = val == '' or val is None
+                if is_null and is_null != data['nullable']:
+                    return False         
+                if key != "gender" and 'max_length' in data:
+                    if len(val) != data['max_length']:
+                        return False
+                if key == "grade":
+                    if int(val) < 1 or int(val) > 12:
+                        return False
+                if key == "gender" and val not in ['M', 'F', '-', '']:
                     return False
-            if key == "grade":
-                if int(val) < 1 or int(val) > 12:
-                    return False
-            if key == "gender" and val not in ['M', 'F', '-', '']:
-                return False
         return True
     
     @staticmethod
-    def check_teacher_csv_columns(file):
+    def check_valid_teacher(row):
+        for key, val in row.items():
+            if key in FileUpload.TEACHER_COLUMN_INFO.keys():
+                data = FileUpload.TEACHER_COLUMN_INFO[key]
+                is_null = val == '' or val is None
+                if is_null and is_null != data['nullable']:
+                    return False         
+                if 'max_length' in data:
+                    if len(val) != data['max_length']:
+                        return False
+        return True
+    
+    @staticmethod
+    def check_teacher_csv_columns(file, adding=False):
         f = file.stream.read().decode("utf-8").splitlines()
         data = list(csv.DictReader(f))
-        return list(dict(data[0]).keys()) == FileUpload.TEACHER_COLUMN_INFO['columns']
+        columns = list(dict(data[0]).keys())
+        if not adding:
+            return 'email' in columns
+        return columns == FileUpload.TEACHER_COLUMN_INFO['columns']
 
     @staticmethod
     def get_uploads_by_user(user_id, return_dict=False):
@@ -813,6 +851,40 @@ class FileUpload(db.Model):
                 else:
                     students['removed']['unused'].append(student)
         return students
+
+    @staticmethod
+    def get_teachers_results(file_upload, adding=False):
+        teachers = {
+            "added": [],
+            "removed": {
+                "used": [],
+                "unused": []
+            },
+            "invalid": []
+        }
+        f_path = os.path.join(file_upload.full_path, file_upload.filename)
+        f = open(f_path, "r")
+        data = list(csv.DictReader(f))
+        emails = [t['email'] for t in data]
+        if adding:
+            for teach in Teacher.get_all_teachers(return_dict=True):
+                if teach['email'] not in emails:
+                    if User.check_exist_with_teacher_email(teach['email']):
+                        teachers['removed']['used'].append(teach)
+                    else:
+                        teachers['removed']['unused'].append(teach)
+        for t in data:
+            if not FileUpload.check_valid_teacher(t):
+                teachers['invalid'].append(t)
+            elif adding and Teacher.check_new_teacher(t):
+                teachers['added'].append(t)
+            elif Teacher.check_teacher_email(t['email']):
+                teacher = Teacher.get_teacher_by_email(t['email'])
+                if User.check_exist_with_teacher_email(teacher['email']):
+                    teachers['removed']['used'].append(teacher)
+                else:
+                    teachers['removed']['unused'].append(teacher)
+        return teachers
     
     @staticmethod
     def get_upload_by_id(file_id, return_dict=False):

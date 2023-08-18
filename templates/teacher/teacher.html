@@ -57,7 +57,7 @@ Teacher
     </thead>
     <tbody class="table-group-divider">
         {%for i in range(all_trips|length)%}
-        <tr onclick="window.location = 'teacher/{{all_trips[i].code}}'">
+        <tr onclick="window.location = '/teacher/{{all_trips[i].code}}'">
             <td>{{all_trips[i].name}}</td>
             {% if not main_teacher %}
                 <td class="text-center">{{all_trips[i].organizer}}</td>
