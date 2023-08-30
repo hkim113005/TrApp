@@ -642,7 +642,7 @@ def admin_students_update():
         },
         "invalid": []
     }
-    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True)
+    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True, tag="studentCSV")
     if request.method == "POST":
         action = request.form['student_action'] if 'student_action' in request.form else None
         if 'file' not in request.files and 'student_action' not in request.form:
@@ -679,7 +679,7 @@ def admin_students_update():
                     flash('File NOT Uploaded: Name Error!', 'danger')
                 elif file:
                     if FileUpload.check_student_csv_columns(file, adding=adding):
-                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
+                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id, tag="studentCSV")
                         file_upload.save_file(file)
                         results = FileUpload.get_students_results(file_upload, adding=adding)
                         results_generated = True
@@ -742,7 +742,7 @@ def admin_teachers_update():
         },
         "invalid": []
     }
-    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True)
+    uploads = FileUpload.get_uploads_by_user(current_user['db_user'].id, return_dict=True, tag="teacherCSV")
     if request.method == "POST":
         action = request.form['teacher_action'] if 'teacher_action' in request.form else None
         if 'file' not in request.files and 'teacher_action' not in request.form:
@@ -779,7 +779,7 @@ def admin_teachers_update():
                     flash('File NOT Uploaded: Name Error!', 'danger')
                 elif file:
                     if FileUpload.check_teacher_csv_columns(file, adding=adding):
-                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id)
+                        file_upload = FileUpload(filename=file.filename, user_id=current_user['db_user'].id, tag="teacherCSV")
                         file_upload.save_file(file)
                         results = FileUpload.get_teachers_results(file_upload, adding=adding)
                         results_generated = True

@@ -736,6 +736,7 @@ class FileUpload(db.Model):
     filename = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=False, default="unknown")
     upload_date = db.Column(db.DateTime, nullable=False, default=datetime.now().replace(microsecond=0))
+    tag = db.Column(db.String, nullable=False, default="default")
 
     def __init__(self, filename, **kwargs):
         super(FileUpload, self).__init__(**kwargs)
@@ -809,8 +810,11 @@ class FileUpload(db.Model):
         return columns == FileUpload.TEACHER_COLUMN_INFO['columns']
 
     @staticmethod
-    def get_uploads_by_user(user_id, return_dict=False):
-        uploads = db.session.query(FileUpload).filter_by(user_id=user_id).all()
+    def get_uploads_by_user(user_id, return_dict=False, tag=None):
+        uploads = db.session.query(FileUpload).filter_by(user_id=user_id)
+        if tag is not None:
+            uploads = db.session.query(FileUpload).filter_by(user_id=user_id, tag=tag)
+        uploads = uploads.all()
         if return_dict:
             return [dict_converter(u) for u in uploads] 
         else:

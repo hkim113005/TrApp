@@ -18,7 +18,7 @@
     <input class="mt-2 d-grid col-6 mx-auto btn btn-primary" type="submit" value="Upload" id="fileSubmit" disabled/>
     
     <label class="d-grid form-label label-medium mt-3 mx-auto">Select Uploaded File</label>
-    <select name="file_select" id="file_select" class="mt-2 mx-auto form-select" aria-label=".form-select-sm" onchange="document.getElementById('fileSubmit2').disabled = (this.value == 'Select File');">
+    <select {% if uploads|length == 0 %} disabled {% endif %} name="file_select" id="file_select" class="mt-2 mx-auto form-select" aria-label=".form-select-sm" onchange="document.getElementById('fileSubmit2').disabled = (this.value == 'Select File');">
         <option disabled selected>Select File</option>
         {%for u in uploads%}
             <option value="{{u.id}}">{{u.filename}}</option>
