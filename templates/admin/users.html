@@ -178,17 +178,17 @@
                     <input type="text" class="mt-2 mx-auto form-control" id="user_name" placeholder="User Name" oninput="checkUserInfo()">
 
                     <div class="mt-3 form-check form-check-inline">
-						<input type="checkbox" class="form-check-input" id="user_is_admin" onchange="checkUserInfo()">
+						<input type="checkbox" class="form-check-input" id="user_is_admin" onchange="checkUserInfo();">
 						<label id="user_is_admin_label" class="label-medium form-check-label" for="user_is_admin">Admin</label>
 					</div>
 					
 					<div class="mt-3 form-check form-check-inline">
-						<input type="checkbox" class="form-check-input" id="user_is_teacher" onchange="checkUserInfo()">
+						<input type="checkbox" class="form-check-input" id="user_is_teacher" onchange="enableTeacher(this.checked); checkUserInfo();">
 						<label id="user_is_teacher_label" class="label-medium form-check-label" for="user_is_teacher">Teacher</label>
 					</div>
 					
 					<div class="mt-3 form-check form-check-inline">
-						<input type="checkbox" class="form-check-input" id="user_is_student" onchange="enableStudent(this.checked); checkUserInfo()">
+						<input type="checkbox" class="form-check-input" id="user_is_student" onchange="enableStudent(this.checked); checkUserInfo();">
 						<label id="user_is_student_label" class="label-medium form-check-label" for="user_is_student">Student</label>
 					</div>
 
@@ -351,8 +351,8 @@
 		let teacherChanged = isTeacher != u.is_teacher;
 		let studentChanged = isStudent != u.is_student;
 		let emailChanged = email != u.email;
-		let studentIdChanged = studentId != u.student_id;
-        let teacherIdChanged = teacherId != u.teacher_id;
+		let studentIdChanged = isStudent && studentId != u.student_id;
+        let teacherIdChanged = isTeacher && teacherId != u.teacher_id;
 		let passwordChanged = document.getElementById("update_password").checked && password.length > 0;
 
 		if (!updateUserData.id) {
@@ -478,9 +478,9 @@
 
 	function enableStudent(checked) {
 		let idElem1 = document.getElementById("user_student_id");
-		idElem1.disabled= !checked;
+		idElem1.disabled = !checked;
 		let idElem2 = document.getElementById("add_user_student_id");
-		idElem2.disabled= !checked;
+		idElem2.disabled = !checked;
 	}
 
     function enableTeacher(checked) {
