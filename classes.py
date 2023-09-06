@@ -531,9 +531,17 @@ class Trip(db.Model):
     # THIS IS TEMPORARY - THE ACTUAL GROUP GENERATING ALGORITHM WILL NEED TO BE IMPLEMENTED HERE
     def generate_groups(self):
         trip = dict_converter(self)
-        students = TripStudent.get_students_in_trip(self.id)
+        students = TripStudent.get_students_in_trip(self.id) # Students in this trip
+        # Get preferences of each student in local dict
         for s in students:
             s['preferences'] = StudentPreference.get_preferences(self.id, s['id'], return_prefs_only=True)
+        # Each student in the students list has their preferences in an array ([id, id, id...]) accessible through the 'preferences' attribute
+        # Preferences will be None if the student hasn't submitted them yet
+        # None is used as a filler in preference arrays to compensate for a trip not having 5 preferences
+
+        # INSERT ACTUAL ALGORITHM HERE
+
+        # PLACEHOLDER ALGORITHM BELOW
         for group_id in range(1, trip['num_groups'] + 1):
             if not students:
                 break
